@@ -5,13 +5,15 @@ All classes
 	| rows, depending on the context of the object in question.
 
 module DBI
-	connect(class, *args)
+	connect(class, *args, &block)
 		returns a database handle (dbh)
 	| class is a ruby class which corresponds to the database driver. it is no
 	| longer a string.
 	|
 	| *args is a hash with parameter -> value associations, such as :host or
 	| :username.
+	|
+	| Optionally yields a block for usage, yields a freshly connected DBH.
 	|
 	drivers
 		return an array of classes
@@ -49,6 +51,9 @@ module DBI
 	| this method, by definition, can be unpredictable in threaded environments.
 
 class DBH
+	transaction(&block)
+		returns nil
+	| opens a transaction and executes the statements in the block. Yields self.
 	table_schema(table_name)
 		returns a Schema object
 	| returns information about a specific table in a Schema object
@@ -56,19 +61,6 @@ class DBH
 		returns an array of Schema objects
 	| returns information about a specific schema, the current one if none is
 	| specified.
-	select(query, *binds)
-		returns a Result object
-	| performs a query and returns the result.
-	select_one(query, *binds)
-		returns a Result object
-	| performs a query and returns the result, only yielding the first set of
-	| items.
-	prepare(query)
-		returns a statement handle (sth)
-	| prepares a query for execution and returns a statement handle.
-	execute(query, *binds)
-		returns boolean
-	| blindly executes a query and returns some idea of success.
 	reconnect
 		returns boolean
 	| reconnects to the database
@@ -99,10 +91,26 @@ class DBH
 	| native style delegates to the underlying database connector. preprocessed
 	| means we do it.
 
+	these methods all optionally use a block and yield a result or sth depending
+	on context:
+		select(query, *binds)
+			returns a Result object
+		| performs a query and returns the result.
+		select_one(query, *binds)
+			returns a Result object
+		| performs a query and returns the result, only yielding the first set of
+		| items.
+		prepare(query)
+			returns a statement handle (sth)
+		| prepares a query for execution and returns a statement handle.
+		execute(query, *binds)
+			returns boolean
+		| blindly executes a query and returns some idea of success.
+
 class STH
 	execute(*binds)
 		returns Result
-	| executes the prepared statement
+	| executes the prepared statement. optionally yielding a result if block given.
 	driver
 		returns Object
 	| if any, returns the underlying statement handle from the database object.

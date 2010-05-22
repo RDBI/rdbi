@@ -155,6 +155,26 @@ better than your dad.
 
 @chapter class STH 
 
+@deftypemethod STH Result execute (Array @var{*binds})
+    executes the prepared statement. optionally yielding a result if block given.
+@end deftypemethod
+
+@deftypemethod STH Object driver
+    if any, returns the underlying statement handle from the database object.
+@end deftypemethod
+
+@deftypemethod STH Result last_result
+    Returns the last Result this prepared statement has yielded.
+@end deftypemethod
+
+@deftypemethod STH Boolean finish
+    finishes the statement
+@end deftypemethod
+
+@deftypemethod STH DBH dbh
+	returns the dbh this statement handle was created from.
+@end deftypemethod
+
 @page
 @node Method Index
 @unnumbered Method Index

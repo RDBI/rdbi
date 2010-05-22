@@ -190,6 +190,35 @@ better than your dad.
     disconnects all the database connections in the pool.
 @end deftypemethod
 
+@chapter class Result
+
+@deftypemethod Result {Row or Array} fetch (Integer @var{row_count})
+	fetches one row, or given an argument, row_count rows.
+@end deftypemethod
+
+@deftypemethod Result {Row or Array} fetch_all
+	fetches all rows.
+@end deftypemethod
+
+@deftypemethod Result Object fetch_struct (Class @var{kind}, Array @var{*args})
+	fetches the rows and attempts to construct a data structure out of them,
+	given a class which can do so. API for that is forthcoming.
+@end deftypemethod
+
+@deftypemethod Result Boolean finish
+	finishes the underlying statement handle and invalidates the data.
+	reloading will no longer be possible once this is called and should
+	raise (or maybe we should reprepare/execute?).
+@end deftypemethod
+
+@deftypemethod Result STH sth
+	returns the statement handle that yielded this result.	
+@end deftypemethod
+
+@deftypemethod Result Schema schema
+	returns a Schema object that corresponds to the data in this result.
+@end deftypemethod
+
 @page
 @node Method Index
 @unnumbered Method Index

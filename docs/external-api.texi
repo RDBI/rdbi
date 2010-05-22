@@ -219,6 +219,61 @@ better than your dad.
 	returns a Schema object that corresponds to the data in this result.
 @end deftypemethod
 
+@chapter class Row
+
+row is just an array, but this needs to be thought out a little more.
+
+@chapter Schema
+
+@deftypemethod Schema {Array of Column} columns
+	returns column information (see Column object below) for all elements of
+	the Schema.
+@end deftypemethod
+
+@deftypemethod Schema {Array of Symbol} table_names
+	returns table names (there may be more than one in the event of a query
+	Schema) for all the objects a part of this Schema.
+@end deftypemethod
+
+@chapter Column
+
+@deftypemethod Column String name
+@end deftypemethod
+
+@deftypemethod Column String type
+	this is the type the database yields
+@end deftypemethod
+	
+@deftypemethod Column Class ruby_type
+	Accessor. this is what ruby thinks this type should be, or you can set it directly
+	which will be used at type conversion time.
+@end deftypemethod
+
+@deftypemethod Column Integer precision 
+    (alias: length)
+	precision is the first number in a database type. it is aliased to the
+	method 'length' because sometimes that's what precision actually is
+	depending on the type.
+@end deftypemethod
+
+@deftypemethod Column Integer scale
+	scale is the second number in a database type. this is often the right
+	side of a decimal value or sometimes a factoring quotient.
+@end deftypemethod
+
+@deftypemethod Column Boolean nullable@?
+	can this column be null?
+@end deftypemethod
+	
+@deftypemethod Column String metadata
+	metadata is a bucket for things we don't understand; namely things like AUTOINCREMENT.
+@end deftypemethod
+
+@deftypemethod Column String default 
+	default is the column default -- this is provided for informational
+	aspects only and should not be used for anything sane.
+@end deftypemethod
+
 @page
 @node Method Index
 @unnumbered Method Index

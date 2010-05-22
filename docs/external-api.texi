@@ -22,80 +22,138 @@ better than your dad.
 @chapter All Classes
 
 @deftypemethod {All Classes} Boolean reload
-
-this method will semantically refresh items, such as Schema objects or
-rows, depending on the context of the object in question.
-
+    this method will semantically refresh items, such as Schema objects or
+    rows, depending on the context of the object in question.
 @end deftypemethod
 
 @chapter module DBI
 
 @deftypemethod DBI DBH connect (Class @var{klass}, Array @var{*args}, Proc @var{&block})
+    class is a ruby class which corresponds to the database driver. it is no longer
+    a string.
 
-class is a ruby class which corresponds to the database driver. it is no longer
-a string.
+    *args is a hash with parameter -> value associations, such as :host or
+    :username.
 
-*args is a hash with parameter -> value associations, such as :host or
-:username.
-
-Optionally yields a block for usage, yields a freshly connected DBH.
-
+    Optionally yields a block for usage, yields a freshly connected DBH.
 @end deftypemethod
 
 @deftypemethod DBI {Array of Class} drivers
-
-accessor to get at known classes that can be used as drivers.
-
+    accessor to get at known classes that can be used as drivers.
 @end deftypemethod
 
 @deftypemethod DBI DBH connect_cached (Class @var{klass}, Array @var{*args})
-	
-connect to a new resource if one is required (or desired, see below) with
-similar parameters as connect().
+    connect to a new resource if one is required (or desired, see below) with
+    similar parameters as connect().
 
-additional arguments :pool_name and :pool_size can be used to define a
-Pool (object, see below) which holds a specific subset of connected
-database handles. Playing with the size here introduces the ability for
-connect_cached to maintain a minimum number of connections which can be
-re-used over the lifetime of a program.
-
+    additional arguments :pool_name and :pool_size can be used to define a
+    Pool (object, see below) which holds a specific subset of connected
+    database handles. Playing with the size here introduces the ability for
+    connect_cached to maintain a minimum number of connections which can be
+    re-used over the lifetime of a program.
 @end deftypemethod
 
 @deftypemethod DBI Pool pool (String @var{pool_name})
-
-a pool as described above is an array of database handles. this returns
-that data as a "Pool" object, with its own API. See later on in the
-document.
-
+    a pool as described above is an array of database handles. this returns
+    that data as a "Pool" object, with its own API. See later on in the
+    document.
 @end deftypemethod
 
 @deftypemethod DBI Pool all_connections
-
-similar to pool(), this returns all the connections, but ignores pools.
-
+    similar to pool(), this returns all the connections, but ignores pools.
 @end deftypemethod
 
 @deftypemethod DBI Integer ping (Class @var{klass}, Array @var{*args})
-
-similar to connect(), this issues a ping to the databases. This may issue
-a connect() before the ping() to do it properly depending on the database
-implementation.
-
+    similar to connect(), this issues a ping to the databases. This may issue
+    a connect() before the ping() to do it properly depending on the database
+    implementation.
 @end deftypemethod
 
 @deftypemethod DBI Boolean reconnect_all
-
-reconnects all the known database handles.
-
+    reconnects all the known database handles.
 @end deftypemethod
 
 @deftypemethod DBI DBH last_dbh
+    returns the last returned dbh from connect() or connect_cached()
 
-returns the last returned dbh from connect() or connect_cached()
-
-this method, by definition, can be unpredictable in threaded environments.
-
+    this method, by definition, can be unpredictable in threaded environments.
 @end deftypemethod
+
+@chapter class DBH
+
+@deftypemethod DBH NilClass transaction (Proc @var{&block})
+    opens a transaction and executes the statements in the block. Yields self.
+@end deftypemethod
+
+@deftypemethod DBH Schema table_schema (Symbol @var{table_name})
+    returns information about a specific table in a Schema object
+@end deftypemethod
+
+@deftypemethod DBH {Array of Schema} schema (Symbol @var{schema_name})
+    returns information about a specific schema, the current one if none is
+    specified.
+@end deftypemethod
+
+@deftypemethod DBH Boolean reconnect
+    reconnects to the database
+@end deftypemethod
+
+@deftypemethod DBH Integer ping
+    attempts to contact the database, measuring round-trip.
+@end deftypemethod
+
+@deftypemethod DBH Object driver
+    returns the underlying driver.
+@end deftypemethod
+
+@deftypemethod DBH String last_query
+    returns the last query executed or prepared.
+@end deftypemethod
+
+@deftypemethod DBH STH last_sth
+    returns the last statement handle prepared.
+@end deftypemethod
+
+@deftypemethod DBH Mutex mutex
+    returns the mutex for this database. thread management will be per-dbh.
+@end deftypemethod
+
+@deftypemethod DBH String preprocess_query (String @var{query})
+    preprocesses the query and returns what it would look like right before
+    it gets sent to the database.
+@end deftypemethod
+
+@deftypemethod DBH Boolean disconnect
+    disconnects from the database. returns success.
+@end deftypemethod
+
+@deftypemethod DBH Symbol bind_style ({Symbol of [native, preprocessed]} @var{style})
+    Accessor. Native style delegates to the underlying database connector. preprocessed
+    means we do it.
+@end deftypemethod
+
+@section Query Methods
+    these methods all optionally use a block and yield a result or sth depending
+    on context:
+		
+@deftypemethod DBH Result select (String @var{query}, Array @var{*binds})
+    performs a query and returns the result.
+@end deftypemethod
+
+@deftypemethod DBH Result select_one (String @var{query}, Array @var{*binds})
+    performs a query and returns the result, only yielding the first set of
+    items.
+@end deftypemethod
+
+@deftypemethod DBH STH prepare (String @var{query})
+    prepares a query for execution and returns a statement handle.
+@end deftypemethod
+
+@deftypemethod DBH Boolean execute (String @var{query}, Array @var{*binds})
+    blindly executes a query and returns some idea of success.
+@end deftypemethod
+
+@chapter class STH 
 
 @page
 @node Method Index

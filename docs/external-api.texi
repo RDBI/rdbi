@@ -135,7 +135,7 @@ better than your dad.
 @section Query Methods
     these methods all optionally use a block and yield a result or sth depending
     on context:
-		
+        
 @deftypemethod DBH Result select (String @var{query}, Array @var{*binds})
     performs a query and returns the result.
 @end deftypemethod
@@ -172,7 +172,22 @@ better than your dad.
 @end deftypemethod
 
 @deftypemethod STH DBH dbh
-	returns the dbh this statement handle was created from.
+    returns the dbh this statement handle was created from.
+@end deftypemethod
+
+@chapter class Pool
+
+@deftypemethod Pool Boolean reconnect
+    attempts to reconnect the entire pool of database connections.
+@end deftypemethod
+
+@deftypemethod Pool Integer ping
+    attempts to ping and average the response time of all database
+    connections.
+@end deftypemethod
+
+@deftypemethod Pool Boolean disconnect
+    disconnects all the database connections in the pool.
 @end deftypemethod
 
 @page

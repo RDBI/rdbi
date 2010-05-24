@@ -151,22 +151,12 @@ better than your dad.
     on context:
 
 
-
-@deftypemethod DBH Result select (String @var{query}, Array @var{*binds})
-    performs a query and returns the result.
-@end deftypemethod
-
-@deftypemethod DBH Result select_one (String @var{query}, Array @var{*binds})
-    performs a query and returns the result, only yielding the first set of
-    items.
-@end deftypemethod
-
 @deftypemethod DBH STH prepare (String @var{query})
     prepares a query for execution and returns a statement handle.
 @end deftypemethod
 
-@deftypemethod DBH Boolean execute (String @var{query}, Array @var{*binds})
-    blindly executes a query and returns some idea of success.
+@deftypemethod DBH Result execute (String @var{query}, Array @var{*binds})
+    executes a query and returns a result.
 @end deftypemethod
 
 
@@ -222,6 +212,10 @@ better than your dad.
 @chapter class Result
 
 
+
+@deftypemethod Result Integer rows
+    If available, returns the number of rows in this result. Else, nil.
+@end deftypemethod
 
 @deftypemethod Result Array binds
     accessor for the binds that created this method

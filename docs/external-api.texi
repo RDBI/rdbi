@@ -148,7 +148,9 @@ better than your dad.
 
 @section Query Methods
     these methods all optionally use a block and yield a result or sth depending
-    on context:
+    on context. Additionally in async environments, they return immediately,
+    the block being transformed into a callback which will yield when the query
+    completes.
 
 
 @deftypemethod DBH STH prepare (String @var{query})

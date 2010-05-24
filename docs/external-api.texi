@@ -19,14 +19,22 @@ better than your dad.
 @contents
 @node Top
 
+
+
 @chapter All Classes
+
+
 
 @deftypemethod {All Classes} Boolean reload
     this method will semantically refresh items, such as Schema objects or
     rows, depending on the context of the object in question.
 @end deftypemethod
 
+
+
 @chapter module DBI
+
+
 
 @deftypemethod DBI DBH connect (Class @var{klass}, Array @var{*args}, Proc @var{&block})
     class is a ruby class which corresponds to the database driver. it is no longer
@@ -79,7 +87,11 @@ better than your dad.
     this method, by definition, can be unpredictable in threaded environments.
 @end deftypemethod
 
+
+
 @chapter class DBH
+
+
 
 @deftypemethod DBH NilClass transaction (Proc @var{&block})
     opens a transaction and executes the statements in the block. Yields self.
@@ -132,10 +144,14 @@ better than your dad.
     means we do it.
 @end deftypemethod
 
+
+
 @section Query Methods
     these methods all optionally use a block and yield a result or sth depending
     on context:
-        
+
+
+
 @deftypemethod DBH Result select (String @var{query}, Array @var{*binds})
     performs a query and returns the result.
 @end deftypemethod
@@ -153,7 +169,14 @@ better than your dad.
     blindly executes a query and returns some idea of success.
 @end deftypemethod
 
+
+
 @chapter class STH 
+
+
+@deftypemethod STH String query
+    accessor for the query that was used to generate this sth.
+@end deftypemethod
 
 @deftypemethod STH Result execute (Array @var{*binds})
     executes the prepared statement. optionally yielding a result if block given.
@@ -175,7 +198,11 @@ better than your dad.
     returns the dbh this statement handle was created from.
 @end deftypemethod
 
+
+
 @chapter class Pool
+
+
 
 @deftypemethod Pool Boolean reconnect
     attempts to reconnect the entire pool of database connections.
@@ -190,19 +217,32 @@ better than your dad.
     disconnects all the database connections in the pool.
 @end deftypemethod
 
+
+
 @chapter class Result
 
-@deftypemethod Result {Row or Array} fetch (Integer @var{row_count})
-	fetches one row, or given an argument, row_count rows.
+
+
+@deftypemethod Result Array binds
+    accessor for the binds that created this method
 @end deftypemethod
 
-@deftypemethod Result {Row or Array} fetch_all
-	fetches all rows.
-@end deftypemethod
+@deftypemethod Result Object fetch (Integer @var{row_count}, [Class @var{kind}, Array @var{*args}])
+    fetches one row, or given an argument, @var{row_count} rows. If given a
+    Class and arguments, uses it to interpret the array. The class is
+    constructed with the arguments provided at the end, and then a method also
+    called fetch() is attempted with the row count, with the number of arrays
+    fetched from the DB passed to it. 
+    
+    Especially for specific class designations, (XML formatting is a good
+    example) output formats may not necessarily equate to a single row, in that
+    case, one "unit" should be returned, and this entailings of this unit
+    should be specified.
 
-@deftypemethod Result Object fetch_struct (Class @var{kind}, Array @var{*args})
-	fetches the rows and attempts to construct a data structure out of them,
-	given a class which can do so. API for that is forthcoming.
+    If this data is not provided, fetch yields a standard array with type
+    converted items. 
+
+    If the row_count is ":all", fetches all outstanding rows.
 @end deftypemethod
 
 @deftypemethod Result Boolean finish
@@ -219,11 +259,23 @@ better than your dad.
 	returns a Schema object that corresponds to the data in this result.
 @end deftypemethod
 
+
+
+@chapter class CursorResult < Result
+
+This class is just a cursor-oriented method of transmitting results. 
+
+
+
 @chapter class Row
 
 row is just an array, but this needs to be thought out a little more.
 
+
+
 @chapter Schema
+
+
 
 @deftypemethod Schema {Array of Column} columns
 	returns column information (see Column object below) for all elements of
@@ -235,7 +287,11 @@ row is just an array, but this needs to be thought out a little more.
 	Schema) for all the objects a part of this Schema.
 @end deftypemethod
 
+
+
 @chapter Column
+
+
 
 @deftypemethod Column String name
 @end deftypemethod

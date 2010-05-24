@@ -230,9 +230,8 @@ better than your dad.
 @deftypemethod Result Object fetch (Integer @var{row_count}, [Class @var{kind}, Array @var{*args}])
     fetches one row, or given an argument, @var{row_count} rows. If given a
     Class and arguments, uses it to interpret the array. The class is
-    constructed with the arguments provided at the end, and then a method also
-    called fetch() is attempted with the row count, with the number of arrays
-    fetched from the DB passed to it. 
+    constructed with the result object and the arguments provided at the end,
+    and then a method called fetch() is attempted with the row count.
     
     Especially for specific class designations, (XML formatting is a good
     example) output formats may not necessarily equate to a single row, in that
@@ -243,6 +242,11 @@ better than your dad.
     converted items. 
 
     If the row_count is ":all", fetches all outstanding rows.
+@end deftypemethod
+
+@deftypemethod Result {Array of Object} raw_fetch (Integer @var{row_count})
+    Raw fetch performs no conversions -- returns an array of objects yielding
+    whatever the underlying driver gave us. 
 @end deftypemethod
 
 @deftypemethod Result Boolean finish

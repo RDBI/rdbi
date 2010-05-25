@@ -158,7 +158,8 @@ better than your dad.
 @end deftypemethod
 
 @deftypemethod DBH Result execute (String @var{query}, Array @var{*binds})
-    executes a query and returns a result.
+    executes a query and returns a result. If a block is not provided, an async
+    result will be provided which will slowly result in items being fetchable.
 @end deftypemethod
 
 
@@ -215,6 +216,24 @@ better than your dad.
 
 
 
+@deftypemethod Result Boolean complete?
+    Always returns true in a sync environment. In an async environment, only
+    returns true if all result processing has been completed.
+@end deftypemethod
+
+@deftypemethod Result Boolean has_data?
+    Always returns true in a sync environment. In an async environment, only
+    returns true if there is outstanding data to fetch.
+@end deftypemethod
+
+@deftypemethod Result Boolean eof?
+    Returns true if all results have been fetched.
+@end deftypemethod
+
+@deftypemethod Result NilClass rewind
+    resets the fetch iterator to the beginning. See also: #reload.
+@end deftypemethod
+
 @deftypemethod Result Integer rows
     If available, returns the number of rows in this result. Else, nil.
 @end deftypemethod
@@ -223,21 +242,24 @@ better than your dad.
     accessor for the binds that created this method
 @end deftypemethod
 
-@deftypemethod Result Object fetch (Integer @var{row_count}, [Class @var{kind}, Array @var{*args}])
-    fetches one row, or given an argument, @var{row_count} rows. If given a
-    Class and arguments, uses it to interpret the array. The class is
+@deftypemethod Result NilClass as (Class @var{kind}, Array @var{*args})
+    Given a Class and arguments, uses it to interpret the array. The class is
     constructed with the result object and the arguments provided at the end,
     and then a method called fetch() is attempted with the row count.
     
     Especially for specific class designations, (XML formatting is a good
     example) output formats may not necessarily equate to a single row, in that
-    case, one "unit" should be returned, and this entailings of this unit
-    should be specified.
+    case, one "unit" should be returned from #fetch, and this entailings of
+    this unit should be specified in the driver.
 
-    If this data is not provided, fetch yields a standard array with type
+    If this this method is not called, fetch yields a standard array with type
     converted items. 
+@end deftypemethod
 
-    If the row_count is ":all", fetches all outstanding rows.
+@deftypemethod Result Object fetch (Integer @var{row_count})
+    fetches one item, or given an argument, @var{row_count} rows.  If the
+    row_count is ":all", fetches all outstanding rows. See #as for how rows may
+    be interpreted.
 @end deftypemethod
 
 @deftypemethod Result {Array of Object} raw_fetch (Integer @var{row_count})
@@ -259,6 +281,11 @@ better than your dad.
 	returns a Schema object that corresponds to the data in this result.
 @end deftypemethod
 
+@deftypemethod Result NilClass each (@var{&block})
+    similar to calling fetch iteratively with a callback. With proper async
+    driver support, will register a callback from the block which will only
+    process when there are new rows to be had.
+@end deftypemethod
 
 
 @chapter class CursorResult < Result

@@ -58,6 +58,7 @@ class RDBI::Pool
 
     attr_reader :handles
     attr_reader :last_index
+    attr_reader :max
 
     def initialize(name, connect_args, max=5)
         @handles      = []
@@ -69,7 +70,7 @@ class RDBI::Pool
    
     def ping
         reconnect_if_disconnected
-        @handles.map { |x| x.ping || 0 } / @handles.size
+        @handles.inject(1) { |x,y| x + (y.ping || 1) } / @handles.size
     end
 
     def reconnect
@@ -91,14 +92,15 @@ class RDBI::Pool
     end
 
     def add(dbh)
-        dbh = *MethLab.validate_array_params([RDBI::Database], dbh)
+        dbh = *MethLab.validate_array_params([RDBI::Database], [dbh])
         raise dbh if dbh.kind_of?(Exception)
 
-        if ((@handles.size + 1) == @max)
+        if @handles.size >= @max
             raise ArgumentError, "too many handles in this pool (max: #{@max})"
         end
 
         @handles << dbh
+        return self
     end
 
     # XXX: does not disconnect the dbh - intentional
@@ -111,22 +113,25 @@ class RDBI::Pool
     def cull(max=5)
         in_pool = @handles.select(&:connected?)
 
-        unless ((in_pool.size + 1) >= max)
+        unless (in_pool.size >= max)
             disconnected = @handles.select { |x| !x.connected? }
             if disconnected.size > 0
-                in_pool += disconnected[0..(max - connected.size - 1)]
+                in_pool += disconnected[0..(max - in_pool.size)]
             end
         else
             in_pool = in_pool[0..(max-1)]
         end
 
-        rejected = @handles - connected
+        rejected = @handles - in_pool
+
+        @max = max
+        @handles = in_pool
 
         return rejected
     end
 
     def get_dbh
-        if @last_index == @max
+        if @last_index >= @max
             @last_index = 0
         end
 

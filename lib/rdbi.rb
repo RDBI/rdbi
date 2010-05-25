@@ -59,32 +59,42 @@ class RDBI::Pool
     attr_reader :handles
     attr_reader :last_index
     attr_reader :max
+    attr_reader :mutex
 
     def initialize(name, connect_args, max=5)
         @handles      = []
         @connect_args = connect_args
         @max          = max
         @last_index   = 0
+        @mutex        = Mutex.new
         self.class[name] = self
     end
    
     def ping
         reconnect_if_disconnected
-        @handles.inject(1) { |x,y| x + (y.ping || 1) } / @handles.size
+        @mutex.synchronize do 
+            @handles.inject(1) { |x,y| x + (y.ping || 1) } / @handles.size
+        end
     end
 
     def reconnect
-        @handles.each(&:reconnect)
+        @mutex.synchronize do 
+            @handles.each(&:reconnect)
+        end
     end
 
     def reconnect_if_disconnected
-        @handles.each do |dbh|
-            dbh.reconnect unless dbh.connected?
+        @mutex.synchronize do 
+            @handles.each do |dbh|
+                dbh.reconnect unless dbh.connected?
+            end
         end
     end
 
     def disconnect
-        @handles.each(&:disconnect)
+        @mutex.synchronize do
+            @handles.each(&:disconnect)
+        end
     end
 
     def add_connection
@@ -95,58 +105,65 @@ class RDBI::Pool
         dbh = *MethLab.validate_array_params([RDBI::Database], [dbh])
         raise dbh if dbh.kind_of?(Exception)
 
-        if @handles.size >= @max
-            raise ArgumentError, "too many handles in this pool (max: #{@max})"
+        @mutex.synchronize do
+            if @handles.size >= @max
+                raise ArgumentError, "too many handles in this pool (max: #{@max})"
+            end
+
+            @handles << dbh
         end
 
-        @handles << dbh
         return self
     end
 
     # XXX: does not disconnect the dbh - intentional
     def remove(dbh)
-        @handles.reject! { |x| x.object_id == dbh.object_id }
+        @mutex.synchronize do
+            @handles.reject! { |x| x.object_id == dbh.object_id }
+        end
     end
 
     # XXX: does not disconnect the dbh - intentional
     #      will prefer disconnected database handles to remove
     def cull(max=5)
-        in_pool = @handles.select(&:connected?)
+        @mutex.synchronize do
+            in_pool = @handles.select(&:connected?)
 
-        unless (in_pool.size >= max)
-            disconnected = @handles.select { |x| !x.connected? }
-            if disconnected.size > 0
-                in_pool += disconnected[0..(max - in_pool.size - 1)]
+            unless (in_pool.size >= max)
+                disconnected = @handles.select { |x| !x.connected? }
+                if disconnected.size > 0
+                    in_pool += disconnected[0..(max - in_pool.size - 1)]
+                end
+            else
+                in_pool = in_pool[0..(max-1)]
             end
-        else
-            in_pool = in_pool[0..(max-1)]
+
+            rejected = @handles - in_pool
+
+            @max = max
+            @handles = in_pool
+            rejected
         end
-
-        rejected = @handles - in_pool
-
-        @max = max
-        @handles = in_pool
-
-        return rejected
     end
 
     def get_dbh
-        if @last_index >= @max
-            @last_index = 0
+        @mutex.synchronize do
+            if @last_index >= @max
+                @last_index = 0
+            end
+
+            # XXX this is longhand for "make sure it's connected before we hand it
+            #     off"
+            if @handles[@last_index] and !@handles[@last_index].connected?
+                @handles[@last_index].reconnect
+            elsif !@handles[@last_index]
+                @handles[@last_index] = RDBI.connect(*@connect_args)
+            end
+
+            dbh = @handles[@last_index]
+            @last_index += 1
+            dbh
         end
-
-        # XXX this is longhand for "make sure it's connected before we hand it
-        #     off"
-        if @handles[@last_index] and !@handles[@last_index].connected?
-            @handles[@last_index].reconnect
-        elsif !@handles[@last_index]
-            @handles[@last_index] = RDBI.connect(*@connect_args)
-        end
-
-        dbh = @handles[@last_index]
-        @last_index += 1
-
-        return dbh
     end
 end
 

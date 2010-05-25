@@ -50,7 +50,7 @@ better than your dad.
     accessor to get at known classes that can be used as drivers.
 @end deftypemethod
 
-@deftypemethod DBI DBH connect_cached (Class @var{klass}, Array @var{*args})
+@deftypemethod DBI DBH connect_cached (Class @var{klass}, Array @var{*args}, Proc @var{&block})
     connect to a new resource if one is required (or desired, see below) with
     similar parameters as connect().
 

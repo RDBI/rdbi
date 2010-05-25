@@ -47,6 +47,12 @@ class TestPool < Test::Unit::TestCase
         assert_kind_of(RDBI::Database, dbh)
         assert(dbh.connected?)
         assert_equal(1, pool.last_index)
+
+        pool = create_pool(:test_03_2)
+        5.times do
+            dbh = pool.get_dbh
+            assert(dbh.connected?)
+        end
     end
 
     def test_04_remove
@@ -66,6 +72,12 @@ class TestPool < Test::Unit::TestCase
 
         pool.handles.each do |dbh|
             assert(!dbh.connected?)
+        end
+       
+        pool.reconnect
+
+        pool.handles.each do |dbh|
+            assert(dbh.connected?)
         end
     end
 
@@ -96,6 +108,23 @@ class TestPool < Test::Unit::TestCase
         end
 
         assert_equal(1, pool.last_index)
+
+        pool = create_pool(:test_07_2)
+        pool.add_connection
+        handles = pool.cull(2)
+        assert_equal([], handles)
+       
+        # check the ability to cull disconnected objects automatically while
+        # preferring connected ones.
+        pool = create_pool(:test_07_3)
+        5.times { pool.add_connection }
+        dbh = pool.get_dbh
+        pool.disconnect
+        dbh.reconnect
+        handles = pool.cull(2)
+        assert_equal(2, pool.handles.size)
+        assert_equal(3, handles.size)
+        assert(!handles.map(&:object_id).include?(dbh.object_id))
     end
 end
 

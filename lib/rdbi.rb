@@ -116,7 +116,7 @@ class RDBI::Pool
         unless (in_pool.size >= max)
             disconnected = @handles.select { |x| !x.connected? }
             if disconnected.size > 0
-                in_pool += disconnected[0..(max - in_pool.size)]
+                in_pool += disconnected[0..(max - in_pool.size - 1)]
             end
         else
             in_pool = in_pool[0..(max-1)]

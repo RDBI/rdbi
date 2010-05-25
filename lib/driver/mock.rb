@@ -8,12 +8,11 @@ module RDBI
             end
 
             def initialize(*args)
-                # FIXME emacros
-                @hash = args[0]
+                @connect_args = args
             end
 
             def get_handle
-                return DBH.new 
+                return DBH.new(*@connect_args)
             end
         end
     end

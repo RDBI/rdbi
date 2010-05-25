@@ -43,19 +43,17 @@ module RDBI
     end
 end
 
-class Pool
+class RDBI::Pool
     class << self
-        attr_reader :pools
+        def [](name)
+            @pools ||= { }
+            @pools[name.to_sym]
+        end
 
-        @pools = { }
-    end
-
-    def self.[](name)
-        pools[name.to_sym]
-    end
-
-    def self.[]=(name, value)
-        pools[name.to_sym] = value
+        def []=(name, value)
+            @pools ||= { }
+            @pools[name.to_sym] = value
+        end
     end
 
     attr_reader :handles
@@ -66,6 +64,7 @@ class Pool
         @connect_args = connect_args
         @max          = max
         @last_index   = 0
+        self.class[name] = self
     end
    
     def ping
@@ -131,6 +130,8 @@ class Pool
             @last_index = 0
         end
 
+        # XXX this is longhand for "make sure it's connected before we hand it
+        #     off"
         if @handles[@last_index] and !@handles[@last_index].connected?
             @handles[@last_index].reconnect
         elsif !@handles[@last_index]
@@ -148,17 +149,23 @@ class RDBI::Database
     # FIXME methlab controls to inline a bunch of crap
    
     attr_reader :connected
-    alias_method :connected, :connected?
+    alias_method :connected?, :connected
 
     def ping
-        nil
+        raise NoMethodError, "ping is not implemented in this driver" 
     end
 
-    def initialize
+    def initialize(*args)
+        # FIXME symbolify
+        @connect_args = args[0]
         @connected = true
     end
 
-    def disconnected
+    def reconnect
+        @connected = true
+    end
+
+    def disconnect
         @connected = false
     end
 end

@@ -1,7 +1,7 @@
 require 'helper'
 
-class TestRDBI< Test::Unit::TestCase
-    def test_connect
+class TestRDBI < Test::Unit::TestCase
+    def test_01_connect
         dbh = RDBI.connect(:Mock, :username => :foo, :password => :bar)
         assert(dbh)
         assert_kind_of(RDBI::Database, dbh)
@@ -15,14 +15,14 @@ class TestRDBI< Test::Unit::TestCase
         assert_kind_of(RDBI::Database, dbh)
     end
 
-    def test_last_dbh
+    def test_02_last_dbh
         dbh = mock_connect
 
         assert(RDBI.last_dbh)
         assert(dbh.object_id == RDBI.last_dbh.object_id)
     end
 
-    def test_ping
+    def test_03_ping
         assert_equal(10, RDBI.ping(:Mock, :some => :arg))
         assert_equal(10, mock_connect.ping)
     end

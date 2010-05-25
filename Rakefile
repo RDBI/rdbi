@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'rake'
-gem 'test-unit'
 
 begin
   require 'jeweler'
@@ -11,6 +10,11 @@ begin
     gem.email = "erik@hollensbe.org"
     gem.homepage = "http://github.com/erikh/rdbi"
     gem.authors = ["Erik Hollensbe"]
+
+    gem.add_development_dependency 'test-unit'
+
+    gem.add_dependency 'methlab'
+
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -18,12 +22,20 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
+begin
+    gem 'test-unit'
+    require 'rake/testtask'
+    Rake::TestTask.new(:test) do |test|
+        test.libs << 'lib' << 'test'
+        test.pattern = 'test/**/test_*.rb'
+        test.verbose = true
+    end
+rescue LoadError
+    task :test do
+        abort "test-unit gem is not available. In order to run test-unit, you must: sudo gem install test-unit"
+    end
 end
+
 
 begin
   require 'rcov/rcovtask'
@@ -39,19 +51,6 @@ rescue LoadError
 end
 
 task :test => :check_dependencies
-
-begin
-  require 'reek/adapters/rake_task'
-  Reek::RakeTask.new do |t|
-    t.fail_on_error = true
-    t.verbose = false
-    t.source_files = 'lib/**/*.rb'
-  end
-rescue LoadError
-  task :reek do
-    abort "Reek is not available. In order to run reek, you must: sudo gem install reek"
-  end
-end
 
 begin
   require 'roodi'

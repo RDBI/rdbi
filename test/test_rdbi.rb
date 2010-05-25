@@ -27,3 +27,5 @@ class TestRDBI< Test::Unit::TestCase
         assert_equal(10, mock_connect.ping)
     end
 end
+
+# vim: syntax=ruby ts=4 et sw=4 sts=4

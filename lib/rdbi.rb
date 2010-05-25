@@ -21,7 +21,7 @@ module RDBI
                 end
 
         driver = klass.new(*args)
-        dbh = driver.get_handle
+        dbh = @last_dbh = driver.get_handle
         yield dbh if block_given?
         return dbh
     end
@@ -40,7 +40,7 @@ module RDBI
     end
 end
 
-class RDBI::Handle
+class RDBI::Database
     def ping
         nil
     end

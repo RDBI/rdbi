@@ -1,7 +1,7 @@
 module RDBI
     module Driver
         class Mock
-            class DBH < RDBI::Handle
+            class DBH < RDBI::Database
                 def ping
                     10
                 end

@@ -1,12 +1,13 @@
 require 'rubygems'
 require 'rake'
+gem 'test-unit'
 
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "rdbi"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{RDBI provides sane query-level database access with low magic.}
+    gem.description = %Q{RDBI is a rearchitecture of the Ruby/DBI project by its maintainer and others. It intends to fully supplant Ruby/DBI in the future for similar database access needs.}
     gem.email = "erik@hollensbe.org"
     gem.homepage = "http://github.com/erikh/rdbi"
     gem.authors = ["Erik Hollensbe"]

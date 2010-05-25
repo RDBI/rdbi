@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## MAC OS
 .DS_Store
 
@@ -20,7 +19,6 @@ rdoc
 pkg
 
 ## PROJECT::SPECIFIC
-=======
 *.aux
 *.cp
 *.fn
@@ -31,4 +29,3 @@ pkg
 *.toc
 *.tp
 *.vr
->>>>>>> origin/master

@@ -87,11 +87,11 @@ class TestPool < Test::Unit::TestCase
         assert_equal(10, pool.ping)
     end
 
-    def test_07_cull
+    def test_07_resize
         pool = create_pool(:test_07).add_connection
         4.times { pool.add_connection }
 
-        handles = pool.cull(2) 
+        handles = pool.resize(2) 
 
         assert_equal(2, pool.max)
 
@@ -111,7 +111,7 @@ class TestPool < Test::Unit::TestCase
 
         pool = create_pool(:test_07_2)
         pool.add_connection
-        handles = pool.cull(2)
+        handles = pool.resize(2)
         assert_equal([], handles)
        
         # check the ability to cull disconnected objects automatically while
@@ -121,7 +121,7 @@ class TestPool < Test::Unit::TestCase
         dbh = pool.get_dbh
         pool.disconnect
         dbh.reconnect
-        handles = pool.cull(2)
+        handles = pool.resize(2)
         assert_equal(2, pool.handles.size)
         assert_equal(3, handles.size)
         assert(!handles.map(&:object_id).include?(dbh.object_id))

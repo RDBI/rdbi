@@ -1,0 +1,365 @@
+\input texinfo
+@setfilename external-api.texi
+@settitle RDBI External API specification 1.0 draft
+
+@copying
+Copyright @copyright{} 2010 Erik Hollensbe. My dad can distribute this work
+better than your dad.
+@end copying
+
+@titlepage
+@title RDBI External API specification 1.0 draft
+@author Erik Hollensbe <erik@@hollensbe.org>
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+
+@end titlepage
+
+@contents
+@node Top
+
+
+
+@chapter All Classes
+
+
+
+@deftypemethod {All Classes} Boolean reload
+    this method will semantically refresh items, such as Schema objects or
+    rows, depending on the context of the object in question.
+@end deftypemethod
+
+
+
+@chapter module DBI
+
+
+
+@deftypemethod DBI DBH connect (Class @var{klass}, Array @var{*args}, Proc @var{&block})
+    class is a ruby class which corresponds to the database driver. it is no longer
+    a string.
+
+    *args is a hash with parameter -> value associations, such as :host or
+    :username.
+
+    Optionally yields a block for usage, yields a freshly connected DBH.
+@end deftypemethod
+
+@deftypemethod DBI {Array of Class} drivers
+    accessor to get at known classes that can be used as drivers.
+@end deftypemethod
+
+@deftypemethod DBI DBH connect_cached (Class @var{klass}, Array @var{*args})
+    connect to a new resource if one is required (or desired, see below) with
+    similar parameters as connect().
+
+    additional arguments :pool_name and :pool_size can be used to define a
+    Pool (object, see below) which holds a specific subset of connected
+    database handles. Playing with the size here introduces the ability for
+    connect_cached to maintain a minimum number of connections which can be
+    re-used over the lifetime of a program.
+@end deftypemethod
+
+@deftypemethod DBI Pool pool (String @var{pool_name})
+    a pool as described above is an array of database handles. this returns
+    that data as a "Pool" object, with its own API. See later on in the
+    document.
+@end deftypemethod
+
+@deftypemethod DBI Pool all_connections
+    similar to pool(), this returns all the connections, but ignores pools.
+@end deftypemethod
+
+@deftypemethod DBI Integer ping (Class @var{klass}, Array @var{*args})
+    similar to connect(), this issues a ping to the databases. This may issue
+    a connect() before the ping() to do it properly depending on the database
+    implementation.
+@end deftypemethod
+
+@deftypemethod DBI Boolean reconnect_all
+    reconnects all the known database handles.
+@end deftypemethod
+
+@deftypemethod DBI DBH last_dbh
+    returns the last returned dbh from connect() or connect_cached()
+
+    this method, by definition, can be unpredictable in threaded environments.
+@end deftypemethod
+
+
+
+@chapter class DBH
+
+
+
+@deftypemethod DBH NilClass transaction (Proc @var{&block})
+    opens a transaction and executes the statements in the block. Yields self.
+@end deftypemethod
+
+@deftypemethod DBH Schema table_schema (Symbol @var{table_name})
+    returns information about a specific table in a Schema object
+@end deftypemethod
+
+@deftypemethod DBH {Array of Schema} schema (Symbol @var{schema_name})
+    returns information about a specific schema, the current one if none is
+    specified.
+@end deftypemethod
+
+@deftypemethod DBH Boolean reconnect
+    reconnects to the database
+@end deftypemethod
+
+@deftypemethod DBH Integer ping
+    attempts to contact the database, measuring round-trip.
+@end deftypemethod
+
+@deftypemethod DBH Object driver
+    returns the underlying driver.
+@end deftypemethod
+
+@deftypemethod DBH String last_query
+    returns the last query executed or prepared.
+@end deftypemethod
+
+@deftypemethod DBH STH last_sth
+    returns the last statement handle prepared.
+@end deftypemethod
+
+@deftypemethod DBH Mutex mutex
+    returns the mutex for this database. thread management will be per-dbh.
+@end deftypemethod
+
+@deftypemethod DBH String preprocess_query (String @var{query})
+    preprocesses the query and returns what it would look like right before
+    it gets sent to the database.
+@end deftypemethod
+
+@deftypemethod DBH Boolean disconnect
+    disconnects from the database. returns success.
+@end deftypemethod
+
+@deftypemethod DBH Symbol bind_style ({Symbol of [native, preprocessed]} @var{style})
+    Accessor. Native style delegates to the underlying database connector. preprocessed
+    means we do it.
+@end deftypemethod
+
+
+
+@section Query Methods
+    these methods all optionally use a block and yield a result or sth depending
+    on context. Additionally in async environments, they return immediately,
+    the block being transformed into a callback which will yield when the query
+    completes.
+
+
+@deftypemethod DBH STH prepare (String @var{query})
+    prepares a query for execution and returns a statement handle.
+@end deftypemethod
+
+@deftypemethod DBH Result execute (String @var{query}, Array @var{*binds})
+    executes a query and returns a result. If a block is not provided, an async
+    result will be provided which will slowly result in items being fetchable.
+@end deftypemethod
+
+
+
+@chapter class STH 
+
+
+@deftypemethod STH String query
+    accessor for the query that was used to generate this sth.
+@end deftypemethod
+
+@deftypemethod STH Result execute (Array @var{*binds})
+    executes the prepared statement. optionally yielding a result if block given.
+@end deftypemethod
+
+@deftypemethod STH Object driver
+    if any, returns the underlying statement handle from the database object.
+@end deftypemethod
+
+@deftypemethod STH Result last_result
+    Returns the last Result this prepared statement has yielded.
+@end deftypemethod
+
+@deftypemethod STH Boolean finish
+    finishes the statement
+@end deftypemethod
+
+@deftypemethod STH DBH dbh
+    returns the dbh this statement handle was created from.
+@end deftypemethod
+
+
+
+@chapter class Pool
+
+
+
+@deftypemethod Pool Boolean reconnect
+    attempts to reconnect the entire pool of database connections.
+@end deftypemethod
+
+@deftypemethod Pool Integer ping
+    attempts to ping and average the response time of all database
+    connections.
+@end deftypemethod
+
+@deftypemethod Pool Boolean disconnect
+    disconnects all the database connections in the pool.
+@end deftypemethod
+
+
+
+@chapter class Result
+
+
+
+@deftypemethod Result Boolean complete?
+    Always returns true in a sync environment. In an async environment, only
+    returns true if all result processing has been completed.
+@end deftypemethod
+
+@deftypemethod Result Boolean has_data?
+    Always returns true in a sync environment. In an async environment, only
+    returns true if there is outstanding data to fetch.
+@end deftypemethod
+
+@deftypemethod Result Boolean eof?
+    Returns true if all results have been fetched.
+@end deftypemethod
+
+@deftypemethod Result NilClass rewind
+    resets the fetch iterator to the beginning. See also: #reload.
+@end deftypemethod
+
+@deftypemethod Result Integer rows
+    If available, returns the number of rows in this result. Else, nil.
+@end deftypemethod
+
+@deftypemethod Result Array binds
+    accessor for the binds that created this method
+@end deftypemethod
+
+@deftypemethod Result NilClass as (Class @var{kind}, Array @var{*args})
+    Given a Class and arguments, uses it to interpret the array. The class is
+    constructed with the result object and the arguments provided at the end,
+    and then a method called fetch() is attempted with the row count.
+    
+    Especially for specific class designations, (XML formatting is a good
+    example) output formats may not necessarily equate to a single row, in that
+    case, one "unit" should be returned from #fetch, and this entailings of
+    this unit should be specified in the driver.
+
+    If this this method is not called, fetch yields a standard array with type
+    converted items. 
+@end deftypemethod
+
+@deftypemethod Result Object fetch (Integer @var{row_count})
+    fetches one item, or given an argument, @var{row_count} rows.  If the
+    row_count is ":all", fetches all outstanding rows. See #as for how rows may
+    be interpreted.
+@end deftypemethod
+
+@deftypemethod Result {Array of Object} raw_fetch (Integer @var{row_count})
+    Raw fetch performs no conversions -- returns an array of objects yielding
+    whatever the underlying driver gave us. 
+@end deftypemethod
+
+@deftypemethod Result Boolean finish
+	finishes the underlying statement handle and invalidates the data.
+	reloading will no longer be possible once this is called and should
+	raise (or maybe we should reprepare/execute?).
+@end deftypemethod
+
+@deftypemethod Result STH sth
+	returns the statement handle that yielded this result.	
+@end deftypemethod
+
+@deftypemethod Result Schema schema
+	returns a Schema object that corresponds to the data in this result.
+@end deftypemethod
+
+@deftypemethod Result NilClass each (@var{&block})
+    similar to calling fetch iteratively with a callback. With proper async
+    driver support, will register a callback from the block which will only
+    process when there are new rows to be had.
+@end deftypemethod
+
+
+@chapter class CursorResult < Result
+
+This class is just a cursor-oriented method of transmitting results. 
+
+
+
+@chapter class Row
+
+row is just an array, but this needs to be thought out a little more.
+
+
+
+@chapter Schema
+
+
+
+@deftypemethod Schema {Array of Column} columns
+	returns column information (see Column object below) for all elements of
+	the Schema.
+@end deftypemethod
+
+@deftypemethod Schema {Array of Symbol} table_names
+	returns table names (there may be more than one in the event of a query
+	Schema) for all the objects a part of this Schema.
+@end deftypemethod
+
+
+
+@chapter Column
+
+
+
+@deftypemethod Column String name
+@end deftypemethod
+
+@deftypemethod Column String type
+	this is the type the database yields
+@end deftypemethod
+	
+@deftypemethod Column Class ruby_type
+	Accessor. this is what ruby thinks this type should be, or you can set it directly
+	which will be used at type conversion time.
+@end deftypemethod
+
+@deftypemethod Column Integer precision 
+    (alias: length)
+	precision is the first number in a database type. it is aliased to the
+	method 'length' because sometimes that's what precision actually is
+	depending on the type.
+@end deftypemethod
+
+@deftypemethod Column Integer scale
+	scale is the second number in a database type. this is often the right
+	side of a decimal value or sometimes a factoring quotient.
+@end deftypemethod
+
+@deftypemethod Column Boolean nullable@?
+	can this column be null?
+@end deftypemethod
+	
+@deftypemethod Column String metadata
+	metadata is a bucket for things we don't understand; namely things like AUTOINCREMENT.
+@end deftypemethod
+
+@deftypemethod Column String default 
+	default is the column default -- this is provided for informational
+	aspects only and should not be used for anything sane.
+@end deftypemethod
+
+@page
+@node Method Index
+@unnumbered Method Index
+@printindex fn
+
+@bye

@@ -106,13 +106,27 @@ end
 
 class RDBI::Database
     extend MethLab
-   
+
+    attr_reader :driver
+
     inline(:connected, :connected?) { @connected }
 
     inline(:reconnect)  { @connected = true  }
     inline(:disconnect) { @connected = false }
 
-    inline(:ping) { raise NoMethodError, "this method is not implemented in this driver" }
+    inline(
+            :ping, 
+            :transaction, 
+            :table_schema, 
+            :schema,
+            :last_query,
+            :last_sth,
+            :mutex,
+            :preprocess_query,
+            :bind_style,
+            :prepare,
+            :execute
+          ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
     def initialize(*args)
         # FIXME symbolify

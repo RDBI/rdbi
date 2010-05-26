@@ -34,19 +34,15 @@ module RDBI
     # is provided, it will be called upon connection success, with the
     # RDBI::Database object provided in as the first argument.
     def self.connect(klass, *args)
-        klass = case klass
-                when Class
-                    klass
-                when Symbol
-                    self::Driver.const_get(klass)
-                when String
-                    self::Driver.const_get(klass.to_sym)
-                else
+
+        klass = begin
+                    klass.kind_of?(Class) ? klass : self::Driver.const_get(klass.to_s)
+                rescue
                     raise ArgumentError, "Invalid argument for driver name; must be Class, Symbol, or String"
                 end
 
         driver = klass.new(*args)
-        dbh = @last_dbh = driver.get_handle
+        dbh = @last_dbh = driver.new_handle
 
         @all_connections ||= []
         @all_connections.push(dbh)
@@ -65,7 +61,7 @@ module RDBI
     #
     # If a pool *already* exists, your connection arguments will be ignored and
     # it will instance from the Pool's connection arguments.
-    def self.connect_cached(klass, *args, &block)
+    def self.connect_cached(klass, *args)
         args = args[0]
         pool_name = args[:pool_name] || :default
 

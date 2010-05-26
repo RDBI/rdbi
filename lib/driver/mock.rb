@@ -11,7 +11,7 @@ module RDBI
                 @connect_args = args
             end
 
-            def get_handle
+            def new_handle 
                 return DBH.new(*@connect_args)
             end
         end

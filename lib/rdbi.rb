@@ -25,14 +25,34 @@ module RDBI
 
         driver = klass.new(*args)
         dbh = @last_dbh = driver.get_handle
+
+        @all_connections ||= []
+        @all_connections.push(dbh)
+
         yield dbh if block_given?
         return dbh
     end
 
     def self.connect_cached(klass, *args, &block)
+        args = args[0]
+        pool_name = args[:pool_name] || :default
+
+        dbh = nil
+
+        if RDBI::Pool[pool_name]
+            dbh = RDBI::Pool[pool_name].get_dbh
+        else
+            dbh = RDBI::Pool.new(pool_name, [klass, *args]).get_dbh
+        end
+
+        @last_dbh = dbh
+
+        yield dbh if block_given?
+        return dbh
     end
 
     def self.pool(pool_name=:default)
+        RDBI::Pool[pool_name]
     end
 
     def self.ping(klass, *args)
@@ -40,6 +60,11 @@ module RDBI
     end
     
     def self.reconnect_all
+        @all_connections.each(&:reconnect)
+    end
+    
+    def self.disconnect_all
+        @all_connections.each(&:disconnect)
     end
 end
 
@@ -234,8 +259,10 @@ class RDBI::Database
     extend MethLab
    
     inline(:connected, :connected?) { @connected }
-    inline(:reconnect) { @connected = true }
+
+    inline(:reconnect)  { @connected = true  }
     inline(:disconnect) { @connected = false }
+
     inline(:ping) { raise NoMethodError, "this method is not implemented in this driver" }
 
     def initialize(*args)

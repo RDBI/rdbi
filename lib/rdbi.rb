@@ -97,7 +97,8 @@ class RDBI::Pool
     #
     # Ping all database connections and average out the amount.
     # 
-    # If connections are not connected, 1 will be returned for those.
+    # Any disconnected handles will be reconnected before this operation
+    # starts.
     def ping
         reconnect_if_disconnected
         @mutex.synchronize do 
@@ -109,7 +110,7 @@ class RDBI::Pool
     # Unconditionally reconnect all database handles.
     def reconnect
         @mutex.synchronize do 
-            @handles.each(&:reconnect)
+            @handles.each { |dbh| dbh.reconnect } 
         end
     end
 
@@ -214,6 +215,8 @@ class RDBI::Pool
     def add(dbh)
         dbh = *MethLab.validate_array_params([RDBI::Database], [dbh])
         raise dbh if dbh.kind_of?(Exception)
+
+        dbh = dbh[0] if dbh.kind_of?(Array)
 
         @mutex.synchronize do
             if @handles.size >= @max

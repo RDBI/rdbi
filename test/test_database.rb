@@ -5,6 +5,12 @@ class TestPool < Test::Unit::TestCase
         @dbh = mock_connect
     end
 
+    def assert_transaction(bool)
+        in_transaction = @dbh.instance_variable_get("@in_transaction") || 
+            @dbh.instance_variable_get(:@in_transaction)
+        assert_equal(bool, in_transaction)
+    end
+
     def test_01_ping
         assert_equal(10, @dbh.ping)
     end
@@ -17,15 +23,10 @@ class TestPool < Test::Unit::TestCase
         end
 
         res = @dbh.transaction do |dbh|
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(true, in_transaction)
+            assert_transaction(true)
         end
 
-        in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-            @dbh.instance_variable_get(:@in_transaction)
-        assert_equal(false, in_transaction)
-
+        assert_transaction(false)
         assert_equal(true, res)
         
         # rollback works when commit fails
@@ -35,17 +36,11 @@ class TestPool < Test::Unit::TestCase
         end
 
         res = @dbh.transaction do |dbh|
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(true, in_transaction)
-
+            assert_transaction(true)
             true
         end
 
-        in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-            @dbh.instance_variable_get(:@in_transaction)
-        assert_equal(false, in_transaction)
-
+        assert_transaction(false)
         assert_equal("rollback called", res)
 
         # rollback works when transaction fails
@@ -53,59 +48,45 @@ class TestPool < Test::Unit::TestCase
         @dbh.next_action = proc { |*args| true }
 
         res = @dbh.transaction do |dbh|
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(true, in_transaction)
+            assert_transaction(true)
 
             raise StandardError, "should call rollback"
             nil
         end
-        
-        in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-            @dbh.instance_variable_get(:@in_transaction)
-        assert_equal(false, in_transaction)
-
+       
+        assert_transaction(false)
         assert_equal("rollback called", res)
 
         # commit called within transaction
         
-        @dbh.next_action = proc { |*args| @dbh.next_action = proc { raise "shit" } }
+        @dbh.next_action = proc { |*args| @dbh.next_action = proc { raise "shit" }; "commit called" }
 
         res = @dbh.transaction do |dbh|
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(true, in_transaction)
+            assert_transaction(true)
 
             dbh.commit
 
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(false, in_transaction)
-
+            assert_transaction(false)
             true
         end
 
         assert_not_equal("rollback called", res)
+        assert_not_equal("commit called", res)
 
         # rollback called within transaction
 
-        @dbh.next_action = proc { |*args| @dbh.next_action = proc { raise "shit" } }
+        @dbh.next_action = proc { |*args| @dbh.next_action = proc { raise "shit" }; "commit called" }
 
         res = @dbh.transaction do |dbh|
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(true, in_transaction)
+            assert_transaction(true)
 
             dbh.rollback
 
-            in_transaction = @dbh.instance_variable_get("@in_transaction") || 
-                @dbh.instance_variable_get(:@in_transaction)
-            assert_equal(false, in_transaction)
-
-            true
+            assert_transaction(false)
         end
         
         assert_not_equal("rollback called", res)
+        assert_not_equal("commit called", res)
     end
 
     def teardown

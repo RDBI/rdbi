@@ -32,7 +32,7 @@ module RDBI
                 :prepare, 
                 :execute
             ) do |*args|
-                super
+                super(*args)
 
                 ret = nil
 

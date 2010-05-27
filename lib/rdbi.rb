@@ -1,3 +1,4 @@
+require 'epoxy'
 require 'methlab'
 require 'thread'
 
@@ -163,6 +164,12 @@ class RDBI::Database
 
     def execute(query, *binds)
         @last_query = query
+    end
+
+    def preprocess_query(query, *binds)
+        @last_query = query
+        ep = Epoxy.new(query)
+        ep.quote { |x| %Q{'#{binds[x].gsub(/'/, "''")}'} }
     end
 end
 

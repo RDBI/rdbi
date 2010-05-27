@@ -101,6 +101,20 @@ class TestPool < Test::Unit::TestCase
         
         @dbh.execute("here's the last query #4")
         assert_equal("here's the last query #4", @dbh.last_query)
+
+        @dbh.preprocess_query("here's the last query #5")
+        assert_equal("here's the last query #5", @dbh.last_query)
+        
+        @dbh.preprocess_query("here's the last query #6")
+        assert_equal("here's the last query #6", @dbh.last_query)
+    end
+
+    def test_04_preprocess_query
+        query = @dbh.preprocess_query("select * from foo where bind=? and bind2=?", "foo", "bar")
+        assert_equal("select * from foo where bind='foo' and bind2='bar'", query)
+        
+        query = @dbh.preprocess_query("select * from foo where bind=? and bind2=?", "fo'o", "ba''r")
+        assert_equal("select * from foo where bind='fo''o' and bind2='ba''''r'", query)
     end
 
     def teardown

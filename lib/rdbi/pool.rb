@@ -64,7 +64,7 @@ class RDBI::Pool
     # starts.
     def ping
         reconnect_if_disconnected
-        @mutex.synchronize do 
+        mutex.synchronize do 
             @handles.inject(1) { |x,y| x + (y.ping || 1) } / @handles.size
         end
     end
@@ -72,7 +72,7 @@ class RDBI::Pool
     #
     # Unconditionally reconnect all database handles.
     def reconnect
-        @mutex.synchronize do 
+        mutex.synchronize do 
             @handles.each { |dbh| dbh.reconnect } 
         end
     end
@@ -80,7 +80,7 @@ class RDBI::Pool
     #
     # Only reconnect the database handles that have not been already connected.
     def reconnect_if_disconnected
-        @mutex.synchronize do 
+        mutex.synchronize do 
             @handles.each do |dbh|
                 dbh.reconnect unless dbh.connected?
             end
@@ -90,7 +90,7 @@ class RDBI::Pool
     # 
     # Disconnect all database handles.
     def disconnect
-        @mutex.synchronize do
+        mutex.synchronize do
             @handles.each(&:disconnect)
         end
     end
@@ -109,7 +109,7 @@ class RDBI::Pool
     # This database object is *not* disconnected -- it is your responsibility
     # to do so.
     def remove(dbh)
-        @mutex.synchronize do
+        mutex.synchronize do
             @handles.reject! { |x| x.object_id == dbh.object_id }
         end
     end
@@ -123,7 +123,7 @@ class RDBI::Pool
     # Returns the handles that were removed, if any.
     #
     def resize(max=5)
-        @mutex.synchronize do
+        mutex.synchronize do
             in_pool = @handles.select(&:connected?)
 
             unless (in_pool.size >= max)
@@ -151,7 +151,7 @@ class RDBI::Pool
     # handle is disconnected, it will be reconnected.
     # 
     def get_dbh
-        @mutex.synchronize do
+        mutex.synchronize do
             if @last_index >= @max
                 @last_index = 0
             end
@@ -181,7 +181,7 @@ class RDBI::Pool
 
         dbh = dbh[0] if dbh.kind_of?(Array)
 
-        @mutex.synchronize do
+        mutex.synchronize do
             if @handles.size >= @max
                 raise ArgumentError, "too many handles in this pool (max: #{@max})"
             end

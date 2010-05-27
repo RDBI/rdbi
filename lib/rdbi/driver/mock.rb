@@ -1,5 +1,6 @@
 module RDBI
     module Driver
+        # FIXME driver inheritance w/ interface
         class Mock
             attr_reader :connect_args
 
@@ -8,7 +9,9 @@ module RDBI
             end
 
             def new_handle 
-                return DBH.new(*@connect_args)
+                dbh = DBH.new(*@connect_args)
+                dbh.driver = self.class
+                return dbh
             end
         end
 
@@ -24,7 +27,11 @@ module RDBI
             inline(:rollback) { super; "rollback called" }
 
             # XXX more methods to be defined this way.
-            inline(:commit) do |*args|
+            inline(
+                :commit, 
+                :prepare, 
+                :execute
+            ) do |*args|
                 super
 
                 ret = nil

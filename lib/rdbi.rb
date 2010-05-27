@@ -107,8 +107,14 @@ end
 class RDBI::Database
     extend MethLab
 
-    attr_reader :driver
+    # the driver class that is responsible for creating this database handle.
+    attr_accessor :driver
+
+    # are we currently in a transaction?
     attr_reader :in_transaction
+
+    # the last query sent, as a string.
+    attr_reader :last_query
 
     inline(:connected, :connected?) { @connected }
 
@@ -120,13 +126,10 @@ class RDBI::Database
             :transaction, 
             :table_schema, 
             :schema,
-            :last_query,
-            :last_sth,
             :mutex,
             :preprocess_query,
             :bind_style,
-            :prepare,
-            :execute
+            :last_statement
           ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
     inline(:commit, :rollback) { @in_transaction = false }
@@ -147,6 +150,14 @@ class RDBI::Database
         ensure
             @in_transaction = false
         end
+    end
+
+    def prepare(query)
+        @last_query = query
+    end
+
+    def execute(query, *binds)
+        @last_query = query
     end
 end
 

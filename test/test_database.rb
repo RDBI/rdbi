@@ -89,6 +89,20 @@ class TestPool < Test::Unit::TestCase
         assert_not_equal("commit called", res)
     end
 
+    def test_03_last_query
+        @dbh.prepare("here's the last query #1")
+        assert_equal("here's the last query #1", @dbh.last_query)
+
+        @dbh.prepare("here's the last query #2")
+        assert_equal("here's the last query #2", @dbh.last_query)
+        
+        @dbh.execute("here's the last query #3")
+        assert_equal("here's the last query #3", @dbh.last_query)
+        
+        @dbh.execute("here's the last query #4")
+        assert_equal("here's the last query #4", @dbh.last_query)
+    end
+
     def teardown
         @dbh.disconnect
     end

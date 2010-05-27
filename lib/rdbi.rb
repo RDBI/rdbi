@@ -116,6 +116,9 @@ class RDBI::Database
     # the last query sent, as a string.
     attr_reader :last_query
 
+    # the mutex for this database handle.
+    attr_reader :mutex
+
     inline(:connected, :connected?) { @connected }
 
     inline(:reconnect)  { @connected = true  }
@@ -126,7 +129,6 @@ class RDBI::Database
             :transaction, 
             :table_schema, 
             :schema,
-            :mutex,
             :preprocess_query,
             :bind_style,
             :last_statement
@@ -138,17 +140,20 @@ class RDBI::Database
         # FIXME symbolify
         @connect_args = args[0]
         @connected    = true
+        @mutex        = Mutex.new
     end
 
     def transaction(&block)
-        @in_transaction = true
-        begin
-            yield self
-            commit if @in_transaction
-        rescue
-            rollback 
-        ensure
-            @in_transaction = false
+        mutex.synchronize do
+            @in_transaction = true
+            begin
+                yield self
+                commit if @in_transaction
+            rescue
+                rollback 
+            ensure
+                @in_transaction = false
+            end
         end
     end
 

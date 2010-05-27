@@ -130,7 +130,6 @@ class RDBI::Database
             :transaction, 
             :table_schema, 
             :schema,
-            :preprocess_query,
             :bind_style,
             :last_statement
           ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }

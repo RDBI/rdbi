@@ -125,12 +125,12 @@ class RDBI::Database
     inline(:reconnect)  { @connected = true  }
     inline(:disconnect) { @connected = false }
 
+    inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
     inline(
             :ping, 
             :transaction, 
             :table_schema, 
             :schema,
-            :bind_style,
             :last_statement
           ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 

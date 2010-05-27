@@ -108,6 +108,7 @@ class RDBI::Database
     extend MethLab
 
     attr_reader :driver
+    attr_reader :in_transaction
 
     inline(:connected, :connected?) { @connected }
 
@@ -128,10 +129,24 @@ class RDBI::Database
             :execute
           ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
+    inline(:commit, :rollback) { @in_transaction = false }
+
     def initialize(*args)
         # FIXME symbolify
         @connect_args = args[0]
-        @connected = true
+        @connected    = true
+    end
+
+    def transaction(&block)
+        @in_transaction = true
+        begin
+            yield self
+            commit if @in_transaction
+        rescue
+            rollback 
+        ensure
+            @in_transaction = false
+        end
     end
 end
 

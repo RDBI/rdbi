@@ -1,6 +1,8 @@
-= rdbi
+= RDBI - Basic Database Access Re-imagined.
 
-Description goes here.
+Please avoid the URL on the github pages for now, and any RDoc, as it's in
+flux. There is a PDF and .texi in docs/ which contains a tentative API; if you
+wish to evaluate, please do it there. Thanks.
 
 == Note on Patches/Pull Requests
  

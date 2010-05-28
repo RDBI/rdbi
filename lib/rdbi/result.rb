@@ -88,16 +88,36 @@ class RDBI::Result::Driver
     @result.rewind
   end
 
-  def fetch(*args)
-    @result.raw_fetch(*args)
+  def fetch(row_count)
+    @result.raw_fetch(row_count)
   end
 end
 
 # standard array driver.
 class RDBI::Result::Driver::Array < RDBI::Result::Driver
-  # FIXME type conversion
+end
+
+class RDBI::Result::Driver::CSV < RDBI::Result::Driver
+  def initialize(result, *args)
+    super
+    if RUBY_VERSION =~ /^1.8/
+      begin
+        require 'fastercsv'
+      rescue
+        raise LoadError, "The 'fastercsv' gem is required to use this driver. Please install it."
+      end
+    else
+      require 'csv'
+    end
+    # FIXME columns from schema deal maybe?
+  end
+
   def fetch(row_count)
-    @result.raw_fetch(row_count)
+    csv_string = ""
+    @result.raw_fetch(row_count).each do |row|
+      csv_string << row.to_csv
+    end
+    return csv_string
   end
 end
 

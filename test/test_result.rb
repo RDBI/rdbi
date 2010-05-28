@@ -133,6 +133,22 @@ class TestResult < Test::Unit::TestCase
   end
 
   def test_06_as
+    res = mock_result
+    res.as(RDBI::Result::Driver::CSV)
+    assert_equal(
+      "-1,0,1\n",
+      res.fetch(1)
+    )
+
+    assert_equal(
+      "0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
+      res.fetch(:rest)
+    )
+
+    assert_equal(
+      "-1,0,1\n0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
+      res.fetch(:all)
+    )
   end
 end
 

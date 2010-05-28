@@ -19,18 +19,25 @@ module RDBI
             # just to be abundantly clear, this is a mock method intended to
             # facilitate tests.
             def execute(*binds)
+                super
                 mutex.synchronize do
-                    @last_result =  (0..4).to_a.collect do |x|
-                        binds.collect do |bind|
-                            case bind
-                            when Integer
-                                bind + x
-                            else
-                                bind.to_s + x.to_s
-                            end
-                        end
-                    end
+                    @last_result = if result
+                                       result
+                                   else
+                                       (0..4).to_a.collect do |x|
+                                           binds.collect do |bind|
+                                               case bind
+                                               when Integer
+                                                   bind + x
+                                               else
+                                                   bind.to_s + x.to_s
+                                               end
+                                           end
+                                       end
+                                   end
                 end
+
+                return @last_result
             end
         end
 
@@ -50,11 +57,7 @@ module RDBI
             inline(:rollback) { super; "rollback called" }
 
             # XXX more methods to be defined this way.
-            inline(
-                :commit, 
-                :prepare, 
-                :execute
-            ) do |*args|
+            inline(:commit) do |*args|
                 super(*args)
 
                 ret = nil

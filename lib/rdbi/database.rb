@@ -98,22 +98,29 @@ class RDBI::Database
     # FIXME document
     #++
     def prepare(query)
-        # FIXME block
-        # FIXME finish
+        sth = nil
         mutex.synchronize do
             @last_query = query
+            sth = new_statement(query)
+            yield sth if block_given?
         end
+
+        return sth
     end
 
     #--
     # FIXME document
     #++
     def execute(query, *binds)
-        # FIXME block
-        # FIXME finish
+        res = nil
+
         mutex.synchronize do
             @last_query = query
+            res = new_statement(query).execute(*binds)
+            yield res if block_given?
         end
+
+        return res
     end
 
     #

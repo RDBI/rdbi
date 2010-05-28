@@ -143,6 +143,11 @@ class RDBI::Statement
         @mutex = Mutex.new
         @finished = false
     end
+
+    def execute(*binds)
+        raise StandardError, "you may not execute a finished handle" if @finished
+        return *binds # XXX FOR NOW
+    end
 end
 
 require 'rdbi/pool'

@@ -26,6 +26,32 @@ class TestStatement < Test::Unit::TestCase
         assert(!sth.finished?)
         assert(!sth.finished)
     end
+
+    # XXX 
+    #
+    # THIS TEST WILL CHANGE DRASTICALLY VERY SOON. PLEASE LEAVE BE FOR NOW.
+    #
+    # XXX
+    def test_03_execute
+        res = dbh.execute("select * from foo where bar=?", 1)
+        assert_kind_of(Array, res)
+        assert_equal(%W[1 2 3 4 5].map { |x| [x.to_i] }, res)
+
+        sth = dbh.prepare("select * from foo where bar=?")
+        assert_kind_of(RDBI::Statement, sth)
+        assert_respond_to(sth, :execute)
+        res = sth.execute(1)
+        assert_equal(%W[1 2 3 4 5].map { |x| [x.to_i] }, res)
+    end
+
+    def test_04_finish
+        sth = dbh.prepare("select * from foo where bar=?")
+
+        assert(!sth.finished?)
+        sth.finish
+        assert(sth.finished?)
+        assert_raises(StandardError.new("you may not execute a finished handle")) { sth.execute }
+    end
 end
 
 # vim: syntax=ruby ts=4 et sw=4 sts=4

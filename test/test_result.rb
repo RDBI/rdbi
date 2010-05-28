@@ -78,7 +78,7 @@ class TestResult < Test::Unit::TestCase
     end
   end
 
-  def test_03_fetch_works
+  def test_03_fetch
     res = mock_result
     assert_equal([[-1,0,1]], res.fetch)
     assert_equal(1, get_index(res))
@@ -88,10 +88,15 @@ class TestResult < Test::Unit::TestCase
     assert_equal([], res.fetch)
 
     res = mock_result
+    assert_equal(generate_data, res.fetch(:all))
 
+    res = mock_result
+    res.fetch
+    assert_equal(generate_data, res.fetch(:all))
+    assert_equal(1, get_index(res))
   end
 
-  def test_04_finish_works
+  def test_04_finish
     res = mock_result
     res.finish
 
@@ -100,7 +105,7 @@ class TestResult < Test::Unit::TestCase
     guts.values.each { |value| assert_nil(value) } 
   end
 
-  def test_05_enumerable_and_index_predicates_work
+  def test_05_enumerable_and_index_predicates
     res = mock_result
 
     assert(res.has_data?)
@@ -123,6 +128,9 @@ class TestResult < Test::Unit::TestCase
     assert(res.eof)
     assert(!res.more?)
     assert(!res.more)
+  end
+
+  def test_06_as
   end
 end
 

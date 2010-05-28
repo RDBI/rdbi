@@ -58,13 +58,16 @@ class RDBI::Result
   alias read fetch
 
   def raw_fetch(row_count)
-    if row_count == :all
-      return Marshal.load(Marshal.dump(@data))
-    else
-      res = @data[@index..(@index + (row_count - 1))]
-      @index += row_count
-      return Marshal.load(Marshal.dump(res))
-    end
+    final_res = if row_count == :all
+                  Marshal.load(Marshal.dump(@data))
+                elsif row_count == :rest
+                  Marshal.load
+                else
+                  res = @data[@index..(@index + (row_count - 1))]
+                  @index += row_count
+                  res
+                end
+    Marshal.load(Marshal.dump(final_res))
   end
 
   def finish

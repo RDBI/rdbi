@@ -15,6 +15,7 @@ class RDBI::Result
   inline(:complete, :complete?) { true } 
 
   inline(:eof, :eof?)           { @index >= @data.size }
+  inline(:more, :more?)         { @index  < @data.size }
   inline(:has_data, :has_data?) { @data.size > 0 }
 
   def initialize(data, schema, sth, binds)
@@ -31,7 +32,7 @@ class RDBI::Result
   end
 
   def each
-    yield(res.fetch) until res.eof?
+    yield(fetch[0]) while more?
   end
 
   def rewind

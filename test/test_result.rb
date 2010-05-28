@@ -92,8 +92,25 @@ class TestResult < Test::Unit::TestCase
 
     guts.values.each { |value| assert_nil(value) } 
   end
-  
-  def test_05_enumerable_works
+
+  def test_05_enumerable_and_index_predictates_work
+    res = mock_result
+
+    assert(res.has_data?)
+    assert(res.has_data)
+
+    expected = (0..9).to_a.map { |x| [x-1, x, x+1] }
+    
+    res.each_with_index do |x, i|
+      assert_equal(expected[i], x)
+    end
+
+    assert(res.has_data?)
+    assert(res.has_data)
+    assert(res.eof?)
+    assert(res.eof)
+    assert(!res.more?)
+    assert(!res.more)
   end
 end
 

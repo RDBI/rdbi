@@ -8,9 +8,9 @@ require 'rdbi'
 require 'rdbi/driver/mock'
 
 class Test::Unit::TestCase
-    def mock_connect
-        RDBI.connect(:Mock, :username => 'foo', :password => 'bar')
-    end
+  def mock_connect
+    RDBI.connect(:Mock, :username => 'foo', :password => 'bar')
+  end
 end
 
-# vim: syntax=ruby ts=4 et sw=4 sts=4
+# vim: syntax=ruby ts=2 et sw=2 sts=2

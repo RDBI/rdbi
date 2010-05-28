@@ -14,13 +14,37 @@ class TestResult < Test::Unit::TestCase
   end
 
   def get_index(res)
-    res.instance_variable_get("@index") || res.instance_variable_get(:@index)
+    get_guts(res)[:index]
+  end
+
+  def get_guts(res)
+    h = { }
+    %W[index schema binds sth data].collect(&:to_sym).each do |sym|
+      h[sym] = res.instance_variable_get("@#{sym}") || res.instance_variable_get("@#{sym}".to_sym)
+    end
+
+    return h
   end
 
   def test_01_init
     res = mock_result
     assert(res)
     assert_kind_of(RDBI::Result, res)
+
+    guts = get_guts(res)
+
+    assert_kind_of(RDBI::Statement, guts[:sth])
+    assert_kind_of(RDBI::Statement, res.sth)
+    assert_equal(res.sth, guts[:sth])
+
+    assert_kind_of(RDBI::Schema, guts[:schema])
+    assert_kind_of(RDBI::Schema, res.schema)
+    assert_equal(res.schema, guts[:schema])
+
+    assert_kind_of(Array, guts[:binds])
+    assert_equal(res.binds, guts[:binds])
+    assert_not_equal(res.binds.object_id, guts[:binds].object_id)
+    assert_equal([1], guts[:binds])
   end
 
   def test_02_responds
@@ -58,6 +82,18 @@ class TestResult < Test::Unit::TestCase
     assert_equal((1..9).to_a.map { |x| [x-1, x, x+1] }, res.fetch(9))
     assert_equal(10, get_index(res))
     assert_equal([], res.fetch)
+  end
+
+  def test_04_finish_works
+    res = mock_result
+    res.finish
+
+    guts = get_guts(res)
+
+    guts.values.each { |value| assert_nil(value) } 
+  end
+  
+  def test_05_enumerable_works
   end
 end
 

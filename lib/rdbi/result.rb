@@ -31,7 +31,7 @@ class RDBI::Result
   end
 
   def each
-    @data.each { |x| yield x }
+    yield(res.fetch) until res.eof?
   end
 
   def rewind
@@ -58,11 +58,11 @@ class RDBI::Result
 
   def raw_fetch(row_count)
     if row_count == :all
-      return @data.dup
+      return Marshal.load(Marshal.dump(@data))
     else
       res = @data[@index..(@index + (row_count - 1))]
       @index += row_count
-      return res
+      return Marshal.load(Marshal.dump(res))
     end
   end
 
@@ -71,6 +71,8 @@ class RDBI::Result
     @sth    = nil
     @driver = nil
     @binds  = nil
+    @schema = nil
+    @index  = nil
   end
 end
 

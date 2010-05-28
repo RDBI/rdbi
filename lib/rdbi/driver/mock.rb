@@ -1,17 +1,8 @@
 module RDBI
-    module Driver
-        # FIXME driver inheritance w/ interface
-        class Mock
-            attr_reader :connect_args
-
+    class Driver
+        class Mock < RDBI::Driver
             def initialize(*args)
-                @connect_args = args
-            end
-
-            def new_handle 
-                dbh = DBH.new(*@connect_args)
-                dbh.driver = self.class
-                return dbh
+                super(Mock::DBH, *args)
             end
         end
 

@@ -122,6 +122,7 @@ class RDBI::Driver
 end
 
 require 'rdbi/pool'
+require 'rdbi/driver'
 require 'rdbi/database'
 require 'rdbi/statement'
 require 'rdbi/schema'

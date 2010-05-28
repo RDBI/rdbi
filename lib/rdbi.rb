@@ -110,5 +110,6 @@ require 'rdbi/driver'
 require 'rdbi/database'
 require 'rdbi/statement'
 require 'rdbi/schema'
+require 'rdbi/result'
 
 # vim: syntax=ruby ts=4 et sw=4 sts=4

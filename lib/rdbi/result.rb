@@ -61,7 +61,9 @@ class RDBI::Result
     final_res = if row_count == :all
                   Marshal.load(Marshal.dump(@data))
                 elsif row_count == :rest
-                  Marshal.load
+                  res = Marshal.load(Marshal.dump(@data[@index..-1]))
+                  @index = @data.size
+                  res
                 else
                   res = @data[@index..(@index + (row_count - 1))]
                   @index += row_count

@@ -94,6 +94,8 @@ class TestResult < Test::Unit::TestCase
     res.fetch
     assert_equal(generate_data, res.fetch(:all))
     assert_equal(1, get_index(res))
+    assert_equal(generate_data[1..9], res.fetch(:rest))
+    assert_equal(10, get_index(res))
   end
 
   def test_04_finish

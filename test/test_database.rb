@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestPool < Test::Unit::TestCase
+class TestDatabase < Test::Unit::TestCase
     def setup
         @dbh = mock_connect
     end

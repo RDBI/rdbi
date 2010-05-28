@@ -122,14 +122,16 @@ class RDBI::Driver
 end
 
 class RDBI::Statement
+    extend MethLab
+
     attr_reader :dbh
     attr_reader :query
     attr_reader :last_result
     attr_reader :mutex
 
-    inline(:finished, :finished?) { @finished }
-    inline(:driver) { dbh.driver }
-    inline(:finish) { @finished = true }
+    inline(:finished, :finished?)   { @finished        }
+    inline(:driver)                 { dbh.driver       }
+    inline(:finish)                 { @finished = true }
 
     inline(:last_result, :execute) do |*args|
         raise NoMethodError, "this method is not implemented in this driver"

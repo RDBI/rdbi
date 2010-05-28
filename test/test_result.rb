@@ -8,9 +8,13 @@ class TestResult < Test::Unit::TestCase
   def teardown
     @dbh.disconnect
   end
+
+  def generate_data
+    (0..9).to_a.map { |x| [x-1, x, x+1] }
+  end
   
   def mock_result
-    RDBI::Result.new((0..9).to_a.map { |x| [x-1, x, x+1] }, RDBI::Schema.new, @dbh.prepare("foo"), [1])
+    RDBI::Result.new(generate_data, RDBI::Schema.new, @dbh.prepare("foo"), [1])
   end
 
   def get_index(res)
@@ -79,9 +83,12 @@ class TestResult < Test::Unit::TestCase
     assert_equal([[-1,0,1]], res.fetch)
     assert_equal(1, get_index(res))
 
-    assert_equal((1..9).to_a.map { |x| [x-1, x, x+1] }, res.fetch(9))
+    assert_equal(generate_data[1..9], res.fetch(9))
     assert_equal(10, get_index(res))
     assert_equal([], res.fetch)
+
+    res = mock_result
+
   end
 
   def test_04_finish_works
@@ -99,12 +106,17 @@ class TestResult < Test::Unit::TestCase
     assert(res.has_data?)
     assert(res.has_data)
 
-    expected = (0..9).to_a.map { |x| [x-1, x, x+1] }
+    assert(res.complete?)
+    assert(res.complete)
+
+    expected = generate_data
     
     res.each_with_index do |x, i|
       assert_equal(expected[i], x)
     end
-
+    
+    assert(res.complete?)
+    assert(res.complete)
     assert(res.has_data?)
     assert(res.has_data)
     assert(res.eof?)

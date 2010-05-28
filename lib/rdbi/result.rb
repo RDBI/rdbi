@@ -38,20 +38,20 @@ class RDBI::Result
     @index = 0
   end
 
-  def as(driver, *args)
+  def as(driver_klass, *args)
     # FIXME consistent class logic with RDBI.connect
-    @driver       = driver
-    @fetch_handle = driver.new(self, *args) 
+    @driver       = driver_klass
+    @fetch_handle = driver_klass.new(self, *args) 
   end
 
   # XXX after some thought, I really don't like this facade approach. Maybe we
   # just want to hand them an inheriting result.
-  def fetch(row_count, driver=nil, *args)
-    if driver
-      as(driver, *args)
+  def fetch(row_count=1, driver_klass=nil, *args)
+    if driver_klass
+      as(driver_klass, *args)
     end
 
-    driver.fetch(row_count)
+    @fetch_handle.fetch(row_count)
   end
 
   alias read fetch
@@ -60,7 +60,7 @@ class RDBI::Result
     if row_count == :all
       return @data.dup
     else
-      res = @data[@index..(@index + row_count)]
+      res = @data[@index..(@index + (row_count - 1))]
       @index += row_count
       return res
     end

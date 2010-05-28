@@ -121,6 +121,28 @@ class RDBI::Driver
     end
 end
 
+class RDBI::Statement
+    attr_reader :dbh
+    attr_reader :query
+    attr_reader :last_result
+    attr_reader :mutex
+
+    inline(:finished, :finished?) { @finished }
+    inline(:driver) { dbh.driver }
+    inline(:finish) { @finished = true }
+
+    inline(:last_result, :execute) do |*args|
+        raise NoMethodError, "this method is not implemented in this driver"
+    end
+
+    def initialize(query, dbh)
+        @query = query
+        @dbh   = dbh
+        @mutex = Mutex.new
+        @finished = false
+    end
+end
+
 require 'rdbi/pool'
 require 'rdbi/database'
 

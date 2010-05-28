@@ -29,6 +29,7 @@ class RDBI::Database
 
     inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
     inline(
+            :new_statement,
             :ping, 
             :transaction, 
             :table_schema, 

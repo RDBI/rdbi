@@ -93,7 +93,7 @@ class TestResult < Test::Unit::TestCase
     guts.values.each { |value| assert_nil(value) } 
   end
 
-  def test_05_enumerable_and_index_predictates_work
+  def test_05_enumerable_and_index_predicates_work
     res = mock_result
 
     assert(res.has_data?)

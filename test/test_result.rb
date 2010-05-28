@@ -149,6 +149,25 @@ class TestResult < Test::Unit::TestCase
       "-1,0,1\n0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
       res.fetch(:all)
     )
+
+    # XXX reset intentionally.
+    res.as(RDBI::Result::Driver::Array)
+
+    assert_equal(
+      "-1,0,1\n",
+      res.fetch(1, RDBI::Result::Driver::CSV)
+    )
+
+    # XXX this is intentional behavior, because I'm lazy. maybe we'll change it.
+    assert_equal(
+      "-1,0,1\n0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
+      res.fetch(:rest, RDBI::Result::Driver::CSV)
+    )
+
+    assert_equal(
+      "-1,0,1\n0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
+      res.fetch(:all, RDBI::Result::Driver::CSV)
+    )
   end
 end
 

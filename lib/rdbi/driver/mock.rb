@@ -40,7 +40,7 @@ module RDBI
             attr_accessor :next_action
 
             def new_statement(query)
-                STH.new(query, self)
+                Mock::STH.new(query, self)
             end
 
             def ping

@@ -12,6 +12,7 @@ begin
         gem.authors = ["Erik Hollensbe"]
 
         gem.add_development_dependency 'test-unit'
+        gem.add_development_dependency 'rdoc'
 
         gem.add_dependency 'methlab', '>= 0.0.9'
         gem.add_dependency 'epoxy', '>= 0.2.1'
@@ -67,8 +68,8 @@ end
 
 task :default => :test
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
+require 'rdoc/task'
+RDoc::Task.new do |rdoc|
     version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
     rdoc.rdoc_dir = 'rdoc'

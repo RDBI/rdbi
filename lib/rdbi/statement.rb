@@ -10,7 +10,7 @@ class RDBI::Statement
   inline(:driver)                 { dbh.driver       }
   inline(:finish)                 { @finished = true }
 
-  inline(:last_result, :execute) do |*args|
+  inline(:last_result) do |*args|
     raise NoMethodError, "this method is not implemented in this driver"
   end
 

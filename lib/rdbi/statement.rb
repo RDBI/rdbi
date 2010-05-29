@@ -10,7 +10,7 @@ class RDBI::Statement
   inline(:driver)                 { dbh.driver       }
   inline(:finish)                 { @finished = true }
 
-  inline(:last_result) do |*args|
+  inline(:last_result, :new_execution) do |*args|
     raise NoMethodError, "this method is not implemented in this driver"
   end
 
@@ -23,7 +23,11 @@ class RDBI::Statement
 
   def execute(*binds)
     raise StandardError, "you may not execute a finished handle" if @finished
-    return *binds # XXX FOR NOW
+
+    mutex.synchronize do
+      results, schema = new_execution(*binds)
+      @last_result = RDBI::Result.new(results, schema, self, binds)
+    end
   end
 end
 

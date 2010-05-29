@@ -14,31 +14,25 @@ module RDBI
         super
       end
 
-      # FIXME rework when result stuff is done.
-      #
       # just to be abundantly clear, this is a mock method intended to
       # facilitate tests.
-      def execute(*binds)
-        super
-        this_data = []
-        mutex.synchronize do
-          this_data = if result
-                        result
-                      else
-                        (0..4).to_a.collect do |x|
-                          binds.collect do |bind|
-                            case bind
-                            when Integer
-                              bind + x
-                            else
-                              bind.to_s + x.to_s
-                            end
+      def new_execution(*binds)
+        this_data = if result
+                      result
+                    else
+                      (0..4).to_a.collect do |x|
+                        binds.collect do |bind|
+                          case bind
+                          when Integer
+                            bind + x
+                          else
+                            bind.to_s + x.to_s
                           end
                         end
                       end
-        end
+                    end
 
-        return @last_result = RDBI::Result.new(this_data, RDBI::Schema.new, self, binds)
+        return this_data, RDBI::Schema.new
       end
     end
 

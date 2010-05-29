@@ -39,6 +39,8 @@ class TestStatement < Test::Unit::TestCase
 
     sth = dbh.prepare("select * from foo where bar=?")
     assert_kind_of(RDBI::Statement, sth)
+    assert_kind_of(RDBI::Driver::Mock::STH, sth)
+    assert_respond_to(sth, :new_execution)
     assert_respond_to(sth, :execute)
     res = sth.execute(1)
     assert_equal(%W[1 2 3 4 5].map { |x| [x.to_i] }, res.fetch(:all))

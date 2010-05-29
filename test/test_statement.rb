@@ -27,11 +27,6 @@ class TestStatement < Test::Unit::TestCase
     assert(!sth.finished)
   end
 
-  # XXX 
-  #
-  # THIS TEST WILL CHANGE DRASTICALLY VERY SOON. PLEASE LEAVE BE FOR NOW.
-  #
-  # XXX
   def test_03_execute
     res = dbh.execute("select * from foo where bar=?", 1)
     assert_kind_of(RDBI::Result, res)

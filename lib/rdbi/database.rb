@@ -12,6 +12,9 @@ class RDBI::Database
 
   # the driver class that is responsible for creating this database handle.
   attr_accessor :driver
+  
+  # the name of the database we're connected to, if any.
+  attr_accessor :database_name
 
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction }
@@ -116,7 +119,9 @@ class RDBI::Database
 
     mutex.synchronize do
       @last_query = query
-      res = new_statement(query).execute(*binds)
+      sth = new_statement(query)
+      res = sth.execute(*binds)
+      sth.finish
       yield res if block_given?
     end
 

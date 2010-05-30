@@ -16,6 +16,9 @@ class RDBI::Database
   # the name of the database we're connected to, if any.
   attr_accessor :database_name
 
+  # the last statement handle allocated. affected by +prepare+ and +execute+.
+  attr_reader :last_statement
+
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction }
 
@@ -32,12 +35,10 @@ class RDBI::Database
 
   inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
   inline(
-    :new_statement,
     :ping, 
     :transaction, 
     :table_schema, 
-    :schema,
-    :last_statement
+    :schema
   ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
   inline(:commit, :rollback) { @in_transaction = false }
@@ -108,7 +109,7 @@ class RDBI::Database
       yield sth if block_given?
     end
 
-    return sth
+    return @last_statement = sth
   end
 
   #--
@@ -119,7 +120,7 @@ class RDBI::Database
 
     mutex.synchronize do
       @last_query = query
-      sth = new_statement(query)
+      @last_statement = sth = new_statement(query)
       res = sth.execute(*binds)
       sth.finish
       yield res if block_given?

@@ -117,6 +117,14 @@ class TestDatabase < Test::Unit::TestCase
     assert_equal("select * from foo where bind='fo''o' and bind2='ba''''r'", query)
   end
 
+  def test_05_prepare_execute
+    abort 'finish me'
+  end
+
+  def test_06_last_statement
+    abort 'finish me'
+  end
+
   def teardown
     @dbh.disconnect
   end

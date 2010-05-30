@@ -118,11 +118,26 @@ class TestDatabase < Test::Unit::TestCase
   end
 
   def test_05_prepare_execute
-    abort 'finish me'
+    sth = @dbh.prepare("some statement")
+    assert(sth)
+    assert_kind_of(RDBI::Statement, sth)
+
+    res = @dbh.execute("some other statement")
+    assert(res)
+    assert_kind_of(RDBI::Result, res)
   end
 
   def test_06_last_statement
-    abort 'finish me'
+    sth = @dbh.prepare("some statement")
+    assert(sth)
+    assert_kind_of(RDBI::Statement, sth)
+
+    assert_equal(@dbh.last_statement.object_id, sth.object_id)
+
+    res = @dbh.execute("some other statement")
+    assert(res)
+    assert_kind_of(RDBI::Result, res)
+    assert_not_equal(@dbh.last_statement.object_id, sth.object_id)
   end
 
   def teardown

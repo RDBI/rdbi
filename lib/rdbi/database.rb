@@ -36,7 +36,6 @@ class RDBI::Database
   inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
   inline(
     :ping, 
-    :transaction, 
     :table_schema, 
     :schema
   ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
@@ -85,16 +84,15 @@ class RDBI::Database
   # for you.
   #
   def transaction(&block)
-    mutex.synchronize do
-      @in_transaction = true
-      begin
-        yield self
-        commit if @in_transaction
-      rescue
-        rollback 
-      ensure
-        @in_transaction = false
-      end
+    @in_transaction = true
+    begin
+      yield self
+      self.commit if @in_transaction
+    rescue => e
+      self.rollback 
+      raise e
+    ensure
+      @in_transaction = false
     end
   end
 

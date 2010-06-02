@@ -78,4 +78,8 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
+task :to_blog => [:clobber_rdoc, :rdoc] do
+  sh "rm -fr $git/blog/content/docs/rdbi && mv rdoc $git/blog/content/docs/rdbi"
+end
+
 # vim: syntax=ruby ts=2 et sw=2 sts=2

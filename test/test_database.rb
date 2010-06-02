@@ -30,32 +30,35 @@ class TestDatabase < Test::Unit::TestCase
     assert_equal(true, res)
 
     # rollback works when commit fails
-
     @dbh.next_action = proc do |*args|
       raise StandardError, "should call rollback"
     end
 
-    res = @dbh.transaction do |dbh|
-      assert_transaction(true)
-      true
+    assert_raises(StandardError.new("should call rollback")) do 
+      @dbh.transaction do |dbh|
+        assert_transaction(true)
+        true
+      end
     end
 
     assert_transaction(false)
-    assert_equal("rollback called", res)
+    assert_equal(true, res)
 
     # rollback works when transaction fails
 
     @dbh.next_action = proc { |*args| true }
 
-    res = @dbh.transaction do |dbh|
-      assert_transaction(true)
+    assert_raises(StandardError.new("should call rollback")) do 
+      @dbh.transaction do |dbh|
+        assert_transaction(true)
 
-      raise StandardError, "should call rollback"
-      nil
+        raise StandardError, "should call rollback"
+        nil
+      end
     end
 
     assert_transaction(false)
-    assert_equal("rollback called", res)
+    assert_equal(true, res)
 
     # commit called within transaction
 

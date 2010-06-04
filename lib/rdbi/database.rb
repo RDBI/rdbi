@@ -100,6 +100,11 @@ class RDBI::Database
   # Prepares a statement for execution. Takes a query as its only argument,
   # returns a RDBI::Statement.
   #
+  # ex: 
+  #   sth = dbh.prepare("select * from foo where item = ?")
+  #   res = sth.execute("an item")
+  #   ary = res.to_a
+  #
   def prepare(query)
     sth = nil
     mutex.synchronize do
@@ -114,6 +119,10 @@ class RDBI::Database
   #
   # Prepares and executes a statement. Takes a string query and an optional
   # number of variable type binds.
+  #
+  # ex:
+  #   res = dbh.execute("select * from foo where item = ?", "an item")
+  #   ary = res.to_a
   #
   def execute(query, *binds)
     res = nil

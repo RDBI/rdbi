@@ -96,9 +96,10 @@ class RDBI::Database
     end
   end
 
-  #--
-  # FIXME document
-  #++
+  #
+  # Prepares a statement for execution. Takes a query as its only argument,
+  # returns a RDBI::Statement.
+  #
   def prepare(query)
     sth = nil
     mutex.synchronize do
@@ -109,10 +110,11 @@ class RDBI::Database
 
     return @last_statement = sth
   end
-
-  #--
-  # FIXME document
-  #++
+ 
+  #
+  # Prepares and executes a statement. Takes a string query and an optional
+  # number of variable type binds.
+  #
   def execute(query, *binds)
     res = nil
 

@@ -126,6 +126,36 @@ class TestPool < Test::Unit::TestCase
     assert_equal(3, handles.size)
     assert(!handles.map(&:object_id).include?(dbh.object_id))
   end
+
+  def test_08_enumerable
+    assert_equal(
+      [
+        :test_01,
+        :test_02,
+        :test_03,
+        :test_03_2,
+        :test_04,
+        :test_05,
+        :test_06,
+        :test_07,
+        :test_07_2,
+        :test_07_3
+      ], 
+      RDBI::Pool.keys.map(&:to_s).sort.map(&:to_sym)
+    )
+
+    assert_equal(10, RDBI::Pool.values.count)
+    assert_kind_of(RDBI::Pool, RDBI::Pool.values[0])
+
+    count = 0
+    RDBI::Pool.each do |name, pool|
+      count += 1
+      assert_kind_of(Symbol, name)
+      assert_kind_of(RDBI::Pool, pool)
+    end
+
+    assert(10, count)
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

@@ -14,6 +14,26 @@
 #
 class RDBI::Pool
   class << self
+    include Enumerable
+
+    # Iterate each pool and get the name of the pool (as a symbol) and the
+    # value as a Pool object.
+    def each
+      @pools.each do |key, value|
+        yield(key, value)
+      end
+    end
+
+    # obtain the names of each pool.
+    def keys
+      @pools.keys
+    end
+
+    # obtain the pool objects of each pool.
+    def values
+      @pools.values
+    end
+
     #
     # Retrieves a pool object for the name, or nothing if it does not exist.
     def [](name)
@@ -28,6 +48,8 @@ class RDBI::Pool
       @pools[name.to_sym] = value
     end
   end
+
+  include Enumerable
 
   # a list of the pool handles for this object. Do not manipulate this directly.
   attr_reader :handles
@@ -55,6 +77,11 @@ class RDBI::Pool
     @last_index   = 0
     @mutex        = Mutex.new
     self.class[name] = self
+  end
+
+  # Obtain each database handle in the pool.
+  def each
+    @handles.each { |dbh| yield dbh }
   end
 
   #

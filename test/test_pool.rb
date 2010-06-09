@@ -155,6 +155,26 @@ class TestPool < Test::Unit::TestCase
     end
 
     assert(10, count)
+    assert_respond_to(RDBI::Pool, :map)
+
+    pool = create_pool(:test_08)
+
+    assert(pool)
+    assert_kind_of(RDBI::Pool, pool)
+    assert_respond_to(pool, :each)
+
+    count = 0
+
+    3.times { pool.add_connection }
+
+    pool.each do |dbh|
+      count += 1
+      assert_kind_of(RDBI::Database, dbh)
+    end
+
+    assert_equal(3, count)
+
+    assert_respond_to(pool, :map)
   end
 end
 

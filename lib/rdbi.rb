@@ -111,5 +111,6 @@ require 'rdbi/database'
 require 'rdbi/statement'
 require 'rdbi/schema'
 require 'rdbi/result'
+require 'rdbi/types'
 
 # vim: syntax=ruby ts=4 et sw=4 sts=4

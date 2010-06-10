@@ -16,6 +16,8 @@ begin
 
     gem.add_dependency 'methlab', '>= 0.0.9'
     gem.add_dependency 'epoxy', '>= 0.2.1'
+    gem.add_dependency 'typelib'
+    gem.add_dependency 'hashpipe'
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

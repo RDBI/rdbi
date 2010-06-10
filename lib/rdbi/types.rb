@@ -34,9 +34,7 @@ module RDBI
     }
 
     def self.create_type_hash
-      hash = Hash.new
-
-      DEFAULTS.each { |key, value| hash[key] = DEFAULTS[key] }
+      hash = DEFAULTS.dup
 
       return hash
     end

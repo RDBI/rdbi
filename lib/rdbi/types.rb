@@ -5,12 +5,14 @@ module RDBI
   module Type
     module Checks
       include TypeLib::Canned::Checks
+
       IS_NULL = proc { |obj| obj.nil? }
       PASS    = proc { |obj| true }
     end
 
     module Conversions
       include TypeLib::Canned::Conversions
+
       TO_NULL = proc { |obj| nil }
       PASS    = proc { |obj| obj }
     end
@@ -28,9 +30,10 @@ module RDBI
     end
 
     DEFAULTS = {
-      :integer => filterlist(Filters::STR_TO_INT),
-      :decimal => filterlist(Filters::STR_TO_DEC),
-      :default => filterlist(Filters::PASS)
+      :integer  => filterlist(Filters::STR_TO_INT),
+      :decimal  => filterlist(Filters::STR_TO_DEC),
+      :datetime => filterlist(TypeLib::Canned.build_strptime_filter("%Y-%m-%d %H:%M:%S %z")),
+      :default  => filterlist(Filters::PASS)
     }
 
     def self.create_type_hash

@@ -1,4 +1,3 @@
-require 'hashpipe'
 require 'typelib'
 require 'typelib/canned'
 
@@ -35,7 +34,7 @@ module RDBI
     }
 
     def self.create_type_hash
-      hash = HashPipe.new
+      hash = Hash.new
 
       DEFAULTS.each { |key, value| hash[key] = DEFAULTS[key] }
 
@@ -49,7 +48,7 @@ module RDBI
         fl = type_hash.default
       end
 
-      fl.execute(obj, column)
+      fl.execute(obj)
     end
   end
 end

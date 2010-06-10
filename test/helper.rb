@@ -11,6 +11,17 @@ class Test::Unit::TestCase
   def mock_connect
     RDBI.connect(:Mock, :username => 'foo', :password => 'bar')
   end
+
+  # type conversion column
+  def tcc(type)
+    col = RDBI::Column.new
+    col.ruby_type = type
+    col
+  end
+
+  def convert(*args)
+    RDBI::Type.convert(*args)
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

@@ -7,7 +7,7 @@ class TestTypes < Test::Unit::TestCase
 
   def test_01_basic
     assert(@types)
-    assert_kind_of(HashPipe, @types)
+    assert_kind_of(Hash, @types)
     assert(@types.keys.include?(:integer))
     assert(@types.keys.include?(:decimal))
     assert(@types.keys.include?(:default))
@@ -16,5 +16,13 @@ class TestTypes < Test::Unit::TestCase
   end
 
   def test_02_basic_convert
+    assert_equal(1, convert("1", tcc(:integer), @types))
+    assert_equal(nil, convert(nil, tcc(:integer), @types))
+
+    assert_equal(BigDecimal("1.0"), convert("1.0", tcc(:decimal), @types))
+    assert_equal(nil, convert(nil, tcc(:decimal), @types))
+
+    assert_kind_of(DateTime, convert(DateTime.now, tcc(:default), @types))
+    assert_kind_of(Float, convert(1.0, tcc(:default), @types))
   end
 end

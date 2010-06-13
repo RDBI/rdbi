@@ -2,7 +2,7 @@ require 'helper'
 
 class TestTypes < Test::Unit::TestCase
   def setup
-    @types = RDBI::Type.create_type_hash
+    @types = RDBI::Type::Out.create_type_hash
   end
 
   def test_01_basic
@@ -11,8 +11,8 @@ class TestTypes < Test::Unit::TestCase
     assert(@types.keys.include?(:integer))
     assert(@types.keys.include?(:decimal))
     assert(@types.keys.include?(:default))
-    assert_respond_to(RDBI::Type, :create_type_hash)
-    assert_respond_to(RDBI::Type, :convert)
+    assert_respond_to(RDBI::Type::Out, :create_type_hash)
+    assert_respond_to(RDBI::Type::Out, :convert)
   end
 
   def test_02_basic_convert

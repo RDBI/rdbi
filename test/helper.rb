@@ -20,7 +20,7 @@ class Test::Unit::TestCase
   end
 
   def convert(*args)
-    RDBI::Type.convert(*args)
+    RDBI::Type::Out.convert(*args)
   end
 end
 

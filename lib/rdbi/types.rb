@@ -29,27 +29,29 @@ module RDBI
       TypeLib::FilterList.new([Filters::NULL, *ary])
     end
 
-    DEFAULTS = {
-      :integer  => filterlist(Filters::STR_TO_INT),
-      :decimal  => filterlist(Filters::STR_TO_DEC),
-      :datetime => filterlist(TypeLib::Canned.build_strptime_filter("%Y-%m-%d %H:%M:%S %z")),
-      :default  => filterlist(Filters::PASS)
-    }
+    module Out
+      DEFAULTS = {
+        :integer  => Type.filterlist(Filters::STR_TO_INT),
+        :decimal  => Type.filterlist(Filters::STR_TO_DEC),
+        :datetime => Type.filterlist(TypeLib::Canned.build_strptime_filter("%Y-%m-%d %H:%M:%S %z")),
+        :default  => Type.filterlist(Filters::PASS)
+      }
 
-    def self.create_type_hash
-      hash = DEFAULTS.dup
+      def self.create_type_hash
+        hash = DEFAULTS.dup
 
-      return hash
-    end
-
-    def self.convert(obj, column, type_hash)
-      fl = type_hash[column.ruby_type]
-
-      unless fl
-        fl = type_hash.default
+        return hash
       end
 
-      fl.execute(obj)
+      def self.convert(obj, column, type_hash)
+        fl = type_hash[column.ruby_type]
+
+        unless fl
+          fl = type_hash.default
+        end
+
+        fl.execute(obj)
+      end
     end
   end
 end

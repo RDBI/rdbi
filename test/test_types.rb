@@ -38,7 +38,7 @@ class TestTypes < Test::Unit::TestCase
   end
 
   def test_03_out_datetime_convert
-    format = "%Y-%m-%d %H:%M:%S %z"
+    format = RDBI::Type::DEFAULT_STRFTIME_FILTER
     dt = DateTime.now
 
     conv      = out_convert(dt, tcc(:datetime), @out_types).strftime(format)
@@ -54,5 +54,15 @@ class TestTypes < Test::Unit::TestCase
     assert_equal("1.0", in_convert(BigDecimal("1.0"), @in_types))
     assert_equal("artsy", in_convert("artsy", @in_types))
     assert_equal(nil, in_convert(nil, @in_types))
+  end
+
+  def test_05_in_datetime_convert
+    format = RDBI::Type::DEFAULT_STRFTIME_FILTER
+    dt = DateTime.now
+
+    conv      = in_convert(dt, @in_types)
+    formatted = dt.strftime(format)
+
+    assert_equal(formatted, conv)
   end
 end

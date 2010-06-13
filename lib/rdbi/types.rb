@@ -19,7 +19,7 @@ module RDBI
 
       TO_NULL            = proc { |obj| nil }
       TO_STRING_DECIMAL  = proc { |obj| obj.to_s('F') }
-      DATETIME_TO_STRING = proc { |obj| obj.strftime(DEFAULT_STRFTIME_FILTER) }
+      TO_STRING_DATETIME = proc { |obj| obj.strftime(DEFAULT_STRFTIME_FILTER) }
     end
 
     module Filters
@@ -29,7 +29,7 @@ module RDBI
       FROM_INTEGER   = TypeLib::Filter.new(Checks::IS_INTEGER,    Conversions::TO_STRING)
       FROM_NUMERIC   = TypeLib::Filter.new(Checks::IS_NUMERIC,    Conversions::TO_STRING)
       FROM_DECIMAL   = TypeLib::Filter.new(Checks::IS_BIGDECIMAL, Conversions::TO_STRING_DECIMAL)
-      FROM_DATETIME  = TypeLib::Filter.new(Checks::IS_DATETIME,   Conversions::DATETIME_TO_STRING)
+      FROM_DATETIME  = TypeLib::Filter.new(Checks::IS_DATETIME,   Conversions::TO_STRING_DATETIME)
     end
     
     # FilterList factory shorthand

@@ -65,4 +65,30 @@ class TestTypes < Test::Unit::TestCase
 
     assert_equal(formatted, conv)
   end
+
+  def test_06_out_integration
+    dt = DateTime.now
+    dbh = mock_connect 
+    sth = dbh.prepare("select * from foo")
+    sth.set_schema = RDBI::Schema.new(
+      [
+        RDBI::Column.new(:foo, :integer, :integer), 
+        RDBI::Column.new(:bar, :datetime, :datetime),
+        RDBI::Column.new(:quux, :varchar, :string),
+        RDBI::Column.new(:baz, :decimal, :decimal)
+      ]
+    )
+
+    sth.result = [["1", dt.strftime(RDBI::Type::DEFAULT_STRFTIME_FILTER), "hello, world!", "1.0"]]
+
+    res = sth.execute().fetch[0]
+
+    # we can't test datetime objects directly... because datetime is fail.
+    # so, what we do here is compare each result individually.
+    assert_equal(1, res[0])
+    assert_equal(dt.strftime(RDBI::Type::DEFAULT_STRFTIME_FILTER), res[1].strftime(RDBI::Type::DEFAULT_STRFTIME_FILTER))
+    assert_equal("hello, world!", res[2])
+    assert_equal(BigDecimal("1.0"), res[3])
+
+  end
 end

@@ -9,6 +9,7 @@ module RDBI
     # XXX STUB
     class Mock::STH < RDBI::Statement
       attr_accessor :result
+      attr_accessor :set_schema
 
       def initialize(query, dbh)
         super
@@ -32,7 +33,7 @@ module RDBI
                       end
                     end
 
-        return this_data, RDBI::Schema.new((0..9).to_a.map { RDBI::Column.new }), RDBI::Type.create_type_hash(RDBI::Type::Out)
+        return this_data, @set_schema || RDBI::Schema.new((0..9).to_a.map { RDBI::Column.new }), RDBI::Type.create_type_hash(RDBI::Type::Out)
       end
     end
 

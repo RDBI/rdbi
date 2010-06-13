@@ -11,7 +11,7 @@ RDBI::Column = Struct.new(
   :ruby_type,
   :precision,
   :scale,
-  :nullable?,
+  :nullable,
   :metadata,
   :default,
   :table

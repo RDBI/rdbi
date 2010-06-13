@@ -45,10 +45,11 @@ module RDBI
 
     module Out
       DEFAULTS = {
-        :integer  => Type.filterlist(Filters::STR_TO_INT),
-        :decimal  => Type.filterlist(Filters::STR_TO_DEC),
-        :datetime => Type.filterlist(TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)),
-        :default  => Type.filterlist()
+        :integer     => Type.filterlist(Filters::STR_TO_INT),
+        :decimal     => Type.filterlist(Filters::STR_TO_DEC),
+        :datetime    => Type.filterlist(TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)),
+        :timestamp   => Type.filterlist(TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)),
+        :default     => Type.filterlist()
       }
 
       def self.convert(obj, column, type_hash)

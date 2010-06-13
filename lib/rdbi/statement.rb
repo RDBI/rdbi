@@ -25,8 +25,8 @@ class RDBI::Statement
     raise StandardError, "you may not execute a finished handle" if @finished
 
     mutex.synchronize do
-      results, schema = new_execution(*binds)
-      @last_result = RDBI::Result.new(results, schema, self, binds)
+      results, schema, type_hash = new_execution(*binds)
+      @last_result = RDBI::Result.new(results, schema, self, binds, type_hash)
     end
   end
 end

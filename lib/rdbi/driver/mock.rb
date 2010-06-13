@@ -32,7 +32,7 @@ module RDBI
                       end
                     end
 
-        return this_data, RDBI::Schema.new
+        return this_data, RDBI::Schema.new((0..9).to_a.map { RDBI::Column.new }), RDBI::Type.create_type_hash(RDBI::Type::Out)
       end
     end
 

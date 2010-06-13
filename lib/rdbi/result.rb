@@ -6,6 +6,7 @@ class RDBI::Result
   attr_reader :sth
   attr_reader :driver
   attr_reader :rows
+  attr_reader :type_hash
 
   def binds
     @binds.dup
@@ -18,12 +19,13 @@ class RDBI::Result
   inline(:more, :more?)         { @index  < @data.size }
   inline(:has_data, :has_data?) { @data.size > 0 }
 
-  def initialize(data, schema, sth, binds)
+  def initialize(data, schema, sth, binds, type_hash)
     @schema       = schema
     @data         = data
     @rows         = data.size
     @sth          = sth
     @binds        = binds
+    @type_hash    = type_hash
     @index        = 0
     @mutex        = Mutex.new
     @driver       = RDBI::Result::Driver::Array
@@ -89,7 +91,17 @@ class RDBI::Result::Driver
   end
 
   def fetch(row_count)
-    @result.raw_fetch(row_count)
+    @result.raw_fetch(row_count).map do |row|
+      convert_row(row)
+    end
+  end
+
+  def convert_row(row)
+    newrow = []
+    row.each_with_index do |x, i|
+      newrow.push(RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash))
+    end
+    return newrow
   end
 end
 

@@ -10,6 +10,7 @@ module RDBI
     class Mock::STH < RDBI::Statement
       attr_accessor :result
       attr_accessor :set_schema
+      attr_accessor :input_type_map
 
       def initialize(query, dbh)
         super

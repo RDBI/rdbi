@@ -30,7 +30,7 @@ class TestStatement < Test::Unit::TestCase
   def test_03_execute
     res = dbh.execute("select * from foo where bar=?", 1)
     assert_kind_of(RDBI::Result, res)
-    assert_equal(%W[1 2 3 4 5].map { |x| [x.to_i] }, res.fetch(:all))
+    assert_equal(%W[10 11 12 13 14].collect { |x| [x] }, res.fetch(:all))
 
     sth = dbh.prepare("select * from foo where bar=?")
     assert_kind_of(RDBI::Statement, sth)
@@ -38,7 +38,7 @@ class TestStatement < Test::Unit::TestCase
     assert_respond_to(sth, :new_execution)
     assert_respond_to(sth, :execute)
     res = sth.execute(1)
-    assert_equal(%W[1 2 3 4 5].map { |x| [x.to_i] }, res.fetch(:all))
+    assert_equal(%W[10 11 12 13 14].map { |x| [x] }, res.fetch(:all))
   end
 
   def test_04_finish

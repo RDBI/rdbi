@@ -89,6 +89,5 @@ class TestTypes < Test::Unit::TestCase
     assert_equal(dt.strftime(RDBI::Type::DEFAULT_STRFTIME_FILTER), res[1].strftime(RDBI::Type::DEFAULT_STRFTIME_FILTER))
     assert_equal("hello, world!", res[2])
     assert_equal(BigDecimal("1.0"), res[3])
-
   end
 end

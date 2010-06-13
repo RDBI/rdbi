@@ -5,6 +5,7 @@ class RDBI::Statement
   attr_reader :query
   attr_reader :last_result
   attr_reader :mutex
+  attr_reader :input_type_map
 
   inline(:finished, :finished?)   { @finished        }
   inline(:driver)                 { dbh.driver       }
@@ -19,10 +20,13 @@ class RDBI::Statement
     @dbh   = dbh
     @mutex = Mutex.new
     @finished = false
+    @input_type_map = RDBI::Type.create_type_hash(RDBI::Type::In)
   end
 
   def execute(*binds)
     raise StandardError, "you may not execute a finished handle" if @finished
+
+    binds = binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) }
 
     mutex.synchronize do
       results, schema, type_hash = new_execution(*binds)

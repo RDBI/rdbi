@@ -19,8 +19,12 @@ class Test::Unit::TestCase
     col
   end
 
-  def convert(*args)
+  def out_convert(*args)
     RDBI::Type::Out.convert(*args)
+  end
+
+  def in_convert(*args)
+    RDBI::Type::In.convert(*args)
   end
 end
 

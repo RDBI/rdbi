@@ -49,8 +49,6 @@ class RDBI::Result
     @fetch_handle = driver_klass.new(self, *args) 
   end
 
-  # XXX after some thought, I really don't like this facade approach. Maybe we
-  # just want to hand them an inheriting result.
   def fetch(row_count=1, driver_klass=nil, *args)
     if driver_klass
       as(driver_klass, *args)

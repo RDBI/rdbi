@@ -36,11 +36,7 @@ module RDBI
   # RDBI::Database object provided in as the first argument.
   def self.connect(klass, *args)
 
-    klass = begin
-              klass.kind_of?(Class) ? klass : self::Driver.const_get(klass.to_s)
-            rescue
-              raise ArgumentError, "Invalid argument for driver name; must be Class, Symbol, or String"
-            end
+    klass = RDBI::Util.class_from_class_or_symbol(klass, self::Driver)
 
     driver = klass.new(*args)
     dbh = @last_dbh = driver.new_handle
@@ -111,6 +107,14 @@ module RDBI::Util
       require lib
     rescue LoadError => e
       raise LoadError, "The '#{lib}' gem is required to use this driver. Please install it."
+    end
+  end
+
+  def self.class_from_class_or_symbol(klass, namespace)
+    begin
+      klass.kind_of?(Class) ? klass : namespace.const_get(klass.to_s)
+    rescue
+      raise ArgumentError, "Invalid argument for driver name; must be Class, Symbol, or String"
     end
   end
 end

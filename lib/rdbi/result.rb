@@ -147,6 +147,8 @@ class RDBI::Result::Driver::HashPipe < RDBI::Result::Driver
         hash[column_names[i]] = item
       end
 
+      hash.lock!
+
       hashes.push(hash)
     end
 

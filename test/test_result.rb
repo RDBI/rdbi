@@ -180,9 +180,13 @@ class TestResult < Test::Unit::TestCase
 
     results = res.fetch(1)
     assert_kind_of(Array, results)
-    assert_kind_of(HashPipe, results[0])
+    assert(results[0].kind_of?(HashPipe)) # magic!!!!
 
     hash = results[0]
+
+    assert_raises(NoMethodError) { hash[:test] = "something" }
+    assert_raises(NoMethodError) { hash['test'] = "something" }
+    assert_raises(NoMethodError) { hash.test = "something" }
 
     assert_equal(-1, hash.zero)
     assert_equal(0, hash.one)

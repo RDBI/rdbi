@@ -17,12 +17,10 @@ class RDBI::Database
   attr_accessor :database_name
 
   # the last statement handle allocated. affected by +prepare+ and +execute+.
-  inline(:last_statement)  { Thread.current[:last_statement] }
-  inline(:last_statement=) { |sth| Thread.current[:last_statement] = sth }
+  attr_threaded_accessor :last_statement
   
   # the last query sent, as a string.
-  inline(:last_query)  { Thread.current[:last_query] }
-  inline(:last_query=) { |query| Thread.current[:last_query] = query }
+  attr_threaded_accessor :last_query
 
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction }

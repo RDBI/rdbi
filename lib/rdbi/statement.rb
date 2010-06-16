@@ -6,8 +6,7 @@ class RDBI::Statement
   attr_reader :mutex
   attr_reader :input_type_map
 
-  inline(:last_result)  { Thread.current[:last_result] }
-  inline(:last_result=) { |res| Thread.current[:last_result] = res }
+  attr_threaded_accessor :last_result
 
   inline(:finished, :finished?)   { @finished        }
   inline(:driver)                 { dbh.driver       }

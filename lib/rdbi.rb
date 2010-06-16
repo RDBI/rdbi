@@ -19,8 +19,7 @@ module RDBI
     #
     # The last database handle allocated. This may come from pooled connections or regular ones.
     #
-    inline(:last_dbh)  { Thread.current[:last_dbh] }
-    inline(:last_dbh=) { |dbh| Thread.current[:last_dbh] = dbh }
+    attr_threaded_accessor :last_dbh
   end
 
   #

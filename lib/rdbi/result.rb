@@ -119,11 +119,7 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
   def initialize(result, *args)
     super
     if RUBY_VERSION =~ /^1.8/
-      begin
-        require 'fastercsv'
-      rescue LoadError => e
-        raise LoadError, "The 'fastercsv' gem is required to use this driver. Please install it."
-      end
+      RDBI::Util.optional_require('fastercsv')
     else
       require 'csv'
     end
@@ -143,12 +139,7 @@ class RDBI::Result::Driver::HashPipe < RDBI::Result::Driver
   def initialize(result, *args)
     super
 
-    # FIXME consolidate duplicate code
-    begin
-      require 'hashpipe'
-    rescue LoadError => e
-      raise LoadError, "The 'hashpipe' gem is required to use this driver. Please install it."
-    end
+    RDBI::Util.optional_require('hashpipe')
   end
 
   def fetch(row_count)

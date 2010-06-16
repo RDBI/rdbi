@@ -43,6 +43,12 @@ class RDBI::Result
 
   def as(driver_klass, *args)
     # FIXME consistent class logic with RDBI.connect
+    driver_klass = begin
+                     driver_klass.kind_of?(Class) ? driver_klass : RDBI::Result::Driver.const_get(driver_klass.to_s)
+                   rescue
+                     raise ArgumentError, "Invalid argument for driver name; must be Class, Symbol, or String"
+                   end
+
     @driver       = driver_klass
     @fetch_handle = driver_klass.new(self, *args) 
   end

@@ -151,7 +151,10 @@ class TestResult < Test::Unit::TestCase
     )
 
     # XXX reset intentionally.
-    res.as(RDBI::Result::Driver::Array)
+    res.as(:Array)
+    assert_equal([[-1, 0, 1]], res.fetch(1))
+
+    res.rewind
 
     assert_equal(
       "-1,0,1\n",

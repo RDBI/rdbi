@@ -14,7 +14,8 @@ class TestResult < Test::Unit::TestCase
   end
   
   def mock_result
-    RDBI::Result.new(generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(:ruby_type => :default) }), @dbh.prepare("foo"), [1], { :default => RDBI::Type.filterlist() })
+    names = [:zero, :one, :two]
+    RDBI::Result.new(generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), @dbh.prepare("foo"), [1], { :default => RDBI::Type.filterlist() })
   end
 
   def get_index(res)
@@ -171,6 +172,27 @@ class TestResult < Test::Unit::TestCase
       "-1,0,1\n0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
       res.fetch(:all, RDBI::Result::Driver::CSV)
     )
+  end
+
+  def test_07_as
+    res = mock_result
+    res.as(RDBI::Result::Driver::HashPipe)
+
+    results = res.fetch(1)
+    assert_kind_of(Array, results)
+    assert_kind_of(HashPipe, results[0])
+
+    hash = results[0]
+
+    assert_equal(-1, hash.zero)
+    assert_equal(0, hash.one)
+    assert_equal(1, hash.two)
+
+    hash = res.fetch(1)[0]
+
+    assert_equal(0, hash.zero)
+    assert_equal(1, hash.one)
+    assert_equal(2, hash.two)
   end
 end
 

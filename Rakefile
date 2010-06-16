@@ -14,6 +14,7 @@ begin
     gem.add_development_dependency 'test-unit'
     gem.add_development_dependency 'rdoc'
     gem.add_development_dependency 'fastercsv'
+    gem.add_development_dependency 'hashpipe'
 
     gem.add_dependency 'methlab', '>= 0.0.9'
     gem.add_dependency 'epoxy', '>= 0.2.1'

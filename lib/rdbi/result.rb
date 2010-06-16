@@ -121,7 +121,7 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
     if RUBY_VERSION =~ /^1.8/
       begin
         require 'fastercsv'
-      rescue
+      rescue LoadError => e
         raise LoadError, "The 'fastercsv' gem is required to use this driver. Please install it."
       end
     else
@@ -136,6 +136,36 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
       csv_string << row.to_csv
     end
     return csv_string
+  end
+end
+
+class RDBI::Result::Driver::HashPipe < RDBI::Result::Driver
+  def initialize(result, *args)
+    super
+
+    # FIXME consolidate duplicate code
+    begin
+      require 'hashpipe'
+    rescue LoadError => e
+      raise LoadError, "The 'hashpipe' gem is required to use this driver. Please install it."
+    end
+  end
+
+  def fetch(row_count)
+    hashes = []
+    column_names = @result.schema.columns.map(&:name)
+
+    @result.raw_fetch(row_count).each do |row|
+      hash = ::HashPipe.new
+
+      row.each_with_index do |item, i| 
+        hash[column_names[i]] = item
+      end
+
+      hashes.push(hash)
+    end
+
+    return hashes
   end
 end
 

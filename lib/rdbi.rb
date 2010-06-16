@@ -67,7 +67,7 @@ module RDBI
     if RDBI::Pool[pool_name]
       dbh = RDBI::Pool[pool_name].get_dbh
     else
-      dbh = RDBI::Pool.new(pool_name, [klass, *args]).get_dbh
+      dbh = RDBI::Pool.new(pool_name, [klass, args]).get_dbh
     end
 
     @last_dbh = dbh
@@ -116,6 +116,16 @@ module RDBI::Util
     rescue
       raise ArgumentError, "Invalid argument for driver name; must be Class, Symbol, or String"
     end
+  end
+
+  def self.key_hash_as_symbols(hash)
+    new_hash = { }
+
+    hash.keys.each do |key|
+      new_hash[key.to_sym] = hash[key]
+    end
+
+    new_hash
   end
 end
 

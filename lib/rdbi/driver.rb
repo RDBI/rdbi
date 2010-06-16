@@ -4,7 +4,7 @@ class RDBI::Driver
 
   def initialize(dbh_class, *args)
     @dbh_class = dbh_class
-    @connect_args = args
+    @connect_args = [RDBI::Util.key_hash_as_symbols(args[0])]
   end
 
   def new_handle 

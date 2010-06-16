@@ -3,15 +3,17 @@ class RDBI::Statement
 
   attr_reader :dbh
   attr_reader :query
-  attr_reader :last_result
   attr_reader :mutex
   attr_reader :input_type_map
+
+  inline(:last_result)  { Thread.current[:last_result] }
+  inline(:last_result=) { |res| Thread.current[:last_result] = res }
 
   inline(:finished, :finished?)   { @finished        }
   inline(:driver)                 { dbh.driver       }
   inline(:finish)                 { @finished = true }
 
-  inline(:last_result, :new_execution) do |*args|
+  inline(:new_execution) do |*args|
     raise NoMethodError, "this method is not implemented in this driver"
   end
 
@@ -30,7 +32,7 @@ class RDBI::Statement
 
     mutex.synchronize do
       results, schema, type_hash = new_execution(*binds)
-      @last_result = RDBI::Result.new(results, schema, self, binds, type_hash)
+      self.last_result = RDBI::Result.new(results, schema, self, binds, type_hash)
     end
   end
 end

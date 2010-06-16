@@ -7,6 +7,7 @@ module RDBI
   # FIXME would like to use methlab here, but am not entirely sure how to do this best.
   #
   class << self
+    extend MethLab
     #
     # Every database handle allocated throughout the lifetime of the
     # program. This functionality is subject to change and may be pruned
@@ -17,7 +18,9 @@ module RDBI
     #++
     #
     # The last database handle allocated. This may come from pooled connections or regular ones.
-    attr_reader :last_dbh
+    #
+    inline(:last_dbh)  { Thread.current[:last_dbh] }
+    inline(:last_dbh=) { |dbh| Thread.current[:last_dbh] = dbh }
   end
 
   #
@@ -39,7 +42,7 @@ module RDBI
     klass = RDBI::Util.class_from_class_or_symbol(klass, self::Driver)
 
     driver = klass.new(*args)
-    dbh = @last_dbh = driver.new_handle
+    dbh = self.last_dbh = driver.new_handle
 
     @all_connections ||= []
     @all_connections.push(dbh)
@@ -70,7 +73,7 @@ module RDBI
       dbh = RDBI::Pool.new(pool_name, [klass, args]).get_dbh
     end
 
-    @last_dbh = dbh
+    self.last_dbh = dbh
 
     yield dbh if block_given?
     return dbh

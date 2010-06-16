@@ -17,13 +17,16 @@ class RDBI::Database
   attr_accessor :database_name
 
   # the last statement handle allocated. affected by +prepare+ and +execute+.
-  attr_reader :last_statement
+  inline(:last_statement)  { Thread.current[:last_statement] }
+  inline(:last_statement=) { |sth| Thread.current[:last_statement] = sth }
+  
+  # the last query sent, as a string.
+  inline(:last_query)  { Thread.current[:last_query] }
+  inline(:last_query=) { |query| Thread.current[:last_query] = query }
 
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction }
 
-  # the last query sent, as a string.
-  attr_reader :last_query
 
   # the mutex for this database handle.
   attr_reader :mutex
@@ -108,12 +111,12 @@ class RDBI::Database
   def prepare(query)
     sth = nil
     mutex.synchronize do
-      @last_query = query
+      self.last_query = query
       sth = new_statement(query)
       yield sth if block_given?
     end
 
-    return @last_statement = sth
+    return self.last_statement = sth
   end
  
   #
@@ -128,8 +131,8 @@ class RDBI::Database
     res = nil
 
     mutex.synchronize do
-      @last_query = query
-      @last_statement = sth = new_statement(query)
+      self.last_query = query
+      self.last_statement = sth = new_statement(query)
       res = sth.execute(*binds)
       sth.finish
       yield res if block_given?
@@ -146,7 +149,7 @@ class RDBI::Database
   #
   def preprocess_query(query, *binds)
     mutex.synchronize do
-      @last_query = query
+      self.last_query = query
     end
 
     ep = Epoxy.new(query)

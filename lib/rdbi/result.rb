@@ -34,7 +34,7 @@ class RDBI::Result
   end
 
   def reload
-    res = @sth.execute(@binds)
+    res = @sth.execute(*@binds)
     @data      = res.instance_eval { @data }
     @type_hash = res.instance_eval { @type_hash }
     @schema    = res.instance_eval { @schema }

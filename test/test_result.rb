@@ -202,14 +202,18 @@ class TestResult < Test::Unit::TestCase
   def test_08_reload
     res = mock_result 
 
-    assert_equal([-1, 0, 1], res.fetch(:all)[0])
+    assert_equal([-1, 0, 1], res.fetch(1)[0])
+    assert_equal(1, res.instance_eval { @index })
+    assert_equal(10, res.rows)
     assert_equal([:zero, :one, :two], res.schema.columns.map(&:name))
 
     res.reload
 
     # this will actually come back from the Mock driver, which will be
     # completely different.  not the best test, but it gets the job done.
-    assert_equal(%W[10], res.fetch(:all)[0])
+    assert_equal(%W[10], res.fetch(1)[0])
+    assert_equal(1, res.instance_eval { @index })
+    assert_equal(5, res.rows)
     assert_equal((0..9).to_a, res.schema.columns.map(&:name))
   end
 end

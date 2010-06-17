@@ -5,10 +5,10 @@ class TestDatabase < Test::Unit::TestCase
     @dbh = mock_connect
   end
 
-  def assert_transaction(bool)
+  def assert_transaction(count)
     in_transaction = @dbh.instance_variable_get("@in_transaction") || 
       @dbh.instance_variable_get(:@in_transaction)
-    assert_equal(bool, in_transaction)
+    assert_equal(count, in_transaction)
   end
 
   def test_01_ping
@@ -23,10 +23,10 @@ class TestDatabase < Test::Unit::TestCase
     end
 
     res = @dbh.transaction do |dbh|
-      assert_transaction(true)
+      assert_transaction(1)
     end
 
-    assert_transaction(false)
+    assert_transaction(0)
     assert_equal(true, res)
 
     # rollback works when commit fails
@@ -36,12 +36,12 @@ class TestDatabase < Test::Unit::TestCase
 
     assert_raises(StandardError.new("should call rollback")) do 
       @dbh.transaction do |dbh|
-        assert_transaction(true)
+        assert_transaction(1)
         true
       end
     end
 
-    assert_transaction(false)
+    assert_transaction(0)
     assert_equal(true, res)
 
     # rollback works when transaction fails
@@ -50,14 +50,14 @@ class TestDatabase < Test::Unit::TestCase
 
     assert_raises(StandardError.new("should call rollback")) do 
       @dbh.transaction do |dbh|
-        assert_transaction(true)
+        assert_transaction(1)
 
         raise StandardError, "should call rollback"
         nil
       end
     end
 
-    assert_transaction(false)
+    assert_transaction(0)
     assert_equal(true, res)
 
     # commit called within transaction
@@ -65,11 +65,11 @@ class TestDatabase < Test::Unit::TestCase
     @dbh.next_action = proc { |*args| @dbh.next_action = proc { raise "shit" }; "commit called" }
 
     res = @dbh.transaction do |dbh|
-      assert_transaction(true)
+      assert_transaction(1)
 
       dbh.commit
 
-      assert_transaction(false)
+      assert_transaction(0)
       true
     end
 
@@ -81,11 +81,11 @@ class TestDatabase < Test::Unit::TestCase
     @dbh.next_action = proc { |*args| @dbh.next_action = proc { raise "shit" }; "commit called" }
 
     res = @dbh.transaction do |dbh|
-      assert_transaction(true)
+      assert_transaction(1)
 
       dbh.rollback
 
-      assert_transaction(false)
+      assert_transaction(0)
     end
 
     assert_not_equal("rollback called", res)

@@ -23,7 +23,7 @@ class RDBI::Database
   attr_threaded_accessor :last_query
 
   # are we currently in a transaction?
-  inline(:in_transaction, :in_transaction?) { @in_transaction }
+  inline(:in_transaction, :in_transaction?) { @in_transaction > 0}
 
 
   # the mutex for this database handle.
@@ -41,7 +41,7 @@ class RDBI::Database
     :schema
   ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
-  inline(:commit, :rollback) { @in_transaction = false }
+  inline(:commit, :rollback) { @in_transaction -= 1 unless @in_transaction == 0}
 
   #
   # Create a new database handle. This is typically done by a driver and
@@ -51,9 +51,10 @@ class RDBI::Database
   # RDBI.connect.
   def initialize(*args)
     # FIXME symbolify
-    @connect_args = args[0]
-    @connected    = true
-    @mutex        = Mutex.new
+    @connect_args   = args[0]
+    @connected      = true
+    @mutex          = Mutex.new
+    @in_transaction = 0
   end
 
   #
@@ -85,15 +86,15 @@ class RDBI::Database
   # for you.
   #
   def transaction(&block)
-    @in_transaction = true
+    @in_transaction += 1
     begin
       yield self
-      self.commit if @in_transaction
+      self.commit if @in_transaction > 0
     rescue => e
       self.rollback 
       raise e
     ensure
-      @in_transaction = false
+      @in_transaction -= 1 unless @in_transaction == 0
     end
   end
 

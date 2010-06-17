@@ -147,6 +147,50 @@ class TestDatabase < Test::Unit::TestCase
     assert_not_equal(@dbh.last_statement.object_id, sth.object_id)
   end
 
+  def test_07_nested_transactions
+    @dbh.transaction do
+      @dbh.transaction do
+        assert_transaction(2)
+        @dbh.commit
+        assert_transaction(1)
+        # XXX should this be how it works?
+        @dbh.commit
+        assert_transaction(0)
+      end
+    end
+
+    @dbh.transaction do
+      @dbh.transaction do
+        assert_transaction(2)
+        @dbh.commit
+        assert_transaction(1)
+      end
+      @dbh.commit
+      assert_transaction(0)
+    end
+    
+    @dbh.transaction do
+      @dbh.transaction do
+        assert_transaction(2)
+        @dbh.rollback
+        assert_transaction(1)
+        # XXX should this be how it works?
+        @dbh.rollback
+        assert_transaction(0)
+      end
+    end
+
+    @dbh.transaction do
+      @dbh.transaction do
+        assert_transaction(2)
+        @dbh.rollback
+        assert_transaction(1)
+      end
+      @dbh.rollback
+      assert_transaction(0)
+    end
+  end
+
   def teardown
     @dbh.disconnect
   end

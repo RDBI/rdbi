@@ -174,7 +174,7 @@ class TestResult < Test::Unit::TestCase
     )
   end
 
-  def test_07_as
+  def test_07_as_hashpipe
     res = mock_result
     res.as(RDBI::Result::Driver::HashPipe)
 

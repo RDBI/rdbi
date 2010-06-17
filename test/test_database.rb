@@ -9,6 +9,10 @@ class TestDatabase < Test::Unit::TestCase
     in_transaction = @dbh.instance_variable_get("@in_transaction") || 
       @dbh.instance_variable_get(:@in_transaction)
     assert_equal(count, in_transaction)
+
+    if in_transaction > 0
+      assert(@dbh.in_transaction?)
+    end
   end
 
   def test_01_ping

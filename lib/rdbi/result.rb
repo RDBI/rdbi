@@ -33,6 +33,15 @@ class RDBI::Result
     as(@driver)
   end
 
+  def reload
+    res = @sth.execute(@binds)
+    @data      = res.instance_eval { @data }
+    @type_hash = res.instance_eval { @type_hash }
+    @schema    = res.instance_eval { @schema }
+    @rows      = res.instance_eval { @rows }
+    @index     = 0
+  end
+
   def each
     yield(fetch[0]) while more?
   end

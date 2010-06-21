@@ -13,6 +13,9 @@
 # the culled database handles.
 #
 class RDBI::Pool
+
+  @mutex = Mutex.new
+
   class << self
     include Enumerable
 
@@ -37,15 +40,23 @@ class RDBI::Pool
     #
     # Retrieves a pool object for the name, or nothing if it does not exist.
     def [](name)
-      @pools ||= { }
-      @pools[name.to_sym]
+      mutex.synchronize do
+        @pools ||= { }
+        @pools[name.to_sym]
+      end
     end
 
     #
     # Sets the pool for the name. This is not recommended for end-user code.
     def []=(name, value)
-      @pools ||= { }
-      @pools[name.to_sym] = value
+      mutex.synchronize do
+        @pools ||= { }
+        @pools[name.to_sym] = value
+      end
+    end
+
+    def mutex
+      @mutex
     end
   end
 

@@ -13,7 +13,9 @@ begin
 
     gem.add_development_dependency 'test-unit'
     gem.add_development_dependency 'rdoc'
-    gem.add_development_dependency 'fastercsv'
+    unless RUBY_VERSION =~ /^1.9/
+      gem.add_development_dependency 'fastercsv'
+    end
     gem.add_development_dependency 'hashpipe'
 
     gem.add_dependency 'methlab', '>= 0.0.9'

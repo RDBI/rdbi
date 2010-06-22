@@ -51,7 +51,7 @@ module RDBI
         10
       end
 
-      inline(:rollback) { super; "rollback called" }
+      inline(:rollback) { super(); "rollback called" }
 
       # XXX more methods to be defined this way.
       inline(:commit) do |*args|

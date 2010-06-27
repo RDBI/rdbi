@@ -101,6 +101,10 @@ module RDBI
   def self.disconnect_all
     @all_connections.each(&:disconnect)
   end
+
+  class TransactionError < StandardError
+  end
+
 end
 
 module RDBI::Util

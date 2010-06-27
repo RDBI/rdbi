@@ -2,7 +2,8 @@
 
 RDBI::Schema = Struct.new(
   :columns,
-  :tables
+  :tables,
+  :type
 )
 
 RDBI::Column = Struct.new(

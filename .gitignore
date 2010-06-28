@@ -16,7 +16,9 @@ tmtags
 ## PROJECT::GENERAL
 coverage
 rdoc
+doc
 pkg
+.yardoc
 
 ## PROJECT::SPECIFIC
 *.aux
@@ -29,3 +31,4 @@ pkg
 *.toc
 *.tp
 *.vr
+rdbi.gemspec

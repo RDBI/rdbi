@@ -14,7 +14,8 @@ begin
     gem.authors = ["Erik Hollensbe"]
 
     gem.add_development_dependency 'test-unit'
-    gem.add_development_dependency 'rdoc'
+    #gem.add_development_dependency 'rdoc'
+    gem.add_development_dependency 'yard'
     unless RUBY_VERSION =~ /^1.9/
       gem.add_development_dependency 'fastercsv'
     end
@@ -75,16 +76,25 @@ end
 
 task :default => :test
 
-require 'rdoc/task'
-RDoc::Task.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "rdbi #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+begin
+  require 'yard'
+  YARD::Rake::YardocTask.new do |yard|
+    yard.files   = %w[lib/**/*.rb README*]
+    yard.options = %w[--protected --private ]
+  end
+  
+  task :rdoc => [:yard]
+  task :clobber_rdoc => [:yard]
+rescue LoadError => e
+  [:rdoc, :yard, :clobber_rdoc].each do |my_task|
+    task my_task do
+      abort "YARD is not available, which is needed to generate this documentation"
+    end
+  end
 end
 
 task :to_blog => [:clobber_rdoc, :rdoc] do
-  sh "rm -fr $git/blog/content/docs/rdbi && mv rdoc $git/blog/content/docs/rdbi"
+  sh "rm -fr $git/blog/content/docs/rdbi && mv doc $git/blog/content/docs/rdbi"
 end
 
 task :install => [:test, :build]

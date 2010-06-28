@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'rake'
 
+version = (File.exist?('VERSION') ? File.read('VERSION') : "").chomp
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
@@ -75,8 +77,6 @@ task :default => :test
 
 require 'rdoc/task'
 RDoc::Task.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "rdbi #{version}"
   rdoc.rdoc_files.include('README*')
@@ -86,5 +86,7 @@ end
 task :to_blog => [:clobber_rdoc, :rdoc] do
   sh "rm -fr $git/blog/content/docs/rdbi && mv rdoc $git/blog/content/docs/rdbi"
 end
+
+task :install => [:test, :build]
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

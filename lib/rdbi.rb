@@ -110,7 +110,6 @@ module RDBI
 
   class TransactionError < Error
   end
-
 end
 
 module RDBI::Util

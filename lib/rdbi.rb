@@ -102,7 +102,13 @@ module RDBI
     @all_connections.each(&:disconnect)
   end
 
-  class TransactionError < StandardError
+  class Error < StandardError
+  end
+
+  class DisconnectedError < Error
+  end
+
+  class TransactionError < Error
   end
 
 end

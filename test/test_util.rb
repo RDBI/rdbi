@@ -19,7 +19,7 @@ class TestUtil < Test::Unit::TestCase
     end
 
     assert_equal(
-      RDBI::Driver::Mock, 
+      RDBI::Driver::Mock,
       RDBI::Util.class_from_class_or_symbol(RDBI::Driver::Mock, RDBI::Driver)
     )
 
@@ -27,7 +27,7 @@ class TestUtil < Test::Unit::TestCase
       RDBI::Driver::Mock,
       RDBI::Util.class_from_class_or_symbol(:Mock, RDBI::Driver)
     )
-    
+
     assert_equal(
       RDBI::Driver::Mock,
       RDBI::Util.class_from_class_or_symbol('Mock', RDBI::Driver)

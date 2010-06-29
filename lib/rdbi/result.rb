@@ -13,7 +13,7 @@ class RDBI::Result
   end
 
   # FIXME async
-  inline(:complete, :complete?) { true } 
+  inline(:complete, :complete?) { true }
 
   inline(:eof, :eof?)           { @index >= @data.size }
   inline(:more, :more?)         { @index  < @data.size }
@@ -29,7 +29,7 @@ class RDBI::Result
     @index        = 0
     @mutex        = Mutex.new
     @driver       = RDBI::Result::Driver::Array
-    @fetch_handle = nil 
+    @fetch_handle = nil
     as(@driver)
   end
 
@@ -55,7 +55,7 @@ class RDBI::Result
     driver_klass  = RDBI::Util.class_from_class_or_symbol(driver_klass, RDBI::Result::Driver)
 
     @driver       = driver_klass
-    @fetch_handle = driver_klass.new(self, *args) 
+    @fetch_handle = driver_klass.new(self, *args)
   end
 
   def fetch(row_count=1, driver_klass=nil, *args)
@@ -152,7 +152,7 @@ class RDBI::Result::Driver::HashPipe < RDBI::Result::Driver
     @result.raw_fetch(row_count).each do |row|
       hash = ::HashPipe.new
 
-      row.each_with_index do |item, i| 
+      row.each_with_index do |item, i|
         hash[column_names[i]] = item
       end
 

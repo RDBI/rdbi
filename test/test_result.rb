@@ -41,6 +41,7 @@ class TestResult < Test::Unit::TestCase
     assert_kind_of(RDBI::Statement, guts[:sth])
     assert_kind_of(RDBI::Statement, res.sth)
     assert_equal(res.sth, guts[:sth])
+    res.sth.finish
 
     assert_kind_of(RDBI::Schema, guts[:schema])
     assert_kind_of(RDBI::Schema, res.schema)
@@ -77,6 +78,8 @@ class TestResult < Test::Unit::TestCase
     ].collect(&:to_sym).each do |sym|
       assert_respond_to(res, sym)
     end
+
+    res.sth.finish
   end
 
   def test_03_fetch
@@ -87,9 +90,11 @@ class TestResult < Test::Unit::TestCase
     assert_equal(generate_data[1..9], res.fetch(9))
     assert_equal(10, get_index(res))
     assert_equal([], res.fetch)
+    res.sth.finish
 
     res = mock_result
     assert_equal(generate_data, res.fetch(:all))
+    res.sth.finish
 
     res = mock_result
     res.fetch
@@ -97,6 +102,7 @@ class TestResult < Test::Unit::TestCase
     assert_equal(1, get_index(res))
     assert_equal(generate_data[1..9], res.fetch(:rest))
     assert_equal(10, get_index(res))
+    res.sth.finish
   end
 
   def test_04_finish
@@ -131,6 +137,7 @@ class TestResult < Test::Unit::TestCase
     assert(res.eof)
     assert(!res.more?)
     assert(!res.more)
+    res.sth.finish
   end
 
   def test_06_as
@@ -155,6 +162,7 @@ class TestResult < Test::Unit::TestCase
     res.as(:Array)
     assert_equal([[-1, 0, 1]], res.fetch(1))
 
+    res.sth.finish
     res.rewind
 
     assert_equal(
@@ -172,6 +180,7 @@ class TestResult < Test::Unit::TestCase
       "-1,0,1\n0,1,2\n1,2,3\n2,3,4\n3,4,5\n4,5,6\n5,6,7\n6,7,8\n7,8,9\n8,9,10\n",
       res.fetch(:all, RDBI::Result::Driver::CSV)
     )
+    res.sth.finish
   end
 
   def test_07_as_struct
@@ -197,6 +206,7 @@ class TestResult < Test::Unit::TestCase
     assert_equal(0, hash.zero)
     assert_equal(1, hash.one)
     assert_equal(2, hash.two)
+    res.sth.finish
   end
 
   def test_08_reload
@@ -215,6 +225,7 @@ class TestResult < Test::Unit::TestCase
     assert_equal(1, res.instance_eval { @index })
     assert_equal(5, res.rows)
     assert_equal((0..9).to_a, res.schema.columns.map(&:name))
+    res.finish
   end
 end
 

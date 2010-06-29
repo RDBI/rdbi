@@ -17,6 +17,7 @@ class TestStatement < Test::Unit::TestCase
     assert_kind_of(RDBI::Statement, sth)
     assert_kind_of(RDBI::Database, sth.dbh)
     assert_equal(sth.query, "some query")
+    sth.finish
   end
 
   def test_02_accessors
@@ -25,6 +26,7 @@ class TestStatement < Test::Unit::TestCase
     assert_kind_of(Mutex, sth.mutex)
     assert(!sth.finished?)
     assert(!sth.finished)
+    sth.finish
   end
 
   def test_03_execute
@@ -39,6 +41,7 @@ class TestStatement < Test::Unit::TestCase
     assert_respond_to(sth, :execute)
     res = sth.execute(1)
     assert_equal(%W[10 11 12 13 14].map { |x| [x] }, res.fetch(:all))
+    sth.finish
   end
 
   def test_04_finish
@@ -48,6 +51,7 @@ class TestStatement < Test::Unit::TestCase
     sth.finish
     assert(sth.finished?)
     assert_raises(StandardError.new("you may not execute a finished handle")) { sth.execute }
+    sth.finish
   end
 end
 

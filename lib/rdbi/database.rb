@@ -22,6 +22,9 @@ class RDBI::Database
   # the last query sent, as a string.
   attr_threaded_accessor :last_query
 
+  # all the open statement handles.
+  attr_threaded_accessor :open_statements
+
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction > 0}
 
@@ -54,6 +57,19 @@ class RDBI::Database
     @connected      = true
     @mutex          = Mutex.new
     @in_transaction = 0
+    self.open_statements = []
+  end
+
+  #
+  # disconnects from the database: will close (and complain, loudly) any
+  # statement handles left open.
+  #
+  def disconnect
+    unless self.open_statements.empty?
+      warn "[RDBI] Open statements during disconnection -- automatically finishing. You should fix this."
+      self.open_statements.each(&:finish)
+    end
+    @connected = false
   end
 
   #

@@ -191,6 +191,26 @@ class TestDatabase < Test::Unit::TestCase
     end
   end
 
+  def test_08_block_form
+    my_sth = nil
+    my_res = nil
+
+    @dbh.prepare("some statement") do |sth|
+      assert(sth)
+      assert_respond_to(sth, :execute)
+      res = sth.execute
+      assert(res)
+      my_sth = sth
+    end
+
+    assert(my_sth.finished?)
+
+    @dbh.execute("some statement") do |res|
+      assert(res)
+      assert_kind_of(RDBI::Result, res)
+    end
+  end
+
   def teardown
     @dbh.disconnect
   end

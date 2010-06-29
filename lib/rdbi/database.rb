@@ -25,7 +25,6 @@ class RDBI::Database
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction > 0}
 
-
   # the mutex for this database handle.
   attr_reader :mutex
 
@@ -106,6 +105,12 @@ class RDBI::Database
   #   sth = dbh.prepare("select * from foo where item = ?")
   #   res = sth.execute("an item")
   #   ary = res.to_a
+  #   sth.finish
+  #
+  # You can also use a block form which will auto-finish:
+  #   dbh.prepare("select * from foo where item = ?") do |sth|
+  #     sth.execute("an item")
+  #   end
   #
   def prepare(query)
     sth = nil
@@ -113,6 +118,7 @@ class RDBI::Database
       self.last_query = query
       sth = new_statement(query)
       yield sth if block_given?
+      sth.finish if block_given?
     end
 
     return self.last_statement = sth
@@ -126,6 +132,13 @@ class RDBI::Database
   #   res = dbh.execute("select * from foo where item = ?", "an item")
   #   ary = res.to_a
   #
+  # You can also use a block form which will finish the statement and yield the
+  # result handle:
+  #   dbh.execute("select * from foo where item = ?", "an item") do |res|
+  #     res.as(:Struct).fetch(:all).each do |struct|
+  #       p struct.item
+  #     end
+  #   end
   def execute(query, *binds)
     res = nil
 

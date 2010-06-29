@@ -99,4 +99,8 @@ end
 
 task :install => [:test, :build]
 
+task :docview => [:rdoc] do
+  sh "open doc/index.html"
+end
+
 # vim: syntax=ruby ts=2 et sw=2 sts=2

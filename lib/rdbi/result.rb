@@ -151,6 +151,7 @@ class RDBI::Result::Driver::Struct < RDBI::Result::Driver
     klass = ::Struct.new(*column_names)
 
     @result.raw_fetch(row_count).each do |row|
+      row = convert_row(row)
       struct = klass.new(*row)
       structs.push(struct)
     end

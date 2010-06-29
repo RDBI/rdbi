@@ -84,6 +84,7 @@ class RDBI::Result
   end
 
   def finish
+    @sth.finish
     @data   = nil
     @sth    = nil
     @driver = nil

@@ -174,18 +174,18 @@ class TestResult < Test::Unit::TestCase
     )
   end
 
-  def test_07_as_hashpipe
+  def test_07_as_struct
     res = mock_result
-    res.as(RDBI::Result::Driver::HashPipe)
+    res.as(RDBI::Result::Driver::Struct)
 
     results = res.fetch(1)
     assert_kind_of(Array, results)
-    assert(results[0].kind_of?(HashPipe)) # magic!!!!
+    assert(results[0].kind_of?(::Struct)) 
 
     hash = results[0]
 
-    assert_raises(NoMethodError) { hash[:test] = "something" }
-    assert_raises(NoMethodError) { hash['test'] = "something" }
+    assert_raises(NameError) { hash[:test] = "something" }
+    assert_raises(NameError) { hash['test'] = "something" }
     assert_raises(NoMethodError) { hash.test = "something" }
 
     assert_equal(-1, hash.zero)

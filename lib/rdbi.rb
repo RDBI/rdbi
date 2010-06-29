@@ -125,7 +125,7 @@ module RDBI::Util
     begin
       klass.kind_of?(Class) ? klass : namespace.const_get(klass.to_s)
     rescue
-      raise ArgumentError, "Invalid argument for driver name; must be Class, Symbol, or String"
+      raise ArgumentError, "Invalid argument for driver name; must be Class, or a Symbol or String identifying the Class, and the driver Class must have been loaded"
     end
   end
 

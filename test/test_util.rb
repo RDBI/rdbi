@@ -14,7 +14,7 @@ class TestUtil < Test::Unit::TestCase
   end
 
   def test_03_class_from_class_or_symbol
-    assert_raises(ArgumentError.new("Invalid argument for driver name; must be Class, Symbol, or String")) do
+    assert_raises(ArgumentError.new("Invalid argument for driver name; must be Class, or a Symbol or String identifying the Class, and the driver Class must have been loaded")) do
       RDBI::Util.class_from_class_or_symbol(1, RDBI)
     end
 

@@ -138,30 +138,23 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
   end
 end
 
-class RDBI::Result::Driver::HashPipe < RDBI::Result::Driver
+class RDBI::Result::Driver::Struct < RDBI::Result::Driver
   def initialize(result, *args)
     super
-
-    RDBI::Util.optional_require('hashpipe')
   end
 
   def fetch(row_count)
-    hashes = []
+    structs = []
     column_names = @result.schema.columns.map(&:name)
 
+    klass = ::Struct.new(*column_names)
+
     @result.raw_fetch(row_count).each do |row|
-      hash = ::HashPipe.new
-
-      row.each_with_index do |item, i|
-        hash[column_names[i]] = item
-      end
-
-      hash.lock!
-
-      hashes.push(hash)
+      struct = klass.new(*row)
+      structs.push(struct)
     end
 
-    return hashes
+    return structs
   end
 end
 

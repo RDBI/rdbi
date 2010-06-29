@@ -67,7 +67,6 @@ class RDBI::Database
   def disconnect
     unless self.open_statements.empty?
       warn "[RDBI] Open statements during disconnection -- automatically finishing. You should fix this."
-      puts caller
       self.open_statements.each(&:finish)
     end
     @connected = false

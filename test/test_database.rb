@@ -213,6 +213,22 @@ class TestDatabase < Test::Unit::TestCase
     end
   end
 
+  def test_09_statement_allocation
+    sth = @dbh.prepare("some statement")
+    assert(sth)
+
+    assert_equal(@dbh.open_statements.length, 1)
+
+    warn "The next message should appear *exactly once*"
+    @dbh.disconnect
+
+    @dbh = mock_connect
+    sth = @dbh.prepare("some statement")
+    sth.finish
+    assert_equal(@dbh.open_statements.length, 0)
+    @dbh.disconnect
+  end
+
   def teardown
     @dbh.disconnect
   end

@@ -48,12 +48,17 @@ Aaaaaand here are some things RDBI won't do:
 
 == Thinking of Contributing?
  
-* Fork the project.
+* Fork the project: http://github.com/RDBI
 * Make your feature addition or bug fix.
 * Please add tests for it, or indicate there are none. Patches without tests
   will get integrated slower.
 * We use jeweler for our repository management -- patches that mess with this will be rejected regardless of merit.
 * If you fork it permanently, be prepared to support it.
+
+== Want to chat?
+
+* #ruby-dbi on irc.freenode.net
+* rdbi-devel@groups.google.com - for developers
 
 == Copyright
 

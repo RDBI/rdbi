@@ -1,7 +1,7 @@
 = RDBI - Basic Database Access Re-imagined.
 
 RDBI is intended primarily as an alternative to the heavier database layers in
-the ruby ecosystem. 
+the ruby ecosystem.
 
 Here are some important pieces of information about RDBI that you may find
 compelling (or off-putting. We're pragmatists.):
@@ -108,7 +108,7 @@ Hokay:
 == Yes, I'd like to see even more awesome:
 
   5.times do
-    RDBI.connect_cached(:SQLite3, :database => ":memory:") 
+    RDBI.connect_cached(:SQLite3, :database => ":memory:")
   end
 
   # omg! this handle is really already connected!

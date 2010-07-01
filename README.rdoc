@@ -1,7 +1,7 @@
 = RDBI - Low-level Database Access Re-imagined
 
 RDBI is intended primarily as an alternative to the heavier database layers in
-the ruby ecosystem.
+the Ruby ecosystem.
 
 Here are some important pieces of information about RDBI that you may find
 compelling (or off-putting. We're pragmatists.):
@@ -20,7 +20,7 @@ compelling (or off-putting. We're pragmatists.):
 * RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
   our postgresql driver is about 300. Our mock driver is about 50.
 * RDBI has an active community of experienced (in some instances, 5-10 years)
-  ruby and rails programmers.
+  Ruby and Rails programmers.
 
 Here are some things that it does:
 

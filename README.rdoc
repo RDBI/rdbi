@@ -75,6 +75,15 @@ Hokay:
 
   # change the way the results are presented:
   result.as(:CSV).fetch(2) # '1,"foo"\n2,"bar"\n'
+
+  # :CSV is shorthand for RDBI::Result::Driver::CSV. you can also use literal
+  # class names:
+  result.as(RDBI::Result::Driver::CSV)
+
+  # or maybe your own:
+  result.as(MyCoolDriver)
+
+  # Here's another included driver:
   str = result.as(:Struct).fetch(:first)
   str.bar # 1
   str.baz # "foo"

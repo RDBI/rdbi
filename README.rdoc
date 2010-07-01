@@ -1,4 +1,4 @@
-= RDBI - Basic Database Access Re-imagined.
+= RDBI - Low-level Database Access Re-imagined
 
 RDBI is intended primarily as an alternative to the heavier database layers in
 the ruby ecosystem.
@@ -105,7 +105,7 @@ Hokay:
 
   dbh.disconnect
 
-== Yes, I'd like to see even more awesome:
+== Show me even more awesome!
 
   5.times do
     RDBI.connect_cached(:SQLite3, :database => ":memory:")
@@ -129,7 +129,7 @@ Hokay:
 
   pool.resize(10) # want to see what that above loop does now?
 
-== Thinking of Contributing?
+== How can I help?
 
 * Fork the project: http://github.com/RDBI
 * Make your feature addition or bug fix.
@@ -138,7 +138,7 @@ Hokay:
 * We use jeweler for our repository management -- patches that mess with this will be rejected regardless of merit.
 * If you fork it permanently, be prepared to support it; we won't.
 
-== Want to chat?
+== Let's chat
 
 * #ruby-dbi on irc.freenode.net
 * rdbi-devel@groups.google.com - for developers

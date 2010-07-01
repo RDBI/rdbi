@@ -15,7 +15,7 @@ compelling (or off-putting. We're pragmatists.):
   independently installed and used.
 * RDBI contains no monkeypatching, core extensions, or other hell that will
   conflict with your other libraries.
-* RDBI is architected around properties of a relational database, but there is
+* RDBI is designed around properties of a relational database, but there is
   nothing in it that demands one -- use it with Mongo or Redis if you want.
 * RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
   our postgresql driver is about 300. Our mock driver is about 50.

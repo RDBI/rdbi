@@ -97,16 +97,16 @@ class TestDatabase < Test::Unit::TestCase
   end
 
   def test_03_last_query
-    @dbh.prepare("here's the last query #1")
+    @dbh.prepare("here's the last query #1").finish
     assert_equal("here's the last query #1", @dbh.last_query)
 
-    @dbh.prepare("here's the last query #2")
+    @dbh.prepare("here's the last query #2").finish
     assert_equal("here's the last query #2", @dbh.last_query)
 
-    @dbh.execute("here's the last query #3")
+    @dbh.execute("here's the last query #3").finish
     assert_equal("here's the last query #3", @dbh.last_query)
 
-    @dbh.execute("here's the last query #4")
+    @dbh.execute("here's the last query #4").finish
     assert_equal("here's the last query #4", @dbh.last_query)
 
     @dbh.preprocess_query("here's the last query #5")
@@ -132,6 +132,7 @@ class TestDatabase < Test::Unit::TestCase
     res = @dbh.execute("some other statement")
     assert(res)
     assert_kind_of(RDBI::Result, res)
+    sth.finish
   end
 
   def test_06_last_statement
@@ -145,6 +146,7 @@ class TestDatabase < Test::Unit::TestCase
     assert(res)
     assert_kind_of(RDBI::Result, res)
     assert_not_equal(@dbh.last_statement.object_id, sth.object_id)
+    sth.finish
   end
 
   def test_07_nested_transactions
@@ -209,6 +211,22 @@ class TestDatabase < Test::Unit::TestCase
       assert(res)
       assert_kind_of(RDBI::Result, res)
     end
+  end
+
+  def test_09_statement_allocation
+    sth = @dbh.prepare("some statement")
+    assert(sth)
+
+    assert_equal(@dbh.open_statements.length, 1)
+
+    warn "The next message should appear *exactly once*"
+    @dbh.disconnect
+
+    @dbh = mock_connect
+    sth = @dbh.prepare("some statement")
+    sth.finish
+    assert_equal(@dbh.open_statements.length, 0)
+    @dbh.disconnect
   end
 
   def teardown

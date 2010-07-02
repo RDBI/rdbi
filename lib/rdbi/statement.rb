@@ -8,9 +8,8 @@ class RDBI::Statement
 
   attr_threaded_accessor :last_result
 
-  inline(:finished, :finished?)   { @finished        }
-  inline(:driver)                 { dbh.driver       }
-  inline(:finish)                 { @finished = true }
+  inline(:finished, :finished?)   { @finished  }
+  inline(:driver)                 { dbh.driver }
 
   inline(:new_execution) do |*args|
     raise NoMethodError, "this method is not implemented in this driver"
@@ -22,6 +21,8 @@ class RDBI::Statement
     @mutex = Mutex.new
     @finished = false
     @input_type_map = RDBI::Type.create_type_hash(RDBI::Type::In)
+
+    @dbh.open_statements.push(self)
   end
 
   def execute(*binds)
@@ -32,6 +33,13 @@ class RDBI::Statement
     mutex.synchronize do
       results, schema, type_hash = new_execution(*binds)
       self.last_result = RDBI::Result.new(results, schema, self, binds, type_hash)
+    end
+  end
+
+  def finish
+    mutex.synchronize do
+      dbh.open_statements.reject! { |x| x.object_id == self.object_id }
+      @finished = true
     end
   end
 end

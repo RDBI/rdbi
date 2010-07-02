@@ -1,18 +1,147 @@
 = RDBI - Basic Database Access Re-imagined.
 
-Please avoid the URL on the github pages for now, and any RDoc, as it's in
-flux. There is a PDF and .texi in docs/ which contains a tentative API; if you
-wish to evaluate, please do it there. Thanks.
+RDBI is intended primarily as an alternative to the heavier database layers in
+the ruby ecosystem. 
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
+Here are some important pieces of information about RDBI that you may find
+compelling (or off-putting. We're pragmatists.):
+
+* RDBI is, at the time of this writing, less than a thousand lines of code.
+* RDBI is light and fast. Eventually we will show you benchmarks.
+* RDBI can be tested without a database, or even a database driver.
+* RDBI is threadsafe.
+* RDBI can transform your results through a driver system. Want a CSV? Use the
+  CSV driver, don't bother transforming it yourself. Drivers can be
+  independently installed and used.
+* RDBI contains no monkeypatching, core extensions, or other hell that will
+  conflict with your other libraries.
+* RDBI is designed around properties of a relational database, but there is
+  nothing in it that demands one -- use it with Mongo or Redis if you want.
+* RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
+  our postgresql driver is about 300. Our mock driver is about 50.
+* RDBI has an active community of experienced (in some instances, 5-10 years)
+  ruby and rails programmers.
+
+Here are some things that it does:
+
+* Connection pooling with aggregate transforms of your connections (that's a
+  fancy way of saying it uses Enumerable in the Pools). It can be responsible
+  for n segmented pools which relate to different logical databases.
+* Native client binding *and* interpolated binding for databases that do not
+  support it.
+* Don't like our driver? No one's requiring you to use it -- RDBI drivers
+  aren't coupled with RDBI in any way.
+* Result *drivers* can be used to transform your output to whatever you need --
+  never write a transformation skeleton again.
+* Result *handles* can be used to work with results like real data structures.
+  Rewind them, ask the database to re-query the data, select a struct then select
+  an array (*without* requerying), select n items at a time as tuples (which
+  may be more than one or less than all).
+
+Aaaaaand here are some things RDBI won't do:
+
+* RDBI won't write your queries for you. (We have libraries that use RDBI for that)
+* RDBI won't dictate your schema. It won't make you a rockstar and won't
+  prevent you from being stupid or clever. It won't save you tons of time
+  because you can't be bothered to think about how you access your data.
+* Do not taunt RDBI.
+
+== I'd like an example
+
+Hokay:
+
+  dbh = RDBI.connect(:SQLite3, :database => ":memory:")
+  dbh.execute("create table foo (bar integer, baz varchar)")
+  dbh.prepare("insert into foo (bar, baz) values (?, ?)") do |sth|
+    sth.execute(1, "foo")
+    sth.execute(2, "bar")
+    sth.execute(3, "quux")
+  end
+
+  result = dbh.execute("select * from foo")
+  result.fetch(:first) # [1, "foo"]
+
+  # gettin' crazy with method chaining
+
+  dbh.execute("select * from foo").fetch(2) # [[1, "foo"], [2, "bar"]]
+
+  # result drivers!
+
+  result = dbh.execute("select * from foo")
+
+  # select iteratively, then rewind to the first item:
+  result.fetch(2)
+  result.rewind
+
+  # change the way the results are presented:
+  result.as(:CSV).fetch(2) # '1,"foo"\n2,"bar"\n'
+
+  # :CSV is shorthand for RDBI::Result::Driver::CSV. you can also use literal
+  # class names:
+  result.as(RDBI::Result::Driver::CSV)
+
+  # or maybe your own:
+  result.as(MyCoolDriver)
+
+  # Here's another included driver:
+  str = result.as(:Struct).fetch(:first)
+  str.bar # 1
+  str.baz # "foo"
+
+  #
+  # gettin' jiggy wit it
+  #
+  result.rewind
+
+  # select a single item in CSV format
+  csv = result.fetch(:first, :CSV)
+
+  # get the whole thing as an array of structs, keyed by column
+  ary_of_struct = result.as(:Struct).fetch(:all)
+
+  # as() automagically rewinds for you, so select twice for multi-dimension
+  # presentations:
+  ary = result.as(:Array).fetch(:all)
+
+  dbh.disconnect
+
+== Yes, I'd like to see even more awesome:
+
+  5.times do
+    RDBI.connect_cached(:SQLite3, :database => ":memory:") 
+  end
+
+  # omg! this handle is really already connected!
+  dbh = RDBI.connect_cached(:SQLite3, :database => ":memory:")
+
+  # finer-grained control via RDBI::Pool:
+  # 2 connections:
+  pool = RDBI::Pool.new("my_pool_name", [:SQLite3, :database => ":memory:"], 2)
+
+  # zomg!
+  dbh = pool.get_dbh
+
+  # oh lordy lord! still 2 connections
+  10.times { pool.get_dbh }
+
+  pool.disconnect # want to guess what this does?
+  pool.reconnect  # or this?
+
+  pool.resize(10) # want to see what that above loop does now?
+
+== Thinking of Contributing?
+
+* Fork the project: http://github.com/RDBI
 * Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+* Please add tests for it, or indicate there are none. Patches without tests
+  will get integrated slower and must be very compelling.
+* We use jeweler for our repository management -- patches that mess with this will be rejected regardless of merit.
+* If you fork it permanently, be prepared to support it; we won't.
+
+== Want to chat?
+
+* #ruby-dbi on irc.freenode.net
+* rdbi-devel@groups.google.com - for developers
 
 == Copyright
 

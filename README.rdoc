@@ -1,26 +1,26 @@
-= RDBI - Basic Database Access Re-imagined.
+= RDBI - Low-level Database Access Re-imagined
 
 RDBI is intended primarily as an alternative to the heavier database layers in
-the ruby ecosystem. 
+the Ruby ecosystem.
 
 Here are some important pieces of information about RDBI that you may find
 compelling (or off-putting. We're pragmatists.):
 
-* RDBI is, at the time of this writing, less than a thousand lines of code.
+* RDBI is, at the time of this writing, fewer than 1000 lines of code.
 * RDBI is light and fast. Eventually we will show you benchmarks.
 * RDBI can be tested without a database, or even a database driver.
 * RDBI is threadsafe.
 * RDBI can transform your results through a driver system. Want a CSV? Use the
   CSV driver, don't bother transforming it yourself. Drivers can be
-  independently installed and used.
+  independently installed, used and swapped.
 * RDBI contains no monkeypatching, core extensions, or other hell that will
   conflict with your other libraries.
 * RDBI is designed around properties of a relational database, but there is
   nothing in it that demands one -- use it with Mongo or Redis if you want.
 * RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
-  our postgresql driver is about 300. Our mock driver is about 50.
+  our PostgreSQL driver is about 300. Our mock driver is about 50.
 * RDBI has an active community of experienced (in some instances, 5-10 years)
-  ruby and rails programmers.
+  Ruby and Rails programmers.
 
 Here are some things that it does:
 
@@ -29,9 +29,9 @@ Here are some things that it does:
   for n segmented pools which relate to different logical databases.
 * Native client binding *and* interpolated binding for databases that do not
   support it.
-* Don't like our driver? No one's requiring you to use it -- RDBI drivers
+* Don't like our drivers? No one's requiring you to use them -- RDBI drivers
   aren't coupled with RDBI in any way.
-* Result *drivers* can be used to transform your output to whatever you need --
+* Result *drivers* can be used to transform your output into whatever you need --
   never write a transformation skeleton again.
 * Result *handles* can be used to work with results like real data structures.
   Rewind them, ask the database to re-query the data, select a struct then select
@@ -40,10 +40,13 @@ Here are some things that it does:
 
 Aaaaaand here are some things RDBI won't do:
 
-* RDBI won't write your queries for you. (We have libraries that use RDBI for that)
-* RDBI won't dictate your schema. It won't make you a rockstar and won't
-  prevent you from being stupid or clever. It won't save you tons of time
-  because you can't be bothered to think about how you access your data.
+* RDBI won't write your queries for you. (There are libraries that use RDBI for
+  that.)
+* RDBI won't dictate your schema.
+* RDBI won't prevent you from being stupid or clever.
+* It won't save you tons of time because you can't be bothered to think about
+  how you access your data.
+* It won't make you a rockstar.
 * Do not taunt RDBI.
 
 == I'd like an example
@@ -105,10 +108,10 @@ Hokay:
 
   dbh.disconnect
 
-== Yes, I'd like to see even more awesome:
+== Show me even more awesome!
 
   5.times do
-    RDBI.connect_cached(:SQLite3, :database => ":memory:") 
+    RDBI.connect_cached(:SQLite3, :database => ":memory:")
   end
 
   # omg! this handle is really already connected!
@@ -129,7 +132,7 @@ Hokay:
 
   pool.resize(10) # want to see what that above loop does now?
 
-== Thinking of Contributing?
+== How can I help?
 
 * Fork the project: http://github.com/RDBI
 * Make your feature addition or bug fix.
@@ -138,7 +141,7 @@ Hokay:
 * We use jeweler for our repository management -- patches that mess with this will be rejected regardless of merit.
 * If you fork it permanently, be prepared to support it; we won't.
 
-== Want to chat?
+== Let's chat
 
 * #ruby-dbi on irc.freenode.net
 * rdbi-devel@groups.google.com - for developers

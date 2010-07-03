@@ -34,7 +34,6 @@ class RDBI::Database
   inline(:connected, :connected?) { @connected }
 
   inline(:reconnect)  { @connected = true  }
-  inline(:disconnect) { @connected = false }
 
   inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
   inline(

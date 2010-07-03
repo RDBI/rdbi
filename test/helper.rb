@@ -1,4 +1,5 @@
 require 'rubygems'
+gem 'rdbi-driver-mock'
 gem 'test-unit'
 require 'test/unit'
 

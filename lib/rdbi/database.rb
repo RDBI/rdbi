@@ -12,13 +12,13 @@ class RDBI::Database
 
   # the driver class that is responsible for creating this database handle.
   attr_accessor :driver
-  
+
   # the name of the database we're connected to, if any.
   attr_accessor :database_name
 
   # the last statement handle allocated. affected by +prepare+ and +execute+.
   attr_threaded_accessor :last_statement
-  
+
   # the last query sent, as a string.
   attr_threaded_accessor :last_query
 
@@ -38,8 +38,8 @@ class RDBI::Database
 
   inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
   inline(
-    :ping, 
-    :table_schema, 
+    :ping,
+    :table_schema,
     :schema
   ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
@@ -94,7 +94,7 @@ class RDBI::Database
   # within the block to terminate the transaction early -- at which point
   # *the transaction is over with and you may be in autocommit*. The
   # RDBI::Database accessor +in_transaction+ exists to tell you if RDBI
-  # thinks its in a transaction or not. 
+  # thinks its in a transaction or not.
   #
   # If you do not +commit+ or +rollback+ within the block and no exception is
   # raised, RDBI presumes you wish this transaction to succeed and commits
@@ -106,7 +106,7 @@ class RDBI::Database
       yield self
       self.commit if @in_transaction > 0
     rescue => e
-      self.rollback 
+      self.rollback
       raise e
     ensure
       @in_transaction -= 1 unless @in_transaction == 0
@@ -117,7 +117,7 @@ class RDBI::Database
   # Prepares a statement for execution. Takes a query as its only argument,
   # returns a RDBI::Statement.
   #
-  # ex: 
+  # ex:
   #   sth = dbh.prepare("select * from foo where item = ?")
   #   res = sth.execute("an item")
   #   ary = res.to_a
@@ -139,7 +139,7 @@ class RDBI::Database
 
     return self.last_statement = sth
   end
- 
+
   #
   # Prepares and executes a statement. Takes a string query and an optional
   # number of variable type binds.

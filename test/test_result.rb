@@ -239,6 +239,7 @@ class TestResult < Test::Unit::TestCase
 
     assert_equal(10, res.affected_count)
     assert_equal(2,  res.result_count)
+    sth.finish
   end
 end
 

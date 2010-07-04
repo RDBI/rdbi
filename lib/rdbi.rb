@@ -130,6 +130,8 @@ module RDBI::Util
   end
 
   def self.key_hash_as_symbols(hash)
+    return nil unless hash
+
     new_hash = { }
 
     hash.keys.each do |key|

@@ -26,24 +26,28 @@ class RDBI::Database
   attr_threaded_accessor :open_statements
 
   # are we currently in a transaction?
-  inline(:in_transaction, :in_transaction?) { @in_transaction > 0}
+  inline(:in_transaction, :in_transaction?) { @in_transaction > 0 }
 
   # the mutex for this database handle.
   attr_reader :mutex
 
+  # are we connected to the database?
   inline(:connected, :connected?) { @connected }
 
-  inline(:reconnect)  { @connected = true  }
-  inline(:disconnect) { @connected = false }
+  # ping the database. yield an integer result on success.
+  inline(:ping) { raise NoMethodError, "this method is not implemented in this driver" }
 
-  inline(:bind_style) { raise NoMethodError, "unimplemented in this version" }
-  inline(
-    :ping, 
-    :table_schema, 
-    :schema
-  ) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
+  # query the schema for a specific table. Returns a RDBI::Schema object.
+  inline(:table_schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
-  inline(:commit, :rollback) { @in_transaction -= 1 unless @in_transaction == 0}
+  # query the schema for the entire database. Returns an array of RDBI::Schema objects.
+  inline(:schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
+
+  # ends the outstanding transaction and rolls the affected rows back.
+  inline(:rollback) { @in_transaction -= 1 unless @in_transaction == 0 }
+  
+  # ends the outstanding transaction and commits the result.
+  inline(:commit)   { @in_transaction -= 1 unless @in_transaction == 0 }
 
   #
   # Create a new database handle. This is typically done by a driver and
@@ -60,6 +64,12 @@ class RDBI::Database
     self.open_statements = []
   end
 
+  # reconnect to the database. Any outstanding connection will be terminated.
+  def reconnect
+    disconnect rescue nil
+    @connected = true
+  end
+
   #
   # disconnects from the database: will close (and complain, loudly) any
   # statement handles left open.
@@ -69,6 +79,7 @@ class RDBI::Database
       warn "[RDBI] Open statements during disconnection -- automatically finishing. You should fix this."
       self.open_statements.each(&:finish)
     end
+    self.open_statements = []
     @connected = false
   end
 

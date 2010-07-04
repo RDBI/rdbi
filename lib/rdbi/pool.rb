@@ -39,6 +39,7 @@ class RDBI::Pool
 
     #
     # Retrieves a pool object for the name, or nothing if it does not exist.
+    # 
     def [](name)
       mutex.synchronize do
         @pools ||= { }
@@ -48,6 +49,7 @@ class RDBI::Pool
 
     #
     # Sets the pool for the name. This is not recommended for end-user code.
+    #
     def []=(name, value)
       mutex.synchronize do
         @pools ||= { }

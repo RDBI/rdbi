@@ -78,6 +78,8 @@ task :default => :test
 
 begin
   require 'yard'
+  gem 'methlab'
+  require 'methlab/yard'
   YARD::Rake::YardocTask.new do |yard|
     yard.files   = %w[lib/**/*.rb README*]
     yard.options = %w[--protected --private ]

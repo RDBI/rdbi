@@ -6,7 +6,7 @@ class TestDatabase < Test::Unit::TestCase
   end
 
   def assert_transaction(count)
-    in_transaction = @dbh.instance_variable_get("@in_transaction") || 
+    in_transaction = @dbh.instance_variable_get("@in_transaction") ||
       @dbh.instance_variable_get(:@in_transaction)
     assert_equal(count, in_transaction)
 
@@ -38,7 +38,7 @@ class TestDatabase < Test::Unit::TestCase
       raise StandardError, "should call rollback"
     end
 
-    assert_raises(StandardError.new("should call rollback")) do 
+    assert_raises(StandardError.new("should call rollback")) do
       @dbh.transaction do |dbh|
         assert_transaction(1)
         true
@@ -52,7 +52,7 @@ class TestDatabase < Test::Unit::TestCase
 
     @dbh.next_action = proc { |*args| true }
 
-    assert_raises(StandardError.new("should call rollback")) do 
+    assert_raises(StandardError.new("should call rollback")) do
       @dbh.transaction do |dbh|
         assert_transaction(1)
 
@@ -170,7 +170,7 @@ class TestDatabase < Test::Unit::TestCase
       @dbh.commit
       assert_transaction(0)
     end
-    
+
     @dbh.transaction do
       @dbh.transaction do
         assert_transaction(2)

@@ -5,7 +5,8 @@ class RDBI::Result
   attr_reader :schema
   attr_reader :sth
   attr_reader :driver
-  attr_reader :rows
+  attr_reader :result_count
+  attr_reader :affected_count
   attr_reader :type_hash
 
   def binds
@@ -19,27 +20,29 @@ class RDBI::Result
   inline(:more, :more?)         { @index  < @data.size }
   inline(:has_data, :has_data?) { @data.size > 0 }
 
-  def initialize(data, schema, sth, binds, type_hash, rows=data.size)
-    @schema       = schema
-    @data         = data
-    @rows         = rows
-    @sth          = sth
-    @binds        = binds
-    @type_hash    = type_hash
-    @index        = 0
-    @mutex        = Mutex.new
-    @driver       = RDBI::Result::Driver::Array
-    @fetch_handle = nil
+  def initialize(data, schema, sth, binds, type_hash, affected_count=0)
+    @schema         = schema
+    @data           = data
+    @result_count   = data.size
+    @affected_count = affected_count
+    @sth            = sth
+    @binds          = binds
+    @type_hash      = type_hash
+    @index          = 0
+    @mutex          = Mutex.new
+    @driver         = RDBI::Result::Driver::Array
+    @fetch_handle   = nil
     as(@driver)
   end
 
   def reload
     res = @sth.execute(*@binds)
-    @data      = res.instance_eval { @data }
-    @type_hash = res.instance_eval { @type_hash }
-    @schema    = res.instance_eval { @schema }
-    @rows      = res.instance_eval { @rows }
-    @index     = 0
+    @data           = res.instance_eval { @data }
+    @type_hash      = res.instance_eval { @type_hash }
+    @schema         = res.instance_eval { @schema }
+    @result_count   = res.instance_eval { @result_count }
+    @affected_count = res.instance_eval { @affected_count }
+    @index          = 0
   end
 
   def each

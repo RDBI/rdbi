@@ -228,6 +228,18 @@ class TestResult < Test::Unit::TestCase
     assert_equal((0..9).to_a, res.schema.columns.map(&:name))
     res.finish
   end
+
+  def test_09_insert_results
+    dbh = mock_connect
+    sth = dbh.prepare('insert into blah (foo, bar) values (?, ?)')
+    sth.result = [[1,2,3], [1,2,3]]
+    sth.affected_count = 10
+
+    res = sth.execute(1,2)
+
+    assert_equal(10, res.affected_count)
+    assert_equal(2,  res.result_count)
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

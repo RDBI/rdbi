@@ -31,8 +31,8 @@ class RDBI::Statement
     binds = binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) }
 
     mutex.synchronize do
-      results, schema, type_hash = new_execution(*binds)
-      self.last_result = RDBI::Result.new(results, schema, self, binds, type_hash)
+      results, schema, type_hash, affected_rows = new_execution(*binds)
+      self.last_result = RDBI::Result.new(results, schema, self, binds, type_hash, affected_rows)
     end
   end
 

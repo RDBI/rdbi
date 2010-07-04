@@ -60,7 +60,8 @@ class TestResult < Test::Unit::TestCase
       schema
       sth
       driver
-      rows
+      result_count
+      affected_count
       complete
       complete?
       eof
@@ -214,7 +215,7 @@ class TestResult < Test::Unit::TestCase
 
     assert_equal([-1, 0, 1], res.fetch(1)[0])
     assert_equal(1, res.instance_eval { @index })
-    assert_equal(10, res.rows)
+    assert_equal(10, res.result_count)
     assert_equal([:zero, :one, :two], res.schema.columns.map(&:name))
 
     res.reload
@@ -223,7 +224,7 @@ class TestResult < Test::Unit::TestCase
     # completely different.  not the best test, but it gets the job done.
     assert_equal(%W[10], res.fetch(1)[0])
     assert_equal(1, res.instance_eval { @index })
-    assert_equal(5, res.rows)
+    assert_equal(5, res.result_count)
     assert_equal((0..9).to_a, res.schema.columns.map(&:name))
     res.finish
   end

@@ -15,7 +15,7 @@ class TestResult < Test::Unit::TestCase
   
   def mock_result
     names = [:zero, :one, :two]
-    RDBI::Result.new(generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), @dbh.prepare("foo"), [1], { :default => RDBI::Type.filterlist() })
+    RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
   end
 
   def get_index(res)

@@ -20,7 +20,7 @@ class RDBI::Result
   inline(:more, :more?)         { @index  < @data.size }
   inline(:has_data, :has_data?) { @data.size > 0 }
 
-  def initialize(data, schema, sth, binds, type_hash, affected_count=0)
+  def initialize(sth, binds, data, schema, type_hash, affected_count=0)
     @schema         = schema
     @data           = data
     @result_count   = data.size

@@ -15,6 +15,8 @@ class TestRDBI < Test::Unit::TestCase
     assert_kind_of(RDBI::Database, dbh)
 
     assert_raise(ArgumentError) { RDBI.connect(1, :user => :blah) }
+
+    assert_nothing_raised { dbh = RDBI.connect(:Mock) }
   end
 
   def test_02_last_dbh

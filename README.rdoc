@@ -3,52 +3,6 @@
 RDBI is intended primarily as an alternative to the heavier database layers in
 the Ruby ecosystem.
 
-Here are some important pieces of information about RDBI that you may find
-compelling (or off-putting. We're pragmatists.):
-
-* RDBI is, at the time of this writing, fewer than 1000 lines of code.
-* RDBI is light and fast. Eventually we will show you benchmarks.
-* RDBI can be tested without a database, or even a database driver.
-* RDBI is threadsafe.
-* RDBI can transform your results through a driver system. Want a CSV? Use the
-  CSV driver, don't bother transforming it yourself. Drivers can be
-  independently installed, used and swapped.
-* RDBI contains no monkeypatching, core extensions, or other hell that will
-  conflict with your other libraries.
-* RDBI is designed around properties of a relational database, but there is
-  nothing in it that demands one -- use it with Mongo or Redis if you want.
-* RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
-  our PostgreSQL driver is about 300. Our mock driver is about 50.
-* RDBI has an active community of experienced (in some instances, 5-10 years)
-  Ruby and Rails programmers.
-
-Here are some things that it does:
-
-* Connection pooling with aggregate transforms of your connections (that's a
-  fancy way of saying it uses Enumerable in the Pools). It can be responsible
-  for n segmented pools which relate to different logical databases.
-* Native client binding *and* interpolated binding for databases that do not
-  support it.
-* Don't like our drivers? No one's requiring you to use them -- RDBI drivers
-  aren't coupled with RDBI in any way.
-* Result *drivers* can be used to transform your output into whatever you need --
-  never write a transformation skeleton again.
-* Result *handles* can be used to work with results like real data structures.
-  Rewind them, ask the database to re-query the data, select a struct then select
-  an array (*without* requerying), select n items at a time as tuples (which
-  may be more than one or less than all).
-
-Aaaaaand here are some things RDBI won't do:
-
-* RDBI won't write your queries for you. (There are libraries that use RDBI for
-  that.)
-* RDBI won't dictate your schema.
-* RDBI won't prevent you from being stupid or clever.
-* It won't save you tons of time because you can't be bothered to think about
-  how you access your data.
-* It won't make you a rockstar.
-* Do not taunt RDBI.
-
 == I'd like an example
 
 Hokay:
@@ -107,6 +61,54 @@ Hokay:
   ary = result.as(:Array).fetch(:all)
 
   dbh.disconnect
+
+== About RDBI
+
+Here are some important pieces of information about RDBI that you may find
+compelling (or off-putting. We're pragmatists.):
+
+* RDBI is, at the time of this writing, fewer than 1000 lines of code.
+* RDBI is light and fast. Eventually we will show you benchmarks.
+* RDBI can be tested without a database, or even a database driver.
+* RDBI is threadsafe.
+* RDBI can transform your results through a driver system. Want a CSV? Use the
+  CSV driver, don't bother transforming it yourself. Drivers can be
+  independently installed, used and swapped.
+* RDBI contains no monkeypatching, core extensions, or other hell that will
+  conflict with your other libraries.
+* RDBI is designed around properties of a relational database, but there is
+  nothing in it that demands one -- use it with Mongo or Redis if you want.
+* RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
+  our PostgreSQL driver is about 300. Our mock driver is about 50.
+* RDBI has an active community of experienced (in some instances, 5-10 years)
+  Ruby and Rails programmers.
+
+Here are some things that it does:
+
+* Connection pooling with aggregate transforms of your connections (that's a
+  fancy way of saying it uses Enumerable in the Pools). It can be responsible
+  for n segmented pools which relate to different logical databases.
+* Native client binding *and* interpolated binding for databases that do not
+  support it.
+* Don't like our drivers? No one's requiring you to use them -- RDBI drivers
+  aren't coupled with RDBI in any way.
+* Result *drivers* can be used to transform your output into whatever you need --
+  never write a transformation skeleton again.
+* Result *handles* can be used to work with results like real data structures.
+  Rewind them, ask the database to re-query the data, select a struct then select
+  an array (*without* requerying), select n items at a time as tuples (which
+  may be more than one or less than all).
+
+Aaaaaand here are some things RDBI won't do:
+
+* RDBI won't write your queries for you. (There are libraries that use RDBI for
+  that.)
+* RDBI won't dictate your schema.
+* RDBI won't prevent you from being stupid or clever.
+* It won't save you tons of time because you can't be bothered to think about
+  how you access your data.
+* It won't make you a rockstar.
+* Do not taunt RDBI.
 
 == Show me even more awesome!
 

@@ -8,14 +8,12 @@ module RDBI
   #
   class << self
     extend MethLab
-    #
+
     # Every database handle allocated throughout the lifetime of the
     # program. This functionality is subject to change and may be pruned
     # during disconnection.
     attr_reader :all_connections
-    #--
-    #attr_reader :drivers
-    #++
+
     #
     # The last database handle allocated. This may come from pooled connections or regular ones.
     #
@@ -102,17 +100,36 @@ module RDBI
     @all_connections.each(&:disconnect)
   end
 
+  #
+  # Base Error class for RDBI. Rescue this to catch all RDBI-specific errors.
+  #
   class Error < StandardError
   end
 
+  #
+  # This error will be thrown if an operation is attempted while the database
+  # is disconnected.
+  #
   class DisconnectedError < Error
   end
 
+  #
+  # This error will be thrown if an operation is attempted that violated
+  # transaction semantics.
+  #
   class TransactionError < Error
   end
 end
 
+#
+# RDBI::Util is a set of utility methods used internally. It is not geared for
+# public consumption.
+#
 module RDBI::Util
+  #
+  # Requires with a LoadError check and emits a friendly "please install me"
+  # message.
+  #
   def self.optional_require(lib)
     begin
       require lib
@@ -121,6 +138,9 @@ module RDBI::Util
     end
   end
 
+  #
+  # This is the loading logic we use to import drivers of various natures.
+  #
   def self.class_from_class_or_symbol(klass, namespace)
     begin
       klass.kind_of?(Class) ? klass : namespace.const_get(klass.to_s)
@@ -129,7 +149,12 @@ module RDBI::Util
     end
   end
 
+  #
+  # Rekey a string-keyed hash with equivalent symbols.
+  #
   def self.key_hash_as_symbols(hash)
+    return nil unless hash
+
     new_hash = { }
 
     hash.keys.each do |key|

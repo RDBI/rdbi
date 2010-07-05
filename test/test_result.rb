@@ -245,6 +245,16 @@ class TestResult < Test::Unit::TestCase
     assert_equal(2,  res.result_count)
     sth.finish
   end
+
+  def test_10_null_results
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], [], [], 0)
+    assert_equal([], res.fetch(:first))
+    assert_equal([], res.fetch(:last))
+    assert_equal([], res.fetch(:all))
+    assert_equal([], res.fetch(:rest))
+    assert_equal([], res.fetch(1))
+    res.sth.finish
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

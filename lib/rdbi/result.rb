@@ -116,7 +116,7 @@ class RDBI::Result::Driver
   end
 
   def fetch(row_count)
-    Enumerable::Enumerator.new(@result.raw_fetch(row_count)).with_index.map do |item, i|
+    Enumerable::Enumerator.new(@result.raw_fetch(row_count) || []).with_index.map do |item, i|
       case row_count
       when :first, :last
         convert_item(item, @result.schema.columns[i])

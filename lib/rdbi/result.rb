@@ -71,13 +71,25 @@ class RDBI::Result
 
   alias read fetch
 
+  # stub docs:
+  #
+  # * symbols do not affect the index
+  # * :first and :last yield a single array.
+  # * numbers do
+  # * Marshal.dump(Marshal.load) is the best way to deep clone that I know of.
+  #   I know it's slow. If you have code to speed it up, please contribute.
   def raw_fetch(row_count)
-    final_res = if row_count == :all
+    final_res = case row_count
+                when :all
                   Marshal.load(Marshal.dump(@data))
-                elsif row_count == :rest
+                when :rest
                   res = Marshal.load(Marshal.dump(@data[@index..-1]))
                   @index = @data.size
                   res
+                when :first
+                  @data.first
+                when :last
+                  @data[-1]
                 else
                   res = @data[@index..(@index + (row_count - 1))]
                   @index += row_count
@@ -104,17 +116,26 @@ class RDBI::Result::Driver
   end
 
   def fetch(row_count)
-    @result.raw_fetch(row_count).map do |row|
-      convert_row(row)
+    Enumerable::Enumerator.new(@result.raw_fetch(row_count)).with_index.map do |item, i|
+      case row_count
+      when :first, :last
+        convert_item(item, @result.schema.columns[i])
+      else
+        convert_row(item)
+      end
     end
   end
 
   def convert_row(row)
     newrow = []
     row.each_with_index do |x, i|
-      newrow.push(RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash))
+      newrow.push(convert_item(x, @result.schema.columns[i]))
     end
     return newrow
+  end
+
+  def convert_item(item, column)
+    RDBI::Type::Out.convert(item, column, @result.type_hash)
   end
 end
 

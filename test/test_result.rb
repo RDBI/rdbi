@@ -103,6 +103,10 @@ class TestResult < Test::Unit::TestCase
     assert_equal(1, get_index(res))
     assert_equal(generate_data[1..9], res.fetch(:rest))
     assert_equal(10, get_index(res))
+
+    assert_equal(generate_data[0], res.fetch(:first))
+    assert_equal(generate_data[-1], res.fetch(:last))
+
     res.sth.finish
   end
 

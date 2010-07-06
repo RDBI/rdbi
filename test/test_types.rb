@@ -14,6 +14,7 @@ class TestTypes < Test::Unit::TestCase
     assert(@out_types.keys.include?(:integer))
     assert(@out_types.keys.include?(:decimal))
     assert(@out_types.keys.include?(:datetime))
+    assert(@out_types.keys.include?(:boolean))
     assert(@out_types.keys.include?(:default))
     assert_respond_to(RDBI::Type::Out, :convert)
 
@@ -22,6 +23,8 @@ class TestTypes < Test::Unit::TestCase
     assert(@in_types.keys.include?(Integer))
     assert(@in_types.keys.include?(BigDecimal))
     assert(@in_types.keys.include?(DateTime))
+    assert(@in_types.keys.include?(TrueClass))
+    assert(@in_types.keys.include?(FalseClass))
     assert(@in_types.keys.include?(:default))
     assert_respond_to(RDBI::Type::In, :convert)
   end
@@ -35,6 +38,22 @@ class TestTypes < Test::Unit::TestCase
 
     assert_kind_of(DateTime, out_convert(DateTime.now, tcc(:default), @out_types))
     assert_kind_of(Float,    out_convert(1.0, tcc(:default), @out_types))
+
+    assert_equal(true,  out_convert("TRUE", tcc(:boolean), @out_types))
+    assert_equal(true,  out_convert("true", tcc(:boolean), @out_types))
+    assert_equal(true,  out_convert("TRue", tcc(:boolean), @out_types))
+    assert_equal(true,  out_convert("trUE", tcc(:boolean), @out_types))
+    assert_equal(true,  out_convert("T", tcc(:boolean), @out_types))
+    assert_equal(true,  out_convert("t", tcc(:boolean), @out_types))
+    assert_equal(true,  out_convert("1", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("FALSE", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("false", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("FAlse", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("faLSE", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("F", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("f", tcc(:boolean), @out_types))
+    assert_equal(false, out_convert("0", tcc(:boolean), @out_types))
+    assert_equal(nil,   out_convert(nil, tcc(:boolean), @out_types))
   end
 
   def test_03_out_datetime_convert
@@ -53,6 +72,8 @@ class TestTypes < Test::Unit::TestCase
     assert_equal("1.0", in_convert(1.0, @in_types))
     assert_equal("1.0", in_convert(BigDecimal("1.0"), @in_types))
     assert_equal("artsy", in_convert("artsy", @in_types))
+    assert_equal("TRUE", in_convert(true, @in_types))
+    assert_equal("FALSE", in_convert(false, @in_types))
     assert_equal(nil, in_convert(nil, @in_types))
   end
 

@@ -14,8 +14,8 @@ begin
     gem.authors = ["Erik Hollensbe"]
 
     gem.add_development_dependency 'test-unit'
-    #gem.add_development_dependency 'rdoc'
-    gem.add_development_dependency 'yard'
+    gem.add_development_dependency 'rdoc'
+    gem.add_development_dependency 'hanna'
     unless RUBY_VERSION =~ /^1.9/
       gem.add_development_dependency 'fastercsv'
     end
@@ -77,24 +77,20 @@ end
 task :default => :test
 
 begin
-  require 'yard'
-  gem 'methlab'
-  require 'methlab/yard'
-  YARD::Rake::YardocTask.new do |yard|
-    yard.files   = %w[lib/**/*.rb README*]
-    yard.options = %w[--protected --private ]
-  end
-  
-  task :rdoc => [:yard]
-  task :clobber_rdoc => [:yard]
-rescue LoadError => e
-  [:rdoc, :yard, :clobber_rdoc].each do |my_task|
-    task my_task do
-      abort "YARD is not available, which is needed to generate this documentation"
-    end
-  end
-end
+  gem 'hanna'
+  require 'hanna/rdoctask'
+  Rake::RDocTask.new do |rdoc|
+    version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
+    rdoc.rdoc_dir = 'rdoc'
+    rdoc.title = "rdbi #{version}"
+    rdoc.rdoc_files.include('README*')
+    rdoc.rdoc_files.include('lib/**/*.rb')
+  end
+rescue LoadError => e
+  abort "What, were you born in a barn? Install rdoc."
+end
+ 
 task :to_blog => [:clobber_rdoc, :rdoc] do
   sh "rm -fr $git/blog/content/docs/rdbi && mv doc $git/blog/content/docs/rdbi"
 end
@@ -102,7 +98,7 @@ end
 task :install => [:test, :build]
 
 task :docview => [:rdoc] do
-  sh "open doc/index.html"
+  sh "open rdoc/index.html"
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

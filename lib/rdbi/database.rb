@@ -16,36 +16,64 @@ class RDBI::Database
   # the name of the database we're connected to, if any.
   attr_accessor :database_name
 
+  ##
+  # :method: last_statement
   # the last statement handle allocated. affected by +prepare+ and +execute+.
   attr_threaded_accessor :last_statement
 
+  ##
+  # :method: last_query
   # the last query sent, as a string.
   attr_threaded_accessor :last_query
 
+  ##
+  # :method: open_statements
   # all the open statement handles.
   attr_threaded_accessor :open_statements
 
+  ##
+  # :method: in_transaction
+  # are we currently in a transaction?
+  
+  ##
+  # :method: in_transaction?
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction > 0 }
 
   # the mutex for this database handle.
   attr_reader :mutex
 
+  ##
+  # :method: connected
+  # are we connected to the database?
+  
+  ##
+  # :method: connected?
   # are we connected to the database?
   inline(:connected, :connected?) { @connected }
 
+  ##
+  # :method: ping
   # ping the database. yield an integer result on success.
   inline(:ping) { raise NoMethodError, "this method is not implemented in this driver" }
 
+  ##
+  # :method: table_schema
   # query the schema for a specific table. Returns a RDBI::Schema object.
   inline(:table_schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
+  ##
+  # :method: schema
   # query the schema for the entire database. Returns an array of RDBI::Schema objects.
   inline(:schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
+  ##
+  # :method: rollback
   # ends the outstanding transaction and rolls the affected rows back.
   inline(:rollback) { @in_transaction -= 1 unless @in_transaction == 0 }
-  
+ 
+  ##
+  # :method: commit
   # ends the outstanding transaction and commits the result.
   inline(:commit)   { @in_transaction -= 1 unless @in_transaction == 0 }
 

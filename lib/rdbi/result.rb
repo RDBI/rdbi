@@ -8,10 +8,7 @@ class RDBI::Result
   attr_reader :result_count
   attr_reader :affected_count
   attr_reader :type_hash
-
-  def binds
-    @binds.dup
-  end
+  attr_reader :binds
 
   # FIXME async
   inline(:complete, :complete?) { true }

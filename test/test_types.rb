@@ -68,11 +68,11 @@ class TestTypes < Test::Unit::TestCase
 
   def test_06_out_integration
     dt = DateTime.now
-    dbh = mock_connect 
+    dbh = mock_connect
     sth = dbh.prepare("select * from foo")
     sth.set_schema = RDBI::Schema.new(
       [
-        RDBI::Column.new(:foo, :integer, :integer), 
+        RDBI::Column.new(:foo, :integer, :integer),
         RDBI::Column.new(:bar, :datetime, :datetime),
         RDBI::Column.new(:quux, :varchar, :string),
         RDBI::Column.new(:baz, :decimal, :decimal)

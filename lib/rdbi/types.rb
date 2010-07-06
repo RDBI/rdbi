@@ -31,7 +31,7 @@ module RDBI
       FROM_DECIMAL   = TypeLib::Filter.new(Checks::IS_BIGDECIMAL, Conversions::TO_STRING_DECIMAL)
       FROM_DATETIME  = TypeLib::Filter.new(Checks::IS_DATETIME,   Conversions::TO_STRING_DATETIME)
     end
-    
+
     # FilterList factory shorthand
     def self.filterlist(*ary)
       TypeLib::FilterList.new([Filters::NULL, *ary])

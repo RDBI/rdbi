@@ -49,7 +49,6 @@ class TestResult < Test::Unit::TestCase
 
     assert_kind_of(Array, guts[:binds])
     assert_equal(res.binds, guts[:binds])
-    assert_not_equal(res.binds.object_id, guts[:binds].object_id)
     assert_equal([1], guts[:binds])
   end
 

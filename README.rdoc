@@ -145,7 +145,7 @@ Aaaaaand here are some things RDBI won't do:
 
 == Let's chat
 
-* #ruby-dbi on irc.freenode.net
+* \#ruby-dbi on irc.freenode.net
 * rdbi-devel@groups.google.com - for developers
 
 == Copyright

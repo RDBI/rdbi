@@ -17,26 +17,27 @@ class RDBI::Database
   attr_accessor :database_name
 
   ##
-  # :method: last_statement
+  # :attr_reader: last_statement
+  #
   # the last statement handle allocated. affected by +prepare+ and +execute+.
   attr_threaded_accessor :last_statement
 
   ##
-  # :method: last_query
+  # :attr: last_query
   # the last query sent, as a string.
   attr_threaded_accessor :last_query
 
   ##
-  # :method: open_statements
+  # :attr: open_statements
   # all the open statement handles.
   attr_threaded_accessor :open_statements
 
   ##
-  # :method: in_transaction
+  # :attr: in_transaction
   # are we currently in a transaction?
   
   ##
-  # :method: in_transaction?
+  # :attr: in_transaction?
   # are we currently in a transaction?
   inline(:in_transaction, :in_transaction?) { @in_transaction > 0 }
 
@@ -44,11 +45,11 @@ class RDBI::Database
   attr_reader :mutex
 
   ##
-  # :method: connected
+  # :attr: connected
   # are we connected to the database?
   
   ##
-  # :method: connected?
+  # :attr-accessor: connected?
   # are we connected to the database?
   inline(:connected, :connected?) { @connected }
 

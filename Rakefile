@@ -79,7 +79,7 @@ task :default => :test
 begin
   gem 'hanna'
   require 'hanna/rdoctask'
-  Rake::RDocTask.new do |rdoc|
+  Hanna::Task.new do |rdoc|
     version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
     rdoc.rdoc_dir = 'rdoc'
@@ -90,6 +90,8 @@ begin
 rescue LoadError => e
   abort "What, were you born in a barn? Install rdoc."
 end
+
+task :rdoc => [:clobber_rdoc]
  
 task :to_blog => [:clobber_rdoc, :rdoc] do
   sh "rm -fr $git/blog/content/docs/rdbi && mv doc $git/blog/content/docs/rdbi"
@@ -97,7 +99,7 @@ end
 
 task :install => [:test, :build]
 
-task :docview => [:rdoc] do
+task :docview => [:rerdoc] do
   sh "open rdoc/index.html"
 end
 

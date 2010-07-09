@@ -78,21 +78,20 @@ class RDBI::Result
   def raw_fetch(row_count)
     final_res = case row_count
                 when :all
-                  Marshal.load(Marshal.dump(@data))
+                  @data
                 when :rest
-                  res = Marshal.load(Marshal.dump(@data[@index..-1]))
-                  @index = @data.size
-                  res
+                  oindex, @index = @index, @data.size
+                  @data[oindex, @index]
                 when :first
                   @data.first
                 when :last
                   @data[-1]
                 else
-                  res = @data[@index..(@index + (row_count - 1))]
+                  res = @data[@index, row_count]
                   @index += row_count
                   res
                 end
-    Marshal.load(Marshal.dump(final_res))
+    RDBI::Util.deep_copy(final_res)
   end
 
   def finish

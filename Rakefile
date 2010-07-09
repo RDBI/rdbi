@@ -91,7 +91,11 @@ begin
     rdoc.rdoc_files.include('lib/**/*.rb')
   end
 rescue LoadError => e
-  abort "What, were you born in a barn? Install rdoc and hanna at http://github.com/erikh/hanna ."
+  rdoc_missing = lambda do
+    abort "What, were you born in a barn? Install rdoc and hanna at http://github.com/erikh/hanna ."
+  end
+  task :rdoc, &rdoc_missing
+  task :clobber_rdoc, &rdoc_missing
 end
 
 task :to_blog => [:clobber_rdoc, :rdoc] do

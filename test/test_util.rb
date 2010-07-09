@@ -48,4 +48,14 @@ class TestUtil < Test::Unit::TestCase
       RDBI::Util.key_hash_as_symbols(hash2)
     )
   end
+
+  def test_05_deep_copy
+    arr = %w(a b c d e f)
+    arr2 = RDBI::Util.deep_copy(arr)
+    assert_equal arr, arr2
+    arr.zip(arr2).each do |left, right|
+      assert_equal left, right
+      assert_not_equal left.object_id, right.object_id
+    end
+  end
 end

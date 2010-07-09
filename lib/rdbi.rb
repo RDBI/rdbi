@@ -131,22 +131,18 @@ module RDBI::Util
   # message.
   #
   def self.optional_require(lib)
-    begin
-      require lib
-    rescue LoadError => e
-      raise LoadError, "The '#{lib}' gem is required to use this driver. Please install it."
-    end
+    require lib
+  rescue LoadError => e
+    raise LoadError, "The '#{lib}' gem is required to use this driver. Please install it."
   end
 
   #
   # This is the loading logic we use to import drivers of various natures.
   #
   def self.class_from_class_or_symbol(klass, namespace)
-    begin
-      klass.kind_of?(Class) ? klass : namespace.const_get(klass.to_s)
-    rescue
-      raise ArgumentError, "Invalid argument for driver name; must be Class, or a Symbol or String identifying the Class, and the driver Class must have been loaded"
-    end
+    klass.kind_of?(Class) ? klass : namespace.const_get(klass.to_s)
+  rescue
+    raise ArgumentError, "Invalid argument for driver name; must be Class, or a Symbol or String identifying the Class, and the driver Class must have been loaded"
   end
 
   #
@@ -155,13 +151,14 @@ module RDBI::Util
   def self.key_hash_as_symbols(hash)
     return nil unless hash
 
-    new_hash = { }
+    Hash[hash.map { |k,v| [k.to_sym, v] }]
+  end
 
-    hash.keys.each do |key|
-      new_hash[key.to_sym] = hash[key]
-    end
-
-    new_hash
+  #
+  # Copy an object and all of its descendants to form a new tree
+  #
+  def self.deep_copy(obj)
+    Marshal.load(Marshal.dump(obj))
   end
 end
 

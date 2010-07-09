@@ -34,11 +34,11 @@ class RDBI::Result
 
   def reload
     res = @sth.execute(*@binds)
-    @data           = res.instance_eval { @data }
-    @type_hash      = res.instance_eval { @type_hash }
-    @schema         = res.instance_eval { @schema }
-    @result_count   = res.instance_eval { @result_count }
-    @affected_count = res.instance_eval { @affected_count }
+    @data           = res.instance_variable_get(:@data)
+    @type_hash      = res.instance_variable_get(:@type_hash)
+    @schema         = res.instance_variable_get(:@schema)
+    @result_count   = res.instance_variable_get(:@result_count)
+    @affected_count = res.instance_variable_get(:@affected_count)
     @index          = 0
   end
 

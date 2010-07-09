@@ -13,14 +13,14 @@ begin
     gem.homepage = "http://github.com/erikh/rdbi"
     gem.authors = ["Erik Hollensbe"]
 
+    gem.add_development_dependency 'rdbi-driver-mock'
     gem.add_development_dependency 'test-unit'
-    gem.add_development_dependency 'rdoc'
-    # for now, install hanna from here: http://github.com/erikh/hanna
-    gem.add_development_dependency 'hanna'
+    #gem.add_development_dependency 'rdoc'
+    ## for now, install hanna from here: http://github.com/erikh/hanna
+    #gem.add_development_dependency 'hanna'
     unless RUBY_VERSION =~ /^1.9/
       gem.add_development_dependency 'fastercsv'
     end
-    gem.add_development_dependency 'rdbi-driver-mock'
 
     gem.add_dependency 'methlab', '>= 0.0.9'
     gem.add_dependency 'epoxy', '>= 0.2.1'

@@ -105,7 +105,7 @@ class RDBI::Pool
   def ping
     reconnect_if_disconnected
     mutex.synchronize do 
-      @handles.inject(1) { |x,y| x + (y.ping || 1) } / @handles.size
+      @handles.inject(1) { |sum,dbh| sum + (dbh.ping || 1) } / @handles.size
     end
   end
 

@@ -78,6 +78,7 @@ end
 task :default => :test
 
 begin
+  require 'hanna'
   require 'rdoc/task'
   RDoc::Task.new do |rdoc|
     version = File.exist?('VERSION') ? File.read('VERSION') : ""
@@ -90,7 +91,7 @@ begin
     rdoc.rdoc_files.include('lib/**/*.rb')
   end
 rescue LoadError => e
-  abort "What, were you born in a barn? Install rdoc."
+  abort "What, were you born in a barn? Install rdoc and hanna at http://github.com/erikh/hanna ."
 end
 
 task :to_blog => [:clobber_rdoc, :rdoc] do

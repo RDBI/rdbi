@@ -15,6 +15,7 @@ begin
 
     gem.add_development_dependency 'test-unit'
     gem.add_development_dependency 'rdoc'
+    # for now, install hanna from here: http://github.com/erikh/hanna
     gem.add_development_dependency 'hanna'
     unless RUBY_VERSION =~ /^1.9/
       gem.add_development_dependency 'fastercsv'
@@ -77,13 +78,14 @@ end
 task :default => :test
 
 begin
-  gem 'hanna'
-  require 'hanna/rdoctask'
-  Hanna::Task.new do |rdoc|
+  require 'rdoc/task'
+  RDoc::Task.new do |rdoc|
     version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
+    rdoc.options.push '-f', 'hanna'
+    rdoc.main = 'README.rdoc'
     rdoc.rdoc_dir = 'rdoc'
-    rdoc.title = "rdbi #{version}"
+    rdoc.title = "RDBI #{version} Documentation"
     rdoc.rdoc_files.include('README*')
     rdoc.rdoc_files.include('lib/**/*.rb')
   end
@@ -91,8 +93,6 @@ rescue LoadError => e
   abort "What, were you born in a barn? Install rdoc."
 end
 
-task :rdoc => [:clobber_rdoc]
- 
 task :to_blog => [:clobber_rdoc, :rdoc] do
   sh "rm -fr $git/blog/content/docs/rdbi && mv doc $git/blog/content/docs/rdbi"
 end

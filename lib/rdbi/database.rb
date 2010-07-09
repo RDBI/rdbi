@@ -49,7 +49,7 @@ class RDBI::Database
   # are we connected to the database?
   
   ##
-  # :attr-accessor: connected?
+  # :attr_accessor: connected?
   # are we connected to the database?
   inline(:connected, :connected?) { @connected }
 

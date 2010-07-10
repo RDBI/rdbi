@@ -1,3 +1,80 @@
+#
+# RDBI::Statement is the encapsulation of a single prepared statement. A
+# statement can be executed with varying arguments multiple times through a
+# facility called 'binding'.
+#
+# == About Binding
+#
+# Binding is the database term for facilitating placeholder replacement similar
+# to formatters such as "sprintf()", but in a database-centric way:
+#
+#   select * from my_table where some_column = ?
+#
+# The question mark is the placeholder here; upon execution, the user will be
+# asked to provide values to fill that placeholder with.
+#
+# There are two major advantages to binding:
+#
+# * Multiple execution of the same statement with variable data
+#
+# For example, the above statement could be executed 12 times over an iterator:
+#
+#   # RDBI::Database#prepare creates a prepared statement
+#
+#   sth = dbh.prepare('select * from my_table where some_column = ?')
+#
+#   # there is one placeholder here, so we'll use the iterator itself to feed
+#   # to the statement at execution time.
+#   #
+#   # This will send 12 copies of the select statement above, with 0 - 11 being
+#   # passed as the substitution for each placeholder. Use
+#   # RDBI::Database#preprocess_query to see what these queries would look
+#   # like.
+#
+#   12.times do |x|
+#     sth.execute(x)
+#   end
+#
+# * Protection against attacks such as SQL injection in a consistent way (see below).
+#
+# == Native client binding 
+#
+# Binding is typically *not* just text replacement, it is a client-oriented
+# operation that barely involves itself in the string at all. The query is
+# parsed by the SQL engine, then the placeholders are requested; at this point,
+# the client yields those to the database which then uses them in the
+# *internal* representation of the query, which is why this is totally legal in
+# a binding scenario:
+#
+#   # RDBI::Database#execute is a way to prepare and execute statements immediately.
+#   dbh.execute("select * from my_table where some_column = ?", "; drop table my_table;")
+#
+# For purposes of instruction, this resolves to:
+#
+#   select * from my_table where some_column = '; drop table my_table;'
+#
+# *BUT*, as mentioned above, the query is actually sent in two stages. It gets this:
+#
+#   select * from my_table where some_column = ?
+#
+# Then a single element tuple is sent:
+#
+#   ["; drop table my_table;"]
+#
+# These are combined *post-parsing* to create a full, legal statement, so no
+# grammar rules can be exploited.
+#
+# As a result, placeholder rules in this scenario are pretty rigid, only values
+# can be used. For example, you cannot supply placeholders for:
+#
+# * table names
+# * sql keywords and functions
+# * other elements of syntax (punctuation, etc)
+#
+# == Preprocessing
+#
+# Preprocessing is a fallback mechanism we use when the underlying database 
+#
 class RDBI::Statement
   extend MethLab
 

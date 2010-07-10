@@ -12,6 +12,7 @@ module RDBI
       IS_NULL       = proc { |obj| obj.nil? }
       IS_BIGDECIMAL = proc { |obj| obj.kind_of?(BigDecimal) }
       IS_DATETIME   = proc { |obj| obj.kind_of?(DateTime) }
+      IS_BOOLEAN    = proc { |obj| obj.kind_of?(TrueClass) or obj.kind_of?(FalseClass) }
 
       STR_IS_BOOLEAN = proc { |obj| obj.kind_of?(String) and obj =~ /^(t(rue)?|f(alse)?|1|0)$/i }
     end

@@ -12,7 +12,7 @@ class RDBI::Driver
   # Database driver class requested for initialization
   attr_reader :dbh_class
 
-  # Initialize a new driver object. This accepts a RDBI::Database subclass as a
+  # Initialize a new driver object. This accepts an RDBI::Database subclass as a
   # class name (shorthand does not work here) and the arguments to pass into
   # the constructor.
   def initialize(dbh_class, *args)

@@ -1,6 +1,6 @@
 #
-# RDBI::Statement is the encapsulation of a single prepared statement. A
-# statement can be executed with varying arguments multiple times through a
+# RDBI::Statement is the encapsulation of a single prepared statement (query).
+# A statement can be executed with varying arguments multiple times through a
 # facility called 'binding'.
 #
 # == About Binding
@@ -61,8 +61,8 @@
 #
 #   ["; drop table my_table;"]
 #
-# These are combined *post-parsing* to create a full, legal statement, so no
-# grammar rules can be exploited.
+# These are combined with *post-parsing* to create a full, legal statement, so
+# no grammar rules can be exploited.
 #
 # As a result, placeholder rules in this scenario are pretty rigid, only values
 # can be used. For example, you cannot supply placeholders for:
@@ -73,25 +73,56 @@
 #
 # == Preprocessing
 #
-# Preprocessing is a fallback mechanism we use when the underlying database 
+# Preprocessing is a fallback mechanism we use when the underlying database
+# does not support the above mechanism. It, unlike native client binding, is
+# basically text replacement, so all those rules about what you can and cannot
+# do go away.
+#
+# The downside is that if our replacement system (provided by the Epoxy class,
+# which itself is provided by the epoxy gem) is unkempt, SQL injection attacks
+# may be possible.
 #
 class RDBI::Statement
   extend MethLab
 
+  # the RDBI::Database handle that created this statement.
   attr_reader :dbh
+  # The query this statement was created for.
   attr_reader :query
+  # A mutex for locked operations. Basically a cached copy of Mutex.new.
   attr_reader :mutex
+  # The input type map provided during statement creation -- used for binding.
   attr_reader :input_type_map
 
+  ##
+  # :attr_reader: last_result
+  #
+  # The last RDBI::Result this statement yielded.
   attr_threaded_accessor :last_result
 
+  ##
+  # :attr_reader: finished
+  #
+  # Has this statement been finished?
+  
+  ##
+  # :attr_reader: finished?
+  #
+  # Has this statement been finished?
+  
   inline(:finished, :finished?)   { @finished  }
+
+  ##
+  # :attr_reader: driver
+  #
+  # The RDBI::Driver object that this statement belongs to.
+
   inline(:driver)                 { dbh.driver }
-
-  inline(:new_execution) do |*args|
-    raise NoMethodError, "this method is not implemented in this driver"
-  end
-
+  
+  # 
+  # Initialize a statement handle, given a text query and the RDBI::Database
+  # handle that created it.
+  #
   def initialize(query, dbh)
     @query = query
     @dbh   = dbh
@@ -102,6 +133,9 @@ class RDBI::Statement
     @dbh.open_statements.push(self)
   end
 
+  #
+  # Execute the statement with the supplied binds. 
+  #
   def execute(*binds)
     raise StandardError, "you may not execute a finished handle" if @finished
 
@@ -113,11 +147,44 @@ class RDBI::Statement
     end
   end
 
+  #
+  # Deallocate any internal resources devoted to the statement. It will not be
+  # usable after this is called.
+  #
+  # Driver implementors will want to subclass this, do their thing and call
+  # 'super' as their last statement.
+  #
   def finish
     mutex.synchronize do
       dbh.open_statements.reject! { |x| x.object_id == self.object_id }
       @finished = true
     end
+  end
+
+  ##
+  # :method: new_execution
+  # :call-seq: new_execution(*binds)
+  #
+  # Database drivers will subclass this in their respective RDBI::Statement
+  # subclasses. This method is called when RDBI::Statement#execute or
+  # RDBI::Database#execute is called.
+  #
+  # Those who implement this method must return (in order):
+  #
+  # * the array of database tuples (also represented as an array)
+  # * an RDBI::Schema struct which represents the kinds of data being queried.
+  # * A +type_hash+ for on-fetch conversion which corresponds to the
+  #   RDBI::Column information (see RDBI::Schema) and follows a structure similar
+  #   to RDBI::Type::Out
+  # * Optionally and last, a count of the affected rows -- this is not a count
+  #   of the data returned, but of rows modified or altered in some way.
+  #
+  # These return values are passed (along with this object and the binds passed
+  # to this call) to RDBI::Result.new.
+  #
+  
+  inline(:new_execution) do |*args|
+    raise NoMethodError, "this method is not implemented in this driver"
   end
 end
 

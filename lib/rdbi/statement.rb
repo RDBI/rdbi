@@ -37,7 +37,7 @@
 #
 # * Protection against attacks such as SQL injection in a consistent way (see below).
 #
-# == Native client binding 
+# == Native client binding
 #
 # Binding is typically *not* just text replacement, it is a client-oriented
 # operation that barely involves itself in the string at all. The query is
@@ -104,12 +104,12 @@ class RDBI::Statement
   # :attr_reader: finished
   #
   # Has this statement been finished?
-  
+
   ##
   # :attr_reader: finished?
   #
   # Has this statement been finished?
-  
+
   inline(:finished, :finished?)   { @finished  }
 
   ##
@@ -118,8 +118,8 @@ class RDBI::Statement
   # The RDBI::Driver object that this statement belongs to.
 
   inline(:driver)                 { dbh.driver }
-  
-  # 
+
+  #
   # Initialize a statement handle, given a text query and the RDBI::Database
   # handle that created it.
   #
@@ -134,7 +134,7 @@ class RDBI::Statement
   end
 
   #
-  # Execute the statement with the supplied binds. 
+  # Execute the statement with the supplied binds.
   #
   def execute(*binds)
     raise StandardError, "you may not execute a finished handle" if @finished
@@ -182,7 +182,7 @@ class RDBI::Statement
   # These return values are passed (along with this object and the binds passed
   # to this call) to RDBI::Result.new.
   #
-  
+
   inline(:new_execution) do |*args|
     raise NoMethodError, "this method is not implemented in this driver"
   end

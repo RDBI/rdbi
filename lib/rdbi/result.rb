@@ -97,8 +97,8 @@ class RDBI::Result
 
   #
   # Creates a new RDBI::Result. Please refer to RDBI::Statement#new_execution
-  # for instructions on how this is typically use and the contents passed to
-  # the constructor.
+  # for instructions on how this is typically used and how the contents are
+  # passed to the constructor.
   #
   def initialize(sth, binds, data, schema, type_hash, affected_count=0)
     @schema         = schema
@@ -205,7 +205,7 @@ class RDBI::Result
   # essentially a running row count that is altered by certain fetch
   # operations. This makes sequential fetches much simpler.
   #
-  # Items that do not use the index do not effect it.
+  # Items that do not use the index do not affect it.
   #
   # Result Drivers will always rewind the index, as this implicates a "point of
   # no return" state change. You may always return to the original driver you

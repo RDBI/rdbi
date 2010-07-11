@@ -165,19 +165,19 @@ class RDBI::Statement
   # :method: new_execution
   # :call-seq: new_execution(*binds)
   #
-  # Database drivers will subclass this in their respective RDBI::Statement
+  # Database drivers will override this method in their respective RDBI::Statement
   # subclasses. This method is called when RDBI::Statement#execute or
   # RDBI::Database#execute is called.
   #
-  # Those who implement this method must return (in order):
+  # Implementations of this method must return, in order:
   #
-  # * the array of database tuples (also represented as an array)
-  # * an RDBI::Schema struct which represents the kinds of data being queried.
-  # * A +type_hash+ for on-fetch conversion which corresponds to the
+  # * the Array of database tuples (each also represented as an Array)
+  # * an RDBI::Schema struct which represents the kinds of data being queried
+  # * a +type_hash+ for on-fetch conversion which corresponds to the
   #   RDBI::Column information (see RDBI::Schema) and follows a structure similar
   #   to RDBI::Type::Out
-  # * Optionally and last, a count of the affected rows -- this is not a count
-  #   of the data returned, but of rows modified or altered in some way.
+  # * a count of the affected rows (optional) -- this is not a count
+  #   of the data (tuples) returned, but of rows modified or altered in some way
   #
   # These return values are passed (along with this object and the binds passed
   # to this call) to RDBI::Result.new.

@@ -1,28 +1,60 @@
 = RDBI - Low-level Database Access Re-imagined
 
 RDBI is intended primarily as an alternative to the heavier database layers in
-the Ruby ecosystem.
+the Ruby ecosystem. It provides a consistent interface to databases for working
+with query languages directly, instead of providing an extremely high level
+interface which does this work for you. While usable, it largely targets
+high-level database libraries, similar to how +rack+ targets web frameworks.
 
-== I'd like an example
+== I'd like to get started
 
 Hokay:
 
+  # connect to an in-memory sqlite3 database:
   dbh = RDBI.connect(:SQLite3, :database => ":memory:")
+
+  # execute this CREATE TABLE statement:
   dbh.execute("create table foo (bar integer, baz varchar)")
+
+  # prepare an insert statement for execution with two placeholders:
   dbh.prepare("insert into foo (bar, baz) values (?, ?)") do |sth|
+
+    # and execute it with bound variables:
     sth.execute(1, "foo")
     sth.execute(2, "bar")
     sth.execute(3, "quux")
   end
 
+  # get a result handle from a select statement:
   result = dbh.execute("select * from foo")
+
+  # and fetch the first row
   result.fetch(:first) # [1, "foo"]
 
-  # gettin' crazy with method chaining
+== About RDBI
 
+Here are some important pieces of information about RDBI that you may find
+compelling (or off-putting. We're pragmatists.):
+
+* RDBI is, at the time of this writing, fewer than 1000 lines of code.
+* RDBI is light and fast. Eventually we will show you benchmarks.
+* RDBI can be tested without a database, or even a database driver.
+* RDBI is almost 100% thread-safe.
+* RDBI can transform your results through a driver system. Want a CSV? Use the
+  CSV driver, don't bother transforming it yourself. Transform to JSON or YAML
+  with another gem. Drivers can be independently installed, used and swapped.
+* RDBI contains no monkeypatching, core extensions, or other hell that will
+  conflict with your other libraries.
+* RDBI is designed around properties of a relational database, but there is
+  nothing in it that demands one -- use it with Mongo or Redis if you want.
+* RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
+  our PostgreSQL driver is about 300. Our mock driver is about 50.
+* RDBI has an active community of experienced Ruby and Rails programmers.
+
+== I'd like some more, please.
+
+  # result objects are very flexible and amenable to method chaining:
   dbh.execute("select * from foo").fetch(2) # [[1, "foo"], [2, "bar"]]
-
-  # result drivers!
 
   result = dbh.execute("select * from foo")
 
@@ -45,9 +77,6 @@ Hokay:
   str.bar # 1
   str.baz # "foo"
 
-  #
-  # gettin' jiggy wit it
-  #
   result.rewind
 
   # select a single item in CSV format
@@ -60,28 +89,8 @@ Hokay:
   # presentations:
   ary = result.as(:Array).fetch(:all)
 
+  # and we're done! Disconnect from the database.
   dbh.disconnect
-
-== About RDBI
-
-Here are some important pieces of information about RDBI that you may find
-compelling (or off-putting. We're pragmatists.):
-
-* RDBI is, at the time of this writing, fewer than 1000 lines of code.
-* RDBI is light and fast. Eventually we will show you benchmarks.
-* RDBI can be tested without a database, or even a database driver.
-* RDBI is threadsafe.
-* RDBI can transform your results through a driver system. Want a CSV? Use the
-  CSV driver, don't bother transforming it yourself. Drivers can be
-  independently installed, used and swapped.
-* RDBI contains no monkeypatching, core extensions, or other hell that will
-  conflict with your other libraries.
-* RDBI is designed around properties of a relational database, but there is
-  nothing in it that demands one -- use it with Mongo or Redis if you want.
-* RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
-  our PostgreSQL driver is about 300. Our mock driver is about 50.
-* RDBI has an active community of experienced (in some instances, 5-10 years)
-  Ruby and Rails programmers.
 
 Here are some things that it does:
 
@@ -107,11 +116,13 @@ Aaaaaand here are some things RDBI won't do:
 * RDBI won't prevent you from being stupid or clever.
 * It won't save you tons of time because you can't be bothered to think about
   how you access your data.
-* It won't make you a rockstar.
+* It won't make you (or anyone, really) a rockstar.
 * Do not taunt RDBI.
 
 == Show me even more awesome!
 
+  # retrieve cached handles 5 times -- handles will be yielded twice if there
+  # is a smaller Pool size: 
   5.times do
     RDBI.connect_cached(:SQLite3, :database => ":memory:")
   end
@@ -129,18 +140,19 @@ Aaaaaand here are some things RDBI won't do:
   # oh lordy lord! still 2 connections
   10.times { pool.get_dbh }
 
-  pool.disconnect # want to guess what this does?
-  pool.reconnect  # or this?
+  pool.disconnect # disconnect the entire pool
+  pool.reconnect  # reconnect the entire pool
 
-  pool.resize(10) # want to see what that above loop does now?
+  pool.resize(10) # resize the pool to 10 connections.
 
-== How can I help?
+== I'd like to patch and/or help maintain RDBI. How can I?
 
 * Fork the project: http://github.com/RDBI
 * Make your feature addition or bug fix.
 * Please add tests for it, or indicate there are none. Patches without tests
   will get integrated slower and must be very compelling.
-* We use jeweler for our repository management -- patches that mess with this will be rejected regardless of merit.
+* We use +jeweler+ for our repository management -- patches that mess with this
+  will be rejected regardless of merit.
 * If you fork it permanently, be prepared to support it; we won't.
 
 == Let's chat

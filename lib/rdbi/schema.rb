@@ -1,5 +1,3 @@
-# FIXME Methlab, maybe?
-
 RDBI::Schema = Struct.new(
   :columns,
   :tables,

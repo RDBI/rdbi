@@ -21,7 +21,7 @@
 # To elaborate, the "affected rows" is a count of rows that were altered by the
 # statement from a DML result such as +INSERT+ or +UPDATE+. In some cases,
 # statements will both alter rows and yield results, which is why this value is
-# not switched depending on the kind of statement. 
+# not switched depending on the kind of statement.
 #
 # == Result Drivers
 #
@@ -66,7 +66,7 @@ class RDBI::Result
   # :attr_reader: eof
   #
   # Are we at the end of the results?
-  
+
   ##
   # :attr_reader: eof?
   #
@@ -77,7 +77,7 @@ class RDBI::Result
   # :attr_reader: more
   #
   # Do we have more input available?
-  
+
   ##
   # :attr_reader: more?
   #
@@ -88,7 +88,7 @@ class RDBI::Result
   # :attr_reader: has_data
   #
   # Does this result have data?
-  
+
   ##
   # :attr_reader: has_data?
   #
@@ -118,7 +118,7 @@ class RDBI::Result
   #
   # Reload the result. This will:
   #
-  # * Execute the statement that yielded this result again, with the original binds 
+  # * Execute the statement that yielded this result again, with the original binds
   # * Replace the results and other attributes with the new results.
   #
   def reload
@@ -146,12 +146,12 @@ class RDBI::Result
   end
 
   #
-  # :call-seq: 
+  # :call-seq:
   #   as(String)
   #   as(Symbol)
   #   as(Class)
   #   as([Class, String, or Symbol], *driver_arguments)
-  # 
+  #
   # Replace the Result Driver. See RDBI::Result's main docs and
   # RDBI::Result::Driver for more information on Result Drivers.
   #
@@ -194,7 +194,7 @@ class RDBI::Result
   #
   # * An Integer n requests n rows from the result and increments the index.
   # * No argument uses an Integer count of 1.
-  # * :first yields the first row of the result, regardless of the index. 
+  # * :first yields the first row of the result, regardless of the index.
   # * :last yields the last row of the result, regardless of the index.
   # * :all yields the whole set of rows, regardless of the index.
   # * :rest yields all the items that have not been fetched, determined by the index.
@@ -221,7 +221,7 @@ class RDBI::Result
 
   alias read fetch
 
-  # 
+  #
   # raw_fetch is a straight array fetch without driver interaction. If you
   # think you need this, please still read the fetch documentation as there is
   # a considerable amount of overlap.
@@ -351,7 +351,7 @@ end
 #
 # The +fastercsv+ gem on 1.8 is used, which is the canonical +csv+ library on
 # 1.9. If you are using Ruby 1.8 and do not have this gem available and try to
-# use this driver, the code will abort during driver construction. 
+# use this driver, the code will abort during driver construction.
 #
 class RDBI::Result::Driver::CSV < RDBI::Result::Driver
   def initialize(result, *args)
@@ -373,7 +373,7 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
   end
 end
 
-# 
+#
 # Yields Struct objects instead of arrays for the rows. What this means is that
 # you will recieve a single array of Structs, each struct representing a row of
 # the database.

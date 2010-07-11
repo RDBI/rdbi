@@ -28,7 +28,7 @@
 # Result drivers are subclasses of RDBI::Result::Driver that take the result as
 # input and yield a transformed input: data structures such a hashes, or even
 # wilder results such as CSV or JSON or YAML. Given the ability to sanely
-# transform row-oriented input, result driver effectively have the power to do
+# transform row-oriented input, result drivers effectively have the power to do
 # anything.
 #
 # Accessing result drivers is as easy as using a secondary form of

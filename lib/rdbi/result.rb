@@ -9,7 +9,7 @@
 #
 # == Just give me the data!
 #
-# Have a peek at fetch.
+# Have a peek at RDBI::Result#fetch.
 #
 # == Result Counts
 #
@@ -21,7 +21,7 @@
 # To elaborate, the "affected rows" is a count of rows that were altered by the
 # statement from a DML result such as +INSERT+ or +UPDATE+. In some cases,
 # statements will both alter rows and yield results, which is why this value is
-# not multiplexed. 
+# not switched depending on the kind of statement. 
 #
 # == Result Drivers
 #
@@ -262,20 +262,49 @@ class RDBI::Result
   end
 end
 
+#
+# A result driver is a transformative element for RDBI::Result. Its design
+# could be loosely described as a "fancy decorator".
+#
+# Usage and purpose is covered in the main RDBI::Result documentation. This
+# section will largely serve the purpose of helping those who wish to implement
+# result drivers themselves.
+#
+# == Creating a Result Driver
+#
+# A result driver typically inherits from RDBI::Result::Driver and implements
+# at least one method: +fetch+.
+#
+# This fetch is not RDBI::Result#fetch, and doesn't have the same call
+# semantics. Instead, it takes a single argument, the +row_count+, and
+# typically passes that to RDBI::Result#raw_fetch to get results to process. It
+# then returns the data transformed.
+#
+# RDBI::Result::Driver additionally provides two methods, convert_row and
+# convert_item, which leverage RDBI's type conversion facility (see RDBI::Type)
+# to assist in type conversion. For performance reasons, RDBI chooses to
+# convert on request instead of preemptively, so <b>it is the driver implementor's
+# job to do any conversion</b>.
+#
+# If you wish to implement a constructor in your class, please see
+# RDBI::Result::Driver.new.
+#
 class RDBI::Result::Driver
+
+  #
+  # Result driver constructor. This is the logic that associates the result
+  # driver for decoration over the result; if you wish to override this method,
+  # please call +super+ before performing your own operations.
+  #
   def initialize(result, *args)
     @result = result
     @result.rewind
   end
 
-
-  # stub docs:
   #
-  # * symbols do not affect the index
-  # * :first and :last yield a single array.
-  # * numbers do
-  # * Marshal.dump(Marshal.load) is the best way to deep clone that I know of.
-  #   I know it's slow. If you have code to speed it up, please contribute.
+  # Fetch the result with any transformations. The default is to present the
+  # type converted array.
+  #
   def fetch(row_count)
     (@result.raw_fetch(row_count) || []).enum_for.with_index.map do |item, i|
       case row_count
@@ -287,6 +316,8 @@ class RDBI::Result::Driver
     end
   end
 
+  # convert an entire row of data with the specified result map (see
+  # RDBI::Type)
   def convert_row(row)
     newrow = []
     row.each_with_index do |x, i|
@@ -295,15 +326,33 @@ class RDBI::Result::Driver
     return newrow
   end
 
+  # convert a single item (row element) with the specified result map.
   def convert_item(item, column)
     RDBI::Type::Out.convert(item, column, @result.type_hash)
   end
 end
 
-# standard array driver.
+#
+# This is the standard Array driver. If you are familiar with the typical
+# results of a database layer similar to RDBI, these results should be very
+# familiar.
+#
+# If you wish for named accessors, please see RDBI::Result::Driver::Struct.
+#
 class RDBI::Result::Driver::Array < RDBI::Result::Driver
 end
 
+#
+# This driver yields CSV:
+#
+#   dbh.execute("select foo, bar from my_table").fetch(:first, :CSV)
+#
+# Yields the contents of columns foo and bar in CSV format (a String).
+#
+# The +fastercsv+ gem on 1.8 is used, which is the canonical +csv+ library on
+# 1.9. If you are using Ruby 1.8 and do not have this gem available and try to
+# use this driver, the code will abort during driver construction. 
+#
 class RDBI::Result::Driver::CSV < RDBI::Result::Driver
   def initialize(result, *args)
     super
@@ -324,6 +373,18 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
   end
 end
 
+# 
+# Yields Struct objects instead of arrays for the rows. What this means is that
+# you will recieve a single array of Structs, each struct representing a row of
+# the database.
+#
+# example:
+#
+#   results = dbh.execute("select foo, bar from my_table").fetch(:all, :Struct)
+#
+#   results[0].foo        # first row, foo column
+#   results[10].bar       # 11th row, bar column
+#
 class RDBI::Result::Driver::Struct < RDBI::Result::Driver
   def initialize(result, *args)
     super

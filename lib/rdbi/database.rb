@@ -85,8 +85,7 @@ class RDBI::Database
   # args is the connection arguments the user initially supplied to
   # RDBI.connect.
   def initialize(*args)
-    # FIXME symbolify
-    @connect_args   = args[0]
+    @connect_args   = RDBI::Util.key_hash_as_symbols(args[0])
     @connected      = true
     @mutex          = Mutex.new
     @in_transaction = 0

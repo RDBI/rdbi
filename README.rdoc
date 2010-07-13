@@ -145,6 +145,13 @@ Aaaaaand here are some things RDBI won't do:
 
   pool.resize(10) # resize the pool to 10 connections.
 
+== Who is responsible for this madness?
+
+* Erik Hollensbe (erikh)
+* Pistos (... Pistos)
+* Lee Jarvis (injekt)
+* James Tucker (raggi)
+
 == I'd like to patch and/or help maintain RDBI. How can I?
 
 * Fork the project: http://github.com/RDBI

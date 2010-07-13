@@ -122,6 +122,15 @@ class TestDatabase < Test::Unit::TestCase
 
     query = @dbh.preprocess_query("select * from foo where bind=? and bind2=?", "fo'o", "ba''r")
     assert_equal("select * from foo where bind='fo''o' and bind2='ba''''r'", query)
+    
+    query = @dbh.preprocess_query("select * from foo where bind=?foo and bind2=?bar", { :foo => "fo'o", :bar => "ba''r" })
+    assert_equal("select * from foo where bind='fo''o' and bind2='ba''''r'", query)
+    
+    query = @dbh.preprocess_query("select * from foo where bind=?foo and bind2=?bar", { :foo => "fo'o"}, { :bar => "ba''r" })
+    assert_equal("select * from foo where bind='fo''o' and bind2='ba''''r'", query)
+    
+    query = @dbh.preprocess_query("select * from foo where bind=?foo and bind2=?bar and bind3=?", { :foo => "fo'o"}, { :bar => "ba''r" }, "quux")
+    assert_equal("select * from foo where bind='fo''o' and bind2='ba''''r' and bind3='quux'", query)
   end
 
   def test_05_prepare_execute

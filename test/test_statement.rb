@@ -42,6 +42,14 @@ class TestStatement < Test::Unit::TestCase
     res = sth.execute(1)
     assert_equal(%W[10 11 12 13 14].map { |x| [x] }, res.fetch(:all))
     sth.finish
+    
+    sth = dbh.prepare("select * from foo where bar=?bar and foo=?")
+    res = sth.execute({:bar => "10"}, "1")
+    assert_equal(
+      [ { :bar => "10" }, "1" ],
+      res.binds
+    )
+    sth.finish
   end
 
   def test_04_finish

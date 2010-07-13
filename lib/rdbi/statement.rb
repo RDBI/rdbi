@@ -139,7 +139,20 @@ class RDBI::Statement
   def execute(*binds)
     raise StandardError, "you may not execute a finished handle" if @finished
 
-    binds = binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) }
+    # XXX if we ever support some kind of hash type, this'll get ugly.
+    if hashes = binds.map { |x| x.class }.reject! { |x| x.kind_of?(Hash) }
+      hashes.collect! do |hash|
+        newhash = { }
+
+        hash.each do |key, value|
+          newhash[key] = RDBI::Type::In.convert(value, @input_type_map)
+        end
+
+        newhash
+      end
+    end
+
+    binds = (hashes || []) + binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) } 
 
     mutex.synchronize do
       exec_args = *new_execution(*binds)

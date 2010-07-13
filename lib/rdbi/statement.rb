@@ -140,7 +140,9 @@ class RDBI::Statement
     raise StandardError, "you may not execute a finished handle" if @finished
 
     # XXX if we ever support some kind of hash type, this'll get ugly.
-    if hashes = binds.map { |x| x.class }.reject! { |x| x.kind_of?(Hash) }
+    hashes, binds = binds.partition { |x| x.kind_of?(Hash) }
+
+    if hashes
       hashes.collect! do |hash|
         newhash = { }
 

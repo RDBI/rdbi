@@ -219,8 +219,12 @@ class RDBI::Database
       self.last_query = query
     end
 
+    hashes, binds = binds.partition { |x| x.kind_of?(Hash) }
+
+    total_hash = hashes.inject({}) { |x, y| x.merge(y) }
+
     ep = Epoxy.new(query)
-    ep.quote { |x| %Q{'#{binds[x].to_s.gsub(/'/, "''")}'} }
+    ep.quote(total_hash) { |x| %Q{'#{(total_hash[x] || binds[x]).to_s.gsub(/'/, "''")}'} }
   end
 end
 

@@ -10,7 +10,7 @@ begin
     gem.summary = %Q{RDBI provides sane query-level database access with low magic.}
     gem.description = %Q{RDBI is a rearchitecture of the Ruby/DBI project by its maintainer and others. It intends to fully supplant Ruby/DBI in the future for similar database access needs.}
     gem.email = "erik@hollensbe.org"
-    gem.homepage = "http://github.com/erikh/rdbi"
+    gem.homepage = "http://github.com/RDBI/rdbi"
     gem.authors = ["Erik Hollensbe"]
 
     gem.add_development_dependency 'rdbi-driver-mock'
@@ -23,7 +23,7 @@ begin
     end
 
     gem.add_dependency 'methlab', '>= 0.0.9'
-    gem.add_dependency 'epoxy', '>= 0.2.1'
+    gem.add_dependency 'epoxy', '>= 0.3.0'
     gem.add_dependency 'typelib'
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings

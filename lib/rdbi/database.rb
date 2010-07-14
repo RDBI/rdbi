@@ -214,6 +214,9 @@ class RDBI::Database
   # settings, this may include interpolated data or client binding
   # placeholders.
   #
+  #--
+  # FIXME leaky abstraction. Could really use better driver support for the
+  #       common case.
   def preprocess_query(query, *binds)
     mutex.synchronize do
       self.last_query = query

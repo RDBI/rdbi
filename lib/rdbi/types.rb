@@ -1,6 +1,17 @@
 require 'typelib'
 require 'typelib/canned'
 
+#
+# RDBI::Type -- manage types going to and coming from your database.
+#
+# RDBI::Type consists of:
+#
+# * Checks and Conversions (facilitated by TypeLib) for ruby -> database and
+#   database -> ruby
+# * Mappings for Input (Ruby -> DB) and Output (DB -> Ruby) conversions based
+#   on type.
+# * Convenience methods for TypeLib and creating new mappings.
+#
 module RDBI::Type
   DEFAULT_STRFTIME_FILTER = "%Y-%m-%d %H:%M:%S %z"
 
@@ -42,7 +53,7 @@ module RDBI::Type
     FROM_DECIMAL   = TypeLib::Filter.new(Checks::IS_BIGDECIMAL, Conversions::TO_STRING_DECIMAL)
     FROM_DATETIME  = TypeLib::Filter.new(Checks::IS_DATETIME,   Conversions::TO_STRING_DATETIME)
     FROM_BOOLEAN   = TypeLib::Filter.new(Checks::IS_BOOLEAN,    Conversions::TO_STRING_BOOLEAN)
-
+    
     TO_BOOLEAN     = TypeLib::Filter.new(Checks::STR_IS_BOOLEAN, Conversions::SQL_STR_TO_BOOLEAN)
   end
 

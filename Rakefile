@@ -23,7 +23,7 @@ begin
     end
 
     gem.add_dependency 'methlab', '>= 0.0.9'
-    gem.add_dependency 'epoxy', '>= 0.3.0'
+    gem.add_dependency 'epoxy', '>= 0.3.1'
     gem.add_dependency 'typelib'
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings

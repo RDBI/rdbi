@@ -214,9 +214,20 @@ class RDBI::Database
   # settings, this may include interpolated data or client binding
   # placeholders.
   #
-  #--
-  # FIXME leaky abstraction. Could really use better driver support for the
-  #       common case.
+  # <b>Driver Authors</b>: if the instance variable @preprocess_quoter is set
+  # to a proc that accepts an index/key, a map of named binds and an array of
+  # indexed binds, it will be called instead of the default quoter and there is
+  # no need to override this method. For example:
+  #
+  #   def initialize(...)
+  #     @preprocess_quoter = proc do |x, named, indexed|
+  #       @some_handle.quote((named[x] || indexed[x]).to_s)
+  #     end
+  #   end
+  #
+  # This will use RDBI's code to manage the binds before quoting, but use your
+  # quoter during bind processing.
+  #
   def preprocess_query(query, *binds)
     mutex.synchronize do
       self.last_query = query
@@ -228,7 +239,11 @@ class RDBI::Database
     binds.collect! { |x| x.kind_of?(Hash) ? nil : x } 
     total_hash = hashes.inject({}) { |x, y| x.merge(y) }
 
-    ep.quote(total_hash) { |x| %Q{'#{(total_hash[x] || binds[x]).to_s.gsub(/'/, "''")}'} }
+    if @preprocess_quoter.respond_to?(:call)
+      ep.quote(total_hash) { |x| @preprocess_quoter.call(x, total_hash, binds) }
+    else
+      ep.quote(total_hash) { |x| %Q{'#{(total_hash[x] || binds[x]).to_s.gsub(/'/, "''")}'} }
+    end
   end
 end
 

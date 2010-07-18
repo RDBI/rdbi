@@ -5,7 +5,7 @@
 # have the same properties. Many group actions can be performed on them, such
 # as disconnecting the entire lot.
 #
-# RDBI::Pool itself has a global accessor, by way of RDBI::Pool.[], that can
+# RDBI::Pool itself has a global accessor, by way of +RDBI::Pool::[]+, that can
 # access these pools by name. Alternatively, you may access them through the
 # RDBI.pool interface.
 #

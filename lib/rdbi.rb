@@ -2,7 +2,6 @@ require 'epoxy'
 require 'methlab'
 require 'thread'
 
-# FIXME put something here
 module RDBI
   class << self
     extend MethLab

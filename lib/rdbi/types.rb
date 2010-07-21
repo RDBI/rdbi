@@ -21,7 +21,7 @@ require 'typelib/canned'
 # === A conversion follows these steps:
 #
 # * Metadata on the type (more below) is located and used to reference a
-#   +TypeLib::FilterList+ which contains the +TypeLib::Filters+ (which in turn
+#   TypeLib::FilterList which contains the TypeLib::Filters (which in turn
 #   consist of a +Check+ and +Conversion+ proc) which will process your data.
 # * Data is passed to the FilterList and it is executed, following each filter
 #   in turn and following any conversion passing checks request. This may very

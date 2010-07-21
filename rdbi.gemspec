@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Erik Hollensbe"]
-  s.date = %q{2010-07-16}
+  s.date = %q{2010-07-18}
   s.description = %q{RDBI is a rearchitecture of the Ruby/DBI project by its maintainer and others. It intends to fully supplant Ruby/DBI in the future for similar database access needs.}
   s.email = %q{erik@hollensbe.org}
   s.extra_rdoc_files = [
@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
      "lib/rdbi/schema.rb",
      "lib/rdbi/statement.rb",
      "lib/rdbi/types.rb",
+     "rdbi.gemspec",
      "test/helper.rb",
      "test/test_database.rb",
      "test/test_pool.rb",

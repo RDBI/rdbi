@@ -8,7 +8,19 @@ high-level database libraries, similar to how +rack+ targets web frameworks.
 
 == I'd like to get started
 
-Hokay:
+If you'd prefer to head straight to sinking your teeth into the API, here's a
+path down the rabbit hole:
+
+* RDBI is what you'll use to get your RDBI::Database handle. If you need
+  collections of database handles, look at RDBI::Pool.
+* RDBI::Database contains methods for dealing with database level operations
+  and preparing and executing RDBI::Statement objects.
+* RDBI::Statement yields RDBI::Result objects which leverage
+  RDBI::Result::Driver classes to yield data.
+* If you're interested in how schemas are types are dealt with, see
+  RDBI::Schema, RDBI::Column, and RDBI::Type.
+
+== Look ma, a code sample:
 
   # connect to an in-memory sqlite3 database:
   dbh = RDBI.connect(:SQLite3, :database => ":memory:")

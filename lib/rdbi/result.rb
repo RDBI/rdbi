@@ -211,6 +211,8 @@ class RDBI::Result
   # no return" state change. You may always return to the original driver you
   # were using, but the index position will be lost.
   #
+  # The default result driver is RDBI::Result::Driver::Array.
+  #
   def fetch(row_count=1, driver_klass=nil, *args)
     if driver_klass
       as(driver_klass, *args)

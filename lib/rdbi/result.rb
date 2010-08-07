@@ -242,7 +242,7 @@ class RDBI::Result
                 when :first
                   [@data.first]
                 when :last
-                  [@data[-1]]
+                  [@data.last]
                 else
                   res = @data[@index, row_count]
                   @index += row_count
@@ -311,11 +311,7 @@ class RDBI::Result::Driver
   #
   def fetch(row_count)
     ary = (@result.raw_fetch(row_count) || []).enum_for.with_index.map do |item, i|
-      if [:first, :last].include?(row_count) and item == nil
-        item
-      else
-        convert_row(item)
-      end
+      convert_row(item)
     end
 
     RDBI::Util.format_results(row_count, ary)
@@ -325,7 +321,7 @@ class RDBI::Result::Driver
   # RDBI::Type)
   def convert_row(row)
     newrow = []
-    row.each_with_index do |x, i|
+    (row || []).each_with_index do |x, i|
       newrow.push(convert_item(x, @result.schema.columns[i]))
     end
     return newrow
@@ -396,16 +392,21 @@ class RDBI::Result::Driver::Struct < RDBI::Result::Driver
   end
 
   def fetch(row_count)
-    structs = []
     column_names = @result.schema.columns.map(&:name)
 
     klass = ::Struct.new(*column_names)
 
-    @result.raw_fetch(row_count).each do |row|
-      row = convert_row(row)
-      struct = klass.new(*row)
-      structs.push(struct)
+    structs = super
+
+    if [:first, :last].include?(row_count) 
+      if structs
+        return klass.new(*structs)
+      else
+        return structs
+      end
     end
+
+    structs.collect! { |row| klass.new(*row) }
 
     return RDBI::Util.format_results(row_count, structs)
   end

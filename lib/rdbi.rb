@@ -168,9 +168,11 @@ module RDBI::Util
   def self.format_results(row_count, ary)
     case row_count
     when :first, :last
-      ary[0]
+      ary = ary[0]
+      return nil if ary.empty?
+      return ary
     else
-      ary
+      return ary
     end
   end
 end

@@ -18,6 +18,11 @@ class TestResult < Test::Unit::TestCase
     res = RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
   end
 
+  def mock_empty_result
+    names = [:zero, :one, :two]
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], [], RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+  end
+
   def get_index(res)
     get_guts(res)[:index]
   end
@@ -217,6 +222,12 @@ class TestResult < Test::Unit::TestCase
     assert_equal(0, hash.one)
     assert_equal(1, hash.two)
     
+    res.sth.finish
+
+    res = mock_empty_result
+
+    hash = res.fetch(:first, :Struct)
+    assert_nil(hash)
     res.sth.finish
   end
 

@@ -15,7 +15,7 @@ class TestResult < Test::Unit::TestCase
   
   def mock_result
     names = [:zero, :one, :two]
-    RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
   end
 
   def get_index(res)
@@ -210,6 +210,13 @@ class TestResult < Test::Unit::TestCase
     assert_equal(0, hash.zero)
     assert_equal(1, hash.one)
     assert_equal(2, hash.two)
+    
+    hash = res.fetch(:first)
+   
+    assert_equal(-1, hash.zero)
+    assert_equal(0, hash.one)
+    assert_equal(1, hash.two)
+    
     res.sth.finish
   end
 
@@ -247,8 +254,8 @@ class TestResult < Test::Unit::TestCase
 
   def test_10_null_results
     res = RDBI::Result.new(@dbh.prepare("foo"), [1], [], [], 0)
-    assert_equal([], res.fetch(:first))
-    assert_equal([], res.fetch(:last))
+    assert_equal(nil, res.fetch(:first))
+    assert_equal(nil, res.fetch(:last))
     assert_equal([], res.fetch(:all))
     assert_equal([], res.fetch(:rest))
     assert_equal([], res.fetch(1))

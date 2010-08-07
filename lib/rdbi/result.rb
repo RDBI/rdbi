@@ -198,6 +198,8 @@ class RDBI::Result
   # * :last yields the last row of the result, regardless of the index.
   # * :all yields the whole set of rows, regardless of the index.
   # * :rest yields all the items that have not been fetched, determined by the index.
+  # * :first and :last return nil if there are no results. All others will
+  #   return an empty array.
   #
   # == The index
   #
@@ -238,9 +240,9 @@ class RDBI::Result
                   oindex, @index = @index, @data.size
                   @data[oindex, @index]
                 when :first
-                  @data.first
+                  [@data.first]
                 when :last
-                  @data[-1]
+                  [@data[-1]]
                 else
                   res = @data[@index, row_count]
                   @index += row_count
@@ -308,14 +310,15 @@ class RDBI::Result::Driver
   # type converted array.
   #
   def fetch(row_count)
-    (@result.raw_fetch(row_count) || []).enum_for.with_index.map do |item, i|
-      case row_count
-      when :first, :last
-        convert_item(item, @result.schema.columns[i])
+    ary = (@result.raw_fetch(row_count) || []).enum_for.with_index.map do |item, i|
+      if [:first, :last].include?(row_count) and item == nil
+        item
       else
         convert_row(item)
       end
     end
+
+    RDBI::Util.format_results(row_count, ary)
   end
 
   # convert an entire row of data with the specified result map (see
@@ -404,7 +407,7 @@ class RDBI::Result::Driver::Struct < RDBI::Result::Driver
       structs.push(struct)
     end
 
-    return structs
+    return RDBI::Util.format_results(row_count, structs)
   end
 end
 

@@ -157,6 +157,22 @@ module RDBI::Util
   def self.deep_copy(obj)
     Marshal.load(Marshal.dump(obj))
   end
+
+  #
+  # Takes an array and appropriate boxes/deboxes it based on what was
+  # requested.
+  #
+  #--
+  # FIXME this is a really poorly performing way of doing this.
+  #++
+  def self.format_results(row_count, ary)
+    case row_count
+    when :first, :last
+      ary[0]
+    else
+      ary
+    end
+  end
 end
 
 require 'rdbi/pool'

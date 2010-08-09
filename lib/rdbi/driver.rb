@@ -27,7 +27,7 @@ class RDBI::Driver
   #
   def new_handle 
     dbh = @dbh_class.new(*@connect_args)
-    dbh.driver = self.class
+    dbh.driver = self
     return dbh
   end
 end

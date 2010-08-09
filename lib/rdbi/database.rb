@@ -16,6 +16,9 @@ class RDBI::Database
   # the name of the database we're connected to, if any.
   attr_accessor :database_name
 
+  # the arguments used to create the connection.
+  attr_reader :connect_args
+
   ##
   # :attr_reader: last_statement
   #

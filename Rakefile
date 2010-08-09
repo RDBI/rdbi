@@ -92,7 +92,7 @@ begin
   end
 rescue LoadError => e
   rdoc_missing = lambda do
-    abort "What, were you born in a barn? Install rdoc and hanna at http://github.com/erikh/hanna ."
+    abort "What, were you born in a barn? Install rdoc and hanna at http://github.com/raggi/hanna ."
   end
   task :rdoc, &rdoc_missing
   task :clobber_rdoc, &rdoc_missing

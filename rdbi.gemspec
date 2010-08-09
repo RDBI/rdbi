@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Erik Hollensbe"]
-  s.date = %q{2010-08-07}
+  s.date = %q{2010-08-09}
   s.description = %q{RDBI is a rearchitecture of the Ruby/DBI project by its maintainer and others. It intends to fully supplant Ruby/DBI in the future for similar database access needs.}
   s.email = %q{erik@hollensbe.org}
   s.extra_rdoc_files = [
@@ -66,14 +66,12 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rdbi-driver-mock>, [">= 0"])
       s.add_development_dependency(%q<test-unit>, [">= 0"])
-      s.add_development_dependency(%q<fastercsv>, [">= 0"])
       s.add_runtime_dependency(%q<methlab>, [">= 0.0.9"])
       s.add_runtime_dependency(%q<epoxy>, [">= 0.3.1"])
       s.add_runtime_dependency(%q<typelib>, [">= 0"])
     else
       s.add_dependency(%q<rdbi-driver-mock>, [">= 0"])
       s.add_dependency(%q<test-unit>, [">= 0"])
-      s.add_dependency(%q<fastercsv>, [">= 0"])
       s.add_dependency(%q<methlab>, [">= 0.0.9"])
       s.add_dependency(%q<epoxy>, [">= 0.3.1"])
       s.add_dependency(%q<typelib>, [">= 0"])
@@ -81,7 +79,6 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<rdbi-driver-mock>, [">= 0"])
     s.add_dependency(%q<test-unit>, [">= 0"])
-    s.add_dependency(%q<fastercsv>, [">= 0"])
     s.add_dependency(%q<methlab>, [">= 0.0.9"])
     s.add_dependency(%q<epoxy>, [">= 0.3.1"])
     s.add_dependency(%q<typelib>, [">= 0"])

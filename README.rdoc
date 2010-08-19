@@ -119,6 +119,7 @@ Here are some things that it does:
   Rewind them, ask the database to re-query the data, select a struct then select
   an array (*without* requerying), select n items at a time as tuples (which
   may be more than one or less than all).
+* RDBI's core test suite passes in MRI 1.8, 1.9, and JRuby 1.5.
 
 Aaaaaand here are some things RDBI won't do:
 

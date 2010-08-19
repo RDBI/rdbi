@@ -63,28 +63,6 @@ class RDBI::Result
   inline(:complete, :complete?) { true }
 
   ##
-  # :attr_reader: eof
-  #
-  # Are we at the end of the results?
-
-  ##
-  # :attr_reader: eof?
-  #
-  # Are we at the end of the results?
-  inline(:eof, :eof?)           { @index >= @data.size }
-
-  ##
-  # :attr_reader: more
-  #
-  # Do we have more input available?
-
-  ##
-  # :attr_reader: more?
-  #
-  # Do we have more input available?
-  inline(:more, :more?)         { @index  < @data.size }
-
-  ##
   # :attr_reader: has_data
   #
   # Does this result have data?
@@ -135,7 +113,9 @@ class RDBI::Result
   # Iterator for Enumerable methods. Yields a row at a time.
   #
   def each
-    yield(fetch[0]) while more?
+    @data.each do |row|
+      yield(row)
+    end
   end
 
   #
@@ -173,6 +153,7 @@ class RDBI::Result
 
     @driver       = driver_klass
     @fetch_handle = driver_klass.new(self, *args)
+    @data.rewind
   end
 
   #
@@ -235,18 +216,15 @@ class RDBI::Result
   def raw_fetch(row_count)
     final_res = case row_count
                 when :all
-                  @data
+                  @data.all
                 when :rest
-                  oindex, @index = @index, @data.size
-                  @data[oindex, @index]
+                  @data.rest
                 when :first
                   [@data.first]
                 when :last
                   [@data.last]
                 else
-                  res = @data[@index, row_count]
-                  @index += row_count
-                  res
+                  @data.fetch(row_count)
                 end
     RDBI::Util.deep_copy(final_res)
   end

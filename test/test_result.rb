@@ -20,11 +20,11 @@ class TestResult < Test::Unit::TestCase
 
   def mock_empty_result
     names = [:zero, :one, :two]
-    res = RDBI::Result.new(@dbh.prepare("foo"), [1], [], RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], RDBI::Driver::Mock::Cursor.new([]), RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
   end
 
   def get_index(res)
-    get_guts(res)[:index]
+    get_guts(get_guts(res)[:data])[:index]
   end
 
   def get_guts(res)
@@ -68,8 +68,6 @@ class TestResult < Test::Unit::TestCase
       affected_count
       complete
       complete?
-      eof
-      eof?
       has_data
       has_data?
       each
@@ -98,12 +96,12 @@ class TestResult < Test::Unit::TestCase
     res.sth.finish
 
     res = mock_result
-    assert_equal(generate_data, res.fetch(:all))
+    assert_equal(generate_data.all, res.fetch(:all))
     res.sth.finish
 
     res = mock_result
     res.fetch
-    assert_equal(generate_data, res.fetch(:all))
+    assert_equal(generate_data.all, res.fetch(:all))
     assert_equal(1, get_index(res))
     assert_equal(generate_data[1..9], res.fetch(:rest))
     assert_equal(10, get_index(res))
@@ -142,10 +140,6 @@ class TestResult < Test::Unit::TestCase
     assert(res.complete)
     assert(res.has_data?)
     assert(res.has_data)
-    assert(res.eof?)
-    assert(res.eof)
-    assert(!res.more?)
-    assert(!res.more)
     res.sth.finish
   end
 
@@ -235,7 +229,6 @@ class TestResult < Test::Unit::TestCase
     res = mock_result 
 
     assert_equal([-1, 0, 1], res.fetch(1)[0])
-    assert_equal(1, res.instance_eval { @index })
     assert_equal(10, res.result_count)
     assert_equal([:zero, :one, :two], res.schema.columns.map(&:name))
 
@@ -244,7 +237,6 @@ class TestResult < Test::Unit::TestCase
     # this will actually come back from the Mock driver, which will be
     # completely different.  not the best test, but it gets the job done.
     assert_equal(%W[10], res.fetch(1)[0])
-    assert_equal(1, res.instance_eval { @index })
     assert_equal(5, res.result_count)
     assert_equal((0..9).to_a, res.schema.columns.map(&:name))
     res.finish
@@ -264,7 +256,7 @@ class TestResult < Test::Unit::TestCase
   end
 
   def test_10_null_results
-    res = RDBI::Result.new(@dbh.prepare("foo"), [1], [], [], 0)
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], RDBI::Driver::Mock::Cursor.new([]), [], 0)
     assert_equal(nil, res.fetch(:first))
     assert_equal(nil, res.fetch(:last))
     assert_equal([], res.fetch(:all))

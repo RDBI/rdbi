@@ -18,8 +18,10 @@ class RDBI::Cursor
     :last,
     :rest,
     :all,
+    :fetch,
     :[],
     :last_row?,
+    :empty?,
     :rewind
   ) do
     raise NotImplementedError, 'Subclasses must implement this method'

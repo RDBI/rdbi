@@ -183,6 +183,7 @@ require 'rdbi/database'
 require 'rdbi/statement'
 require 'rdbi/schema'
 require 'rdbi/result'
+require 'rdbi/cursor'
 require 'rdbi/types'
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

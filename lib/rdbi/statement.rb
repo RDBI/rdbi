@@ -186,13 +186,11 @@ class RDBI::Statement
   #
   # Implementations of this method must return, in order:
   #
-  # * the Array of database tuples (each also represented as an Array)
-  # * an RDBI::Schema struct which represents the kinds of data being queried
+  # * A RDBI::Cursor object which encapsulates the result
+  # * a RDBI::Schema struct which represents the kinds of data being queried
   # * a +type_hash+ for on-fetch conversion which corresponds to the
   #   RDBI::Column information (see RDBI::Schema) and follows a structure similar
   #   to RDBI::Type::Out
-  # * a count of the affected rows (optional) -- this is not a count
-  #   of the data (tuples) returned, but of rows modified or altered in some way
   #
   # These return values are passed (along with this object and the binds passed
   # to this call) to RDBI::Result.new.

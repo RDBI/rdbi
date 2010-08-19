@@ -197,6 +197,9 @@ class RDBI::Database
   #       p struct.item
   #     end
   #   end
+  #
+  # Which will be considerably more performant under some database drivers.
+  #
   def execute(query, *binds)
     res = nil
 
@@ -204,8 +207,8 @@ class RDBI::Database
       self.last_query = query
       self.last_statement = sth = new_statement(query)
       res = sth.execute(*binds)
-      sth.finish
       yield res if block_given?
+      sth.finish
     end
 
     return res

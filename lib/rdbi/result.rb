@@ -150,9 +150,9 @@ class RDBI::Result
 
     driver_klass  = RDBI::Util.class_from_class_or_symbol(driver_klass, RDBI::Result::Driver)
 
+    @data.rewind
     @driver       = driver_klass
     @fetch_handle = driver_klass.new(self, *args)
-    @data.rewind
   end
 
   #
@@ -237,6 +237,7 @@ class RDBI::Result
   #
   def finish
     @sth.finish
+    @data.finish
     @data   = nil
     @sth    = nil
     @driver = nil

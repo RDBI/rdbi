@@ -86,7 +86,6 @@ class RDBI::Result
     @sth            = sth
     @binds          = binds
     @type_hash      = type_hash
-    @index          = 0
     @mutex          = Mutex.new
     @driver         = RDBI::Result::Driver::Array
     @fetch_handle   = nil
@@ -122,7 +121,7 @@ class RDBI::Result
   # Reset the index.
   #
   def rewind
-    @index = 0
+    @data.rewind
   end
 
   #
@@ -188,6 +187,9 @@ class RDBI::Result
   # essentially a running row count that is altered by certain fetch
   # operations. This makes sequential fetches much simpler.
   #
+  # The index is largely implemented by RDBI::Cursor (and Database Driver
+  # subclasses)
+  #
   # Items that do not use the index do not affect it.
   #
   # Result Drivers will always rewind the index, as this implicates a "point of
@@ -240,7 +242,6 @@ class RDBI::Result
     @driver = nil
     @binds  = nil
     @schema = nil
-    @index  = nil
   end
 end
 

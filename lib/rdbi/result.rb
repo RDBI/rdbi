@@ -125,6 +125,13 @@ class RDBI::Result
   end
 
   #
+  # Coerce the underlying result to an array, fetching all values.
+  #
+  def coerce_to_array
+    @data.coerce_to_array
+  end
+
+  #
   # :call-seq:
   #   as(String)
   #   as(Symbol)

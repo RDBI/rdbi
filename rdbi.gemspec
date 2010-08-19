@@ -36,7 +36,6 @@ Gem::Specification.new do |s|
      "lib/rdbi/types.rb",
      "rdbi.gemspec",
      "test/helper.rb",
-     "test/test_cursor.rb",
      "test/test_database.rb",
      "test/test_pool.rb",
      "test/test_rdbi.rb",
@@ -52,7 +51,6 @@ Gem::Specification.new do |s|
   s.summary = %q{RDBI provides sane query-level database access with low magic.}
   s.test_files = [
     "test/helper.rb",
-     "test/test_cursor.rb",
      "test/test_database.rb",
      "test/test_pool.rb",
      "test/test_rdbi.rb",
@@ -69,14 +67,12 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rdbi-driver-mock>, [">= 0"])
       s.add_development_dependency(%q<test-unit>, [">= 0"])
-      s.add_development_dependency(%q<fastercsv>, [">= 0"])
       s.add_runtime_dependency(%q<methlab>, [">= 0.0.9"])
       s.add_runtime_dependency(%q<epoxy>, [">= 0.3.1"])
       s.add_runtime_dependency(%q<typelib>, [">= 0"])
     else
       s.add_dependency(%q<rdbi-driver-mock>, [">= 0"])
       s.add_dependency(%q<test-unit>, [">= 0"])
-      s.add_dependency(%q<fastercsv>, [">= 0"])
       s.add_dependency(%q<methlab>, [">= 0.0.9"])
       s.add_dependency(%q<epoxy>, [">= 0.3.1"])
       s.add_dependency(%q<typelib>, [">= 0"])
@@ -84,7 +80,6 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<rdbi-driver-mock>, [">= 0"])
     s.add_dependency(%q<test-unit>, [">= 0"])
-    s.add_dependency(%q<fastercsv>, [">= 0"])
     s.add_dependency(%q<methlab>, [">= 0.0.9"])
     s.add_dependency(%q<epoxy>, [">= 0.3.1"])
     s.add_dependency(%q<typelib>, [">= 0"])

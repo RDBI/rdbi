@@ -77,6 +77,12 @@ class RDBI::Cursor
   def finish
   end
 
+  # If your result handles cannot support operation disconnected from the
+  # statement, you will want to implement this method to fetch all values in
+  # certain situations.
+  def coerce_to_array
+  end
+
   # Enumerable helper. Iterate over each item and yield it to a block.
   def each
     yield next_row until last_row? 

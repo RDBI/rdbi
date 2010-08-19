@@ -207,7 +207,13 @@ class RDBI::Database
       self.last_query = query
       self.last_statement = sth = new_statement(query)
       res = sth.execute(*binds)
-      yield res if block_given?
+
+      if block_given?
+        yield res
+      else
+        res.coerce_to_array
+      end
+
       sth.finish
     end
 

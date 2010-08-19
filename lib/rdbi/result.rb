@@ -78,11 +78,11 @@ class RDBI::Result
   # for instructions on how this is typically used and how the contents are
   # passed to the constructor.
   #
-  def initialize(sth, binds, data, schema, type_hash, affected_count=0)
+  def initialize(sth, binds, data, schema, type_hash)
     @schema         = schema
     @data           = data
     @result_count   = data.size
-    @affected_count = affected_count
+    @affected_count = data.affected_count
     @sth            = sth
     @binds          = binds
     @type_hash      = type_hash
@@ -100,13 +100,13 @@ class RDBI::Result
   # * Replace the results and other attributes with the new results.
   #
   def reload
+    @data.finish
     res = @sth.execute(*@binds)
     @data           = res.instance_variable_get(:@data)
     @type_hash      = res.instance_variable_get(:@type_hash)
     @schema         = res.instance_variable_get(:@schema)
     @result_count   = res.instance_variable_get(:@result_count)
     @affected_count = res.instance_variable_get(:@affected_count)
-    @index          = 0
   end
 
   #

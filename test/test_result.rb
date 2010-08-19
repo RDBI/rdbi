@@ -250,7 +250,7 @@ class TestResult < Test::Unit::TestCase
 
     res = sth.execute(1,2)
 
-    assert_equal(10, res.affected_count)
+    assert_equal(16, res.affected_count)
     assert_equal(2,  res.result_count)
     sth.finish
   end

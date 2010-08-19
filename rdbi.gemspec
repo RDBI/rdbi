@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Erik Hollensbe"]
-  s.date = %q{2010-08-18}
+  s.date = %q{2010-08-19}
   s.description = %q{RDBI is a rearchitecture of the Ruby/DBI project by its maintainer and others. It intends to fully supplant Ruby/DBI in the future for similar database access needs.}
   s.email = %q{erik@hollensbe.org}
   s.extra_rdoc_files = [
@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
      "docs/external-api.pdf",
      "docs/external-api.texi",
      "lib/rdbi.rb",
+     "lib/rdbi/cursor.rb",
      "lib/rdbi/database.rb",
      "lib/rdbi/driver.rb",
      "lib/rdbi/pool.rb",
@@ -35,6 +36,7 @@ Gem::Specification.new do |s|
      "lib/rdbi/types.rb",
      "rdbi.gemspec",
      "test/helper.rb",
+     "test/test_cursor.rb",
      "test/test_database.rb",
      "test/test_pool.rb",
      "test/test_rdbi.rb",
@@ -50,6 +52,7 @@ Gem::Specification.new do |s|
   s.summary = %q{RDBI provides sane query-level database access with low magic.}
   s.test_files = [
     "test/helper.rb",
+     "test/test_cursor.rb",
      "test/test_database.rb",
      "test/test_pool.rb",
      "test/test_rdbi.rb",

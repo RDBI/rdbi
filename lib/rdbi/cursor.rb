@@ -5,18 +5,15 @@ class RDBI::Cursor
   include Enumerable
 
   attr_reader :handle
-  attr_threaded_accessor :mutex
 
   def initialize(handle)
     @handle = handle
-    @mutex  = Mutex.new
   end
 
   inline(
     :next_row,
     :result_count,
     :affected_count,
-    :fetch,
     :first,
     :last,
     :rest,
@@ -26,6 +23,10 @@ class RDBI::Cursor
     :rewind
   ) do
     raise NotImplementedError, 'Subclasses must implement this method'
+  end
+
+  def size
+    result_count
   end
 
   def finish

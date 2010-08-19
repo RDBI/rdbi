@@ -10,7 +10,7 @@ class TestResult < Test::Unit::TestCase
   end
 
   def generate_data
-    (0..9).to_a.map { |x| [x-1, x, x+1] }
+    RDBI::Driver::Mock::Cursor.new((0..9).to_a.map { |x| [x-1, x, x+1] })
   end
   
   def mock_result

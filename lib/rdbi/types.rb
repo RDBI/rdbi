@@ -121,7 +121,14 @@ module RDBI::Type
   # Shorthand to duplicate the +DEFAULTS+ hash from a module. Most frequently
   # used to get a copy of the RDBI::Type::In and RDBI::Type::Out type maps.
   def self.create_type_hash(klass)
-    hash = klass::DEFAULTS.dup
+    hash = { }
+    klass::DEFAULTS.each do |key, value|
+      flist = filterlist()
+      value.each do |filter|
+        flist << filter
+      end
+      hash[key] = flist
+    end
 
     return hash
   end

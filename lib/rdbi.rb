@@ -47,14 +47,14 @@ module RDBI
 
   #
   # connect_cached() works similarly to connect, but yields a database handle
-  # copied from a RDBI::Pool. The 'default' pool is the ... default, but this
-  # may be manipulated by providing :pool_name to the connection arguments.
+  # copied from an RDBI::Pool. The 'default' pool is the ... default, but this
+  # may be manipulated by setting :pool_name in the connection arguments.
   #
   # If a pool does not exist already, it will be created and a database
-  # handle instanced from your connection arguments.
+  # handle instantiated using your connection arguments.
   #
   # If a pool *already* exists, your connection arguments will be ignored and
-  # it will instance from the Pool's connection arguments.
+  # it will instantiate from the Pool's connection arguments.
   def self.connect_cached(klass, *args)
     args = args[0]
     pool_name = args[:pool_name] || :default
@@ -74,7 +74,7 @@ module RDBI
   end
 
   #
-  # Retrieves a RDBI::Pool. See RDBI::Pool.[].
+  # Retrieves an RDBI::Pool. See RDBI::Pool.[].
   def self.pool(pool_name=:default)
     RDBI::Pool[pool_name]
   end

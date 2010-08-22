@@ -1,12 +1,12 @@
 #
-# RDBI::Database is the base class for database handles. This is the primary
-# method in which most users will access their database system.
+# RDBI::Database is the base class for database handles.  Most users will
+# access their database system through this class.
 #
 # To execute statements, look at +prepare+ and +execute+.
 #
 # To retrieve schema information, look at +schema+ and +table_schema+.
 #
-# To deal with transactions, +transaction+, +commit+, and +rollback+.
+# To deal with transactions, refer to +transaction+, +commit+, and +rollback+.
 class RDBI::Database
   extend MethLab
 
@@ -63,7 +63,7 @@ class RDBI::Database
 
   ##
   # :method: table_schema
-  # query the schema for a specific table. Returns a RDBI::Schema object.
+  # query the schema for a specific table. Returns an RDBI::Schema object.
   inline(:table_schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
 
   ##
@@ -157,7 +157,7 @@ class RDBI::Database
 
   #
   # Prepares a statement for execution. Takes a query as its only argument,
-  # returns a RDBI::Statement.
+  # returns an RDBI::Statement.
   #
   # ex:
   #   sth = dbh.prepare("select * from foo where item = ?")

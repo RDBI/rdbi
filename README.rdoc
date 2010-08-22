@@ -15,12 +15,12 @@ path down the rabbit hole:
   collections of database handles, look at RDBI::Pool.
 * RDBI::Database contains methods for dealing with database level operations
   and preparing and executing RDBI::Statement objects.
-* RDBI::Statement yields RDBI::Result objects which leverage
-  RDBI::Result::Driver classes to yield data.
-* If you're interested in how schemas are types are dealt with, see
+* RDBI::Statement works with RDBI::Cursor to yield RDBI::Result objects, which
+  leverage RDBI::Result::Driver classes to yield data.
+* If you're interested in how schemas and types are dealt with, see
   RDBI::Schema, RDBI::Column, and RDBI::Type.
 
-== Look ma, a code sample:
+== Give me a code sample already!
 
   # connect to an in-memory sqlite3 database:
   dbh = RDBI.connect(:SQLite3, :database => ":memory:")
@@ -43,7 +43,7 @@ path down the rabbit hole:
   # and fetch the first row
   result.fetch(:first) # [1, "foo"]
 
-== About RDBI
+== What +is+ RDBI all about, anyway?
 
 Here are some important pieces of information about RDBI that you may find
 compelling (or off-putting. We're pragmatists.):
@@ -61,7 +61,7 @@ compelling (or off-putting. We're pragmatists.):
   nothing in it that demands one -- use it with Mongo or Redis if you want.
 * RDBI database drivers are *small* -- our sqlite driver is about 150 lines and
   our PostgreSQL driver is about 300. Our mock driver is about 50.
-* RDBI has an active community of experienced Ruby and Rails programmers.
+* RDBI has an active community of experienced Rails and Ruby programmers.
 
 == I'd like some more, please.
 
@@ -119,6 +119,8 @@ Here are some things that it does:
   Rewind them, ask the database to re-query the data, select a struct then select
   an array (*without* requerying), select n items at a time as tuples (which
   may be more than one or less than all).
+* Cursors are used underneath the hood to ensure as performant a situation as
+  your database (and underlying driver) can provide.
 * RDBI's core test suite passes in MRI 1.8, 1.9, and JRuby 1.5.
 
 Aaaaaand here are some things RDBI won't do:
@@ -164,6 +166,13 @@ Aaaaaand here are some things RDBI won't do:
 * Pistos (... Pistos)
 * Lee Jarvis (injekt)
 * James Tucker (raggi)
+
+== I found a bug!
+
+We use the trackers in the github +RDBI+ project: http://github.com/RDBI for
+each gem. Please find the appropriate place to add your ticket.
+
+Not sure? Just add it to the +rdbi+ tracker: http://github.com/RDBI/rdbi/issues
 
 == I'd like to patch and/or help maintain RDBI. How can I?
 

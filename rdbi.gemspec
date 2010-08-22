@@ -67,6 +67,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rdbi-driver-mock>, [">= 0"])
       s.add_development_dependency(%q<test-unit>, [">= 0"])
+      s.add_development_dependency(%q<rdoc>, [">= 0"])
       s.add_development_dependency(%q<fastercsv>, [">= 0"])
       s.add_runtime_dependency(%q<methlab>, [">= 0.0.9"])
       s.add_runtime_dependency(%q<epoxy>, [">= 0.3.1"])
@@ -74,6 +75,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<rdbi-driver-mock>, [">= 0"])
       s.add_dependency(%q<test-unit>, [">= 0"])
+      s.add_dependency(%q<rdoc>, [">= 0"])
       s.add_dependency(%q<fastercsv>, [">= 0"])
       s.add_dependency(%q<methlab>, [">= 0.0.9"])
       s.add_dependency(%q<epoxy>, [">= 0.3.1"])
@@ -82,6 +84,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<rdbi-driver-mock>, [">= 0"])
     s.add_dependency(%q<test-unit>, [">= 0"])
+    s.add_dependency(%q<rdoc>, [">= 0"])
     s.add_dependency(%q<fastercsv>, [">= 0"])
     s.add_dependency(%q<methlab>, [">= 0.0.9"])
     s.add_dependency(%q<epoxy>, [">= 0.3.1"])

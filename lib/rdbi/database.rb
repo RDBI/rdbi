@@ -38,7 +38,7 @@ class RDBI::Database
   ##
   # :attr: in_transaction
   # are we currently in a transaction?
-  
+
   ##
   # :attr: in_transaction?
   # are we currently in a transaction?
@@ -50,7 +50,7 @@ class RDBI::Database
   ##
   # :attr: connected
   # are we connected to the database?
-  
+
   ##
   # :attr_accessor: connected?
   # are we connected to the database?
@@ -75,7 +75,7 @@ class RDBI::Database
   # :method: rollback
   # ends the outstanding transaction and rolls the affected rows back.
   inline(:rollback) { @in_transaction -= 1 unless @in_transaction == 0 }
- 
+
   ##
   # :method: commit
   # ends the outstanding transaction and commits the result.
@@ -244,11 +244,11 @@ class RDBI::Database
     mutex.synchronize do
       self.last_query = query
     end
-   
+
     ep = Epoxy.new(query)
 
     hashes = binds.select { |x| x.kind_of?(Hash) }
-    binds.collect! { |x| x.kind_of?(Hash) ? nil : x } 
+    binds.collect! { |x| x.kind_of?(Hash) ? nil : x }
     total_hash = hashes.inject({}) { |x, y| x.merge(y) }
 
     if @preprocess_quoter.respond_to?(:call)

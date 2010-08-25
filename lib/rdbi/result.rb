@@ -59,12 +59,8 @@ class RDBI::Result
   # The binds used in the statement that yielded this Result.
   attr_reader :binds
 
-  ##
-  # :attr_accessor: rewindable_result
-  #
   # See RDBI::Statement#rewindable_result.
-  #
-  attr_threaded_accessor :rewindable_result
+  attr_reader :rewindable_result
 
   # FIXME async
   inline(:complete, :complete?) { true }
@@ -137,7 +133,15 @@ class RDBI::Result
   end
 
   #
-  # Coerce the underlying result to an array, fetching all values.
+  # Is this result empty?
+  #
+  def empty?
+    @data.empty?
+  end
+
+  #
+  # Coerce the underlying result to an array, fetching all values. Same as
+  # setting RDBI::Result#rewindable_result.
   #
   def coerce_to_array
     @data.coerce_to_array
@@ -267,7 +271,7 @@ class RDBI::Result
   protected
 
   def configure_rewindable
-    self.rewindable_result = @sth.rewindable_result
+    @rewindable_result = @sth.rewindable_result
     if self.rewindable_result
       @data.coerce_to_array
     end

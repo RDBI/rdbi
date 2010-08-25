@@ -17,6 +17,11 @@ class RDBI::Cursor
   #
   class NotImplementedError < Exception; end
 
+  #
+  # Exception which indicates that this result is not rewindable.
+  #
+  class NotRewindableError < Exception; end
+
   extend MethLab
   include Enumerable
 

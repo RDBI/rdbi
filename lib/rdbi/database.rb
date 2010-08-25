@@ -16,6 +16,9 @@ class RDBI::Database
   # the name of the database we're connected to, if any.
   attr_accessor :database_name
 
+  # see RDBI::Statement#rewindable_result
+  attr_accessor :rewindable_result
+
   # the arguments used to create the connection.
   attr_reader :connect_args
 
@@ -88,11 +91,12 @@ class RDBI::Database
   # args is the connection arguments the user initially supplied to
   # RDBI.connect.
   def initialize(*args)
-    @connect_args   = RDBI::Util.key_hash_as_symbols(args[0])
-    @connected      = true
-    @mutex          = Mutex.new
-    @in_transaction = 0
-    self.open_statements = []
+    @connect_args         = RDBI::Util.key_hash_as_symbols(args[0])
+    @connected            = true
+    @mutex                = Mutex.new
+    @in_transaction       = 0
+    @rewindable_result    = false
+    self.open_statements  = []
   end
 
   # reconnect to the database. Any outstanding connection will be terminated.
@@ -210,8 +214,6 @@ class RDBI::Database
 
       if block_given?
         yield res
-      else
-        res.coerce_to_array
       end
 
       sth.finish

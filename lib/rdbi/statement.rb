@@ -101,6 +101,20 @@ class RDBI::Statement
   attr_threaded_accessor :last_result
 
   ##
+  # :attr_reader: rewindable_result
+  #
+  # Allows the user to request a fully rewindable result, allowing the use of
+  # fetching the last item, direct indexing, and rewinding.
+  #
+  # This can be a huge performance impact and thus should be used with great
+  # caution.
+  #
+  # Cascades from RDBI::Database#rewindable_result and through
+  # RDBI::Result#rewindable_result.
+  #
+  attr_threaded_accessor :rewindable_result
+
+  ##
   # :attr_reader: finished
   #
   # Has this statement been finished?
@@ -109,14 +123,12 @@ class RDBI::Statement
   # :attr_reader: finished?
   #
   # Has this statement been finished?
-
   inline(:finished, :finished?)   { @finished  }
 
   ##
   # :attr_reader: driver
   #
   # The RDBI::Driver object that this statement belongs to.
-
   inline(:driver)                 { dbh.driver }
 
   #
@@ -124,11 +136,12 @@ class RDBI::Statement
   # handle that created it.
   #
   def initialize(query, dbh)
-    @query = query
-    @dbh   = dbh
-    @mutex = Mutex.new
-    @finished = false
-    @input_type_map = RDBI::Type.create_type_hash(RDBI::Type::In)
+    @query                 = query
+    @dbh                   = dbh
+    @mutex                 = Mutex.new
+    @finished              = false
+    @input_type_map        = RDBI::Type.create_type_hash(RDBI::Type::In)
+    self.rewindable_result = dbh.rewindable_result
 
     @dbh.open_statements.push(self)
   end

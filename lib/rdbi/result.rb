@@ -59,6 +59,13 @@ class RDBI::Result
   # The binds used in the statement that yielded this Result.
   attr_reader :binds
 
+  ##
+  # :attr_accessor: rewindable_result
+  #
+  # See RDBI::Statement#rewindable_result.
+  #
+  attr_threaded_accessor :rewindable_result
+
   # FIXME async
   inline(:complete, :complete?) { true }
 
@@ -89,6 +96,9 @@ class RDBI::Result
     @mutex          = Mutex.new
     @driver         = RDBI::Result::Driver::Array
     @fetch_handle   = nil
+
+    configure_rewindable
+
     as(@driver)
   end
 
@@ -106,6 +116,8 @@ class RDBI::Result
     @schema         = res.instance_variable_get(:@schema)
     @result_count   = res.instance_variable_get(:@result_count)
     @affected_count = res.instance_variable_get(:@affected_count)
+
+    configure_rewindable
   end
 
   #
@@ -250,6 +262,15 @@ class RDBI::Result
     @driver = nil
     @binds  = nil
     @schema = nil
+  end
+
+  protected
+
+  def configure_rewindable
+    self.rewindable_result = @sth.rewindable_result
+    if self.rewindable_result
+      @data.coerce_to_array
+    end
   end
 end
 

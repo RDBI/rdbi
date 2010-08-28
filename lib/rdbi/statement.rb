@@ -159,6 +159,8 @@ class RDBI::Statement
   end
 
   def execute_modification(*binds)
+    binds = pre_execute(*binds)
+
     mutex.synchronize do
       return new_modification(*binds)
     end

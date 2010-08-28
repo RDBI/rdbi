@@ -150,28 +150,17 @@ class RDBI::Statement
   # Execute the statement with the supplied binds.
   #
   def execute(*binds)
-    raise StandardError, "you may not execute a finished handle" if @finished
-
-    # XXX if we ever support some kind of hash type, this'll get ugly.
-    hashes, binds = binds.partition { |x| x.kind_of?(Hash) }
-
-    if hashes
-      hashes.collect! do |hash|
-        newhash = { }
-
-        hash.each do |key, value|
-          newhash[key] = RDBI::Type::In.convert(value, @input_type_map)
-        end
-
-        newhash
-      end
-    end
-
-    binds = (hashes || []) + binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) } 
+    binds = pre_execute(*binds)
 
     mutex.synchronize do
       exec_args = *new_execution(*binds)
       self.last_result = RDBI::Result.new(self, binds, *exec_args)
+    end
+  end
+
+  def execute_modification(*binds)
+    mutex.synchronize do
+      return new_modification(*binds)
     end
   end
 
@@ -211,6 +200,35 @@ class RDBI::Statement
 
   inline(:new_execution) do |*args|
     raise NoMethodError, "this method is not implemented in this driver"
+  end
+
+  def new_modification(*binds)
+    raise NoMethodError, "this method is not implemented in this driver"
+  end
+
+  protected
+
+  def pre_execute(*binds)
+    raise StandardError, "you may not execute a finished handle" if @finished
+
+    # XXX if we ever support some kind of hash type, this'll get ugly.
+    hashes, binds = binds.partition { |x| x.kind_of?(Hash) }
+
+    if hashes
+      hashes.collect! do |hash|
+        newhash = { }
+
+        hash.each do |key, value|
+          newhash[key] = RDBI::Type::In.convert(value, @input_type_map)
+        end
+
+        newhash
+      end
+    end
+
+    binds = (hashes || []) + binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) } 
+
+    return binds
   end
 end
 

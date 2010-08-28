@@ -222,6 +222,15 @@ class RDBI::Database
     return res
   end
 
+  def execute_modification(query, *binds)
+    mutex.synchronize do
+      self.last_statement = sth = new_statement(query)
+      rows = sth.execute(*binds)
+      sth.finish
+      return rows
+    end
+  end
+
   #
   # Process the query as your driver would normally, and return the result.
   # Depending on the driver implementation and potentially connection

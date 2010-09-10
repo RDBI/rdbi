@@ -24,6 +24,12 @@ when "prepared_insert"
     sth.finish
   end
 when "insert"
+  FileUtils.rm '/tmp/rdbi_unprepared_insert' rescue nil
+  PerfTools::CpuProfiler.start("/tmp/rdbi_unprepared_insert") do
+    10_000.times do |x|
+      dbh.execute_modification("insert into foo (i) values (?)")
+    end
+  end
 when "raw_select"
 else
   $stderr.puts "[prepared_insert|insert|raw_select|res_select]"

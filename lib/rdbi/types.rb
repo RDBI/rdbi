@@ -122,9 +122,10 @@ module RDBI::Type
   # used to get a copy of the RDBI::Type::In and RDBI::Type::Out type maps.
   def self.create_type_hash(klass)
     hash = { }
-    klass::DEFAULTS.each do |key, value|
+    orig = klass::DEFAULTS
+    orig.keys.each do |key|
       flist = filterlist()
-      value.each do |filter|
+      orig[key].each do |filter|
         flist << filter
       end
       hash[key] = flist

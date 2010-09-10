@@ -113,6 +113,10 @@ namespace :perf do
     task :prepared_insert => [:prep] do
       sh "ruby -I lib perf/profile.rb prepared_insert"
     end
+
+    task :insert => [:prep] do
+      sh "ruby -I lib perf/profile.rb insert"
+    end
   end
 end
 

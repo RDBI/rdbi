@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
      "lib/rdbi/schema.rb",
      "lib/rdbi/statement.rb",
      "lib/rdbi/types.rb",
+     "perf/profile.rb",
      "rdbi.gemspec",
      "test/helper.rb",
      "test/test_database.rb",

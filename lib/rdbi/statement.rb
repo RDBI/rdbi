@@ -131,6 +131,12 @@ class RDBI::Statement
   # The RDBI::Driver object that this statement belongs to.
   inline(:driver)                 { dbh.driver }
 
+  class << self
+    def input_type_map
+      @input_type_map ||= RDBI::Type.create_type_hash(RDBI::Type::In)
+    end
+  end
+
   #
   # Initialize a statement handle, given a text query and the RDBI::Database
   # handle that created it.
@@ -140,7 +146,8 @@ class RDBI::Statement
     @dbh                   = dbh
     @mutex                 = Mutex.new
     @finished              = false
-    @input_type_map        = RDBI::Type.create_type_hash(RDBI::Type::In)
+    @input_type_map        = self.class.input_type_map
+
     self.rewindable_result = dbh.rewindable_result
 
     @dbh.open_statements.push(self)

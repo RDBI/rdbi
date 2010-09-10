@@ -192,6 +192,7 @@ module RDBI::Util
   end
 end
 
+require 'rdbi/types'
 require 'rdbi/pool'
 require 'rdbi/driver'
 require 'rdbi/database'
@@ -199,6 +200,5 @@ require 'rdbi/statement'
 require 'rdbi/schema'
 require 'rdbi/result'
 require 'rdbi/cursor'
-require 'rdbi/types'
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

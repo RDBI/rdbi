@@ -94,8 +94,7 @@ class RDBI::Result
     @fetch_handle   = nil
 
     configure_rewindable
-
-    as(@driver)
+    configure_driver(@driver)
   end
 
   #
@@ -175,7 +174,7 @@ class RDBI::Result
 
     @data.rewind
     @driver       = driver_klass
-    @fetch_handle = driver_klass.new(self, *args)
+    configure_driver(@driver)
   end
 
   #
@@ -269,6 +268,10 @@ class RDBI::Result
   end
 
   protected
+
+  def configure_driver(driver_klass, *args)
+    @fetch_handle = driver_klass.new(self, *args)
+  end
 
   def configure_rewindable
     @rewindable_result = @sth.rewindable_result

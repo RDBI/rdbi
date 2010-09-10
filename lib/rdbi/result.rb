@@ -250,7 +250,6 @@ class RDBI::Result
                 else
                   @data.fetch(row_count)
                 end
-    RDBI::Util.deep_copy(final_res)
   end
 
   #

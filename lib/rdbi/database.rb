@@ -225,7 +225,7 @@ class RDBI::Database
   def execute_modification(query, *binds)
     mutex.synchronize do
       self.last_statement = sth = new_statement(query)
-      rows = sth.execute(*binds)
+      rows = sth.execute_modification(*binds)
       sth.finish
       return rows
     end

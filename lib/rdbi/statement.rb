@@ -213,22 +213,13 @@ class RDBI::Statement
   def pre_execute(*binds)
     raise StandardError, "you may not execute a finished handle" if @finished
 
-    # XXX if we ever support some kind of hash type, this'll get ugly.
-    hashes, binds = binds.partition { |x| x.kind_of?(Hash) }
-
-    if hashes
-      hashes.collect! do |hash|
-        newhash = { }
-
-        hash.each do |key, value|
-          newhash[key] = RDBI::Type::In.convert(value, @input_type_map)
-        end
-
-        newhash
+    if binds[0].kind_of?(Hash)
+      binds[0].each do |key, value|
+        binds[0][key] = RDBI::Type::In.convert(value, @input_type_map)
       end
+    else
+      binds.collect! { |x| RDBI::Type::In.convert(x, @input_type_map) } 
     end
-
-    binds = (hashes || []) + binds.collect { |x| RDBI::Type::In.convert(x, @input_type_map) } 
 
     return binds
   end

@@ -175,6 +175,21 @@ module RDBI::Util
       return ary
     end
   end
+
+  def self.index_binds(args, index_map)
+    # FIXME exception if mixed hash/indexed binds
+    if args[0].kind_of?(Hash)
+      binds = []
+      args[0].keys.each do |key| 
+        if index = index_map.index(key)
+          binds.insert(index, args[0][key])
+        end
+      end
+      return binds
+    else
+      return args
+    end
+  end
 end
 
 require 'rdbi/pool'

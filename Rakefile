@@ -125,6 +125,10 @@ namespace :perf do
     task :res_select => [:prep] do
       sh "ruby -I lib perf/profile.rb res_select"
     end
+    
+    task :single_fetch => [:prep] do
+      sh "ruby -I lib perf/profile.rb single_fetch"
+    end
   end
 end
 

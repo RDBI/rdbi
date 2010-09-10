@@ -2,15 +2,24 @@ $:.unshift 'lib'
 require 'rubygems'
 require 'rdbi'
 require 'fileutils'
-gem 'rdbi-driver-sqlite3'
-require 'rdbi/driver/sqlite3'
+ENV["driver"] ||= "SQLite3"
+gem "rdbi-driver-#{ENV["driver"].downcase}"
+require "rdbi/driver/#{ENV["driver"].downcase}"
 gem 'perftools.rb'
 require 'perftools'
 
 FileUtils.rm 'test.db' rescue nil
 
-dbh = RDBI.connect(:SQLite3, :database => "test.db")
+dbh = nil
 
+if ENV["driver"] == "SQLite3"
+  dbh = RDBI.connect(:SQLite3, :database => "test.db")
+else
+  require 'rdbi-dbrc'
+  dbh = RDBI::DBRC.connect("#{ENV["driver"]}_test")
+end
+
+dbh.execute("drop table foo") rescue nil
 dbh.execute("create table foo (i integer)")
 
 case ARGV[0]
@@ -60,8 +69,19 @@ when "res_select"
     end
     sth.finish
   end
+when "single_fetch"
+  dbh.execute("insert into foo (i) values (?)", 1)
+
+  FileUtils.rm '/tmp/rdbi_single_fetch' rescue nil
+  PerfTools::CpuProfiler.start("/tmp/rdbi_single_fetch") do
+    sth = dbh.prepare("select * from foo")
+    10_000.times do |x|
+      sth.execute.fetch(1)
+    end
+    sth.finish
+  end
 else
-  $stderr.puts "[prepared_insert|insert|raw_select|res_select]"
+  $stderr.puts "[prepared_insert|insert|raw_select|res_select|single_fetch]"
   exit 1
 end
 

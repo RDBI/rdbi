@@ -169,7 +169,7 @@ module RDBI::Util
     case row_count
     when :first, :last
       ary = ary[0]
-      return nil if ary.empty?
+      return nil if ary and ary.empty?
       return ary
     else
       return ary

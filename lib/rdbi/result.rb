@@ -324,21 +324,18 @@ class RDBI::Result::Driver
   # type converted array.
   #
   def fetch(row_count)
-    ary = (@result.raw_fetch(row_count) || []).enum_for.with_index.map do |item, i|
-      convert_row(item)
-    end
-
-    RDBI::Util.format_results(row_count, ary)
+    
+    RDBI::Util.format_results(row_count, (@result.raw_fetch(row_count) || []).collect { |item| convert_row(item) })
   end
 
   # convert an entire row of data with the specified result map (see
   # RDBI::Type)
   def convert_row(row)
-    newrow = []
-    (row || []).each_with_index do |x, i|
-      newrow.push(convert_item(x, @result.schema.columns[i]))
+    i = -1 
+    (row || []).collect do |x|
+      i += 1
+      convert_item(x, @result.schema.columns[i])
     end
-    return newrow
   end
 
   # convert a single item (row element) with the specified result map.

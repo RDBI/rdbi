@@ -46,6 +46,20 @@ when "raw_select"
     sth.finish
   end
 when "res_select"
+  sth = dbh.prepare("insert into foo (i) values (?)")
+  10_000.times do |x|
+    sth.execute_modification(x)
+  end
+  sth.finish
+
+  FileUtils.rm '/tmp/rdbi_res_select' rescue nil
+  PerfTools::CpuProfiler.start("/tmp/rdbi_res_select") do
+    sth = dbh.prepare("select * from foo")
+    100.times do |x|
+      sth.execute.fetch(:all)
+    end
+    sth.finish
+  end
 else
   $stderr.puts "[prepared_insert|insert|raw_select|res_select]"
   exit 1

@@ -106,4 +106,14 @@ task :docview => [:rerdoc] do
   sh "open rdoc/index.html"
 end
 
+namespace :perf do
+  namespace :profile do
+    task :prep => [:install]
+
+    task :prepared_insert => [:prep] do
+      sh "ruby -I lib perf/profile.rb prepared_insert"
+    end
+  end
+end
+
 # vim: syntax=ruby ts=2 et sw=2 sts=2

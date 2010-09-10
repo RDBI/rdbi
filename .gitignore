@@ -31,3 +31,4 @@ pkg
 *.toc
 *.tp
 *.vr
+test.db

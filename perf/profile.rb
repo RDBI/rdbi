@@ -80,8 +80,43 @@ when "single_fetch"
     end
     sth.finish
   end
+when "unprepared_raw_select"
+  sth = dbh.prepare("insert into foo (i) values (?)")
+  10_000.times do |x|
+    sth.execute_modification(x)
+  end
+  sth.finish
+
+  FileUtils.rm '/tmp/rdbi_unprepared_raw_select' rescue nil
+  PerfTools::CpuProfiler.start("/tmp/rdbi_unprepared_raw_select") do
+    100.times do |x|
+      dbh.execute("select * from foo").raw_fetch(:all)
+    end
+  end
+when "unprepared_res_select"
+  sth = dbh.prepare("insert into foo (i) values (?)")
+  10_000.times do |x|
+    sth.execute_modification(x)
+  end
+  sth.finish
+
+  FileUtils.rm '/tmp/rdbi_unprepared_res_select' rescue nil
+  PerfTools::CpuProfiler.start("/tmp/rdbi_unprepared_res_select") do
+    100.times do |x|
+      dbh.execute("select * from foo").fetch(:all)
+    end
+  end
+when "unprepared_single_fetch"
+  dbh.execute("insert into foo (i) values (?)", 1)
+
+  FileUtils.rm '/tmp/rdbi_unprepared_single_fetch' rescue nil
+  PerfTools::CpuProfiler.start("/tmp/rdbi_unprepared_single_fetch") do
+    10_000.times do |x|
+      dbh.execute("select * from foo").fetch(1)
+    end
+  end
 else
-  $stderr.puts "[prepared_insert|insert|raw_select|res_select|single_fetch]"
+  $stderr.puts "[prepared_insert|insert|raw_select|res_select|single_fetch|unprepared_res_select|unprepared_single_fetch]"
   exit 1
 end
 

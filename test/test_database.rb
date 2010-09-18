@@ -226,10 +226,11 @@ class TestDatabase < Test::Unit::TestCase
     sth = @dbh.prepare("some statement")
     assert(sth)
 
-    assert_equal(@dbh.open_statements.length, 1)
+    assert_equal(@dbh.open_statements.keys.length, 1)
 
-    warn "The next message should appear *exactly once*"
     @dbh.disconnect
+
+    assert_equal(@dbh.open_statements.keys.length, 0)
 
     @dbh = mock_connect
     sth = @dbh.prepare("some statement")

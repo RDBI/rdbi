@@ -1,6 +1,6 @@
 require 'epoxy'
 require 'methlab'
-require 'thread'
+require 'fastthread'
 
 module RDBI
   class << self

@@ -23,6 +23,7 @@ begin
     gem.add_dependency 'methlab', '>= 0.0.9'
     gem.add_dependency 'epoxy', '>= 0.3.1'
     gem.add_dependency 'typelib'
+    gem.add_dependency 'fastthread'
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
@@ -128,6 +129,18 @@ namespace :perf do
     
     task :single_fetch => [:prep] do
       sh "ruby -I lib perf/profile.rb single_fetch"
+    end
+    
+    task :unprepared_raw_select => [:prep] do
+      sh "ruby -I lib perf/profile.rb unprepared_raw_select"
+    end
+    
+    task :unprepared_res_select => [:prep] do
+      sh "ruby -I lib perf/profile.rb unprepared_res_select"
+    end
+    
+    task :unprepared_single_fetch => [:prep] do
+      sh "ruby -I lib perf/profile.rb unprepared_single_fetch"
     end
   end
 end

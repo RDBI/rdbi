@@ -149,8 +149,16 @@ class RDBI::Statement
     @input_type_map        = self.class.input_type_map
 
     self.rewindable_result = dbh.rewindable_result
+    @dbh.open_statements[self.object_id] = self
+  end
 
-    @dbh.open_statements.push(self)
+  def prep_finalizer(&block)
+    if block
+      @finish_block = block
+      ObjectSpace.define_finalizer(self, lambda do |x| 
+        block.call
+      end)
+    end
   end
 
   #
@@ -160,8 +168,9 @@ class RDBI::Statement
     binds = pre_execute(*binds)
 
     mutex.synchronize do
-      exec_args = *new_execution(*binds)
-      self.last_result = RDBI::Result.new(self, binds, *exec_args)
+      cursor, schema, type_map = new_execution(*binds)
+      cursor.rewindable_result = self.rewindable_result
+      self.last_result = RDBI::Result.new(self, binds, cursor, schema, type_map)
     end
   end
 
@@ -181,10 +190,9 @@ class RDBI::Statement
   # 'super' as their last statement.
   #
   def finish
-    mutex.synchronize do
-      dbh.open_statements.reject! { |x| x.object_id == self.object_id }
-      @finished = true
-    end
+    @finish_block.call if @finish_block
+    @dbh.open_statements.delete(self.object_id)
+    @finished = true
   end
 
   ##

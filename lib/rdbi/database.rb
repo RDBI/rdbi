@@ -96,7 +96,7 @@ class RDBI::Database
     @mutex                = Mutex.new
     @in_transaction       = 0
     @rewindable_result    = false
-    self.open_statements  = []
+    self.open_statements  = { }
   end
 
   # reconnect to the database. Any outstanding connection will be terminated.
@@ -110,12 +110,9 @@ class RDBI::Database
   # statement handles left open.
   #
   def disconnect
-    unless self.open_statements.empty?
-      warn "[RDBI] Open statements during disconnection -- automatically finishing. You should fix this."
-      self.open_statements.each(&:finish)
-    end
-    self.open_statements = []
     @connected = false
+    self.open_statements.values.each { |x| x.finish if x }
+    self.open_statements = { }
   end
 
   #
@@ -215,8 +212,6 @@ class RDBI::Database
       if block_given?
         yield res
       end
-
-      sth.finish
     end
 
     return res

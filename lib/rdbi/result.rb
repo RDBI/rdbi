@@ -168,11 +168,16 @@ class RDBI::Result
   #
   # Any additional arguments will be passed to the driver's constructor.
   #
+  # This will force a rewind even if +rewindable_result+ is false.
+  #
   def as(driver_klass, *args)
 
     driver_klass  = RDBI::Util.class_from_class_or_symbol(driver_klass, RDBI::Result::Driver)
 
+    rr = @data.rewindable_result
+    @data.rewindable_result = true
     @data.rewind
+    @data.rewindable_result = rr
     @driver       = driver_klass
     configure_driver(@driver)
   end
@@ -316,7 +321,6 @@ class RDBI::Result::Driver
   #
   def initialize(result, *args)
     @result = result
-    @result.rewind
   end
 
   #

@@ -164,10 +164,8 @@ class TestResult < Test::Unit::TestCase
     # XXX reset intentionally.
     res.as(:Array)
     assert_equal([[-1, 0, 1]], res.fetch(1))
-
     res.sth.finish
-    res.rewind
-
+    
     assert_equal(
       "-1,0,1\n",
       res.fetch(1, RDBI::Result::Driver::CSV)
@@ -263,6 +261,17 @@ class TestResult < Test::Unit::TestCase
     assert_equal([], res.fetch(:rest))
     assert_equal([], res.fetch(1))
     res.sth.finish
+  end
+
+  def test_11_rewindable_results
+    @dbh.rewindable_result = true
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], RDBI::Driver::Mock::Cursor.new([]), [], 0)
+
+    res.sth.rewindable_result = false
+    assert_raises(StandardError) { res.rewind }
+    res.sth.rewindable_result = true
+    res.reload
+    res.rewind
   end
 end
 

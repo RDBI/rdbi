@@ -28,6 +28,7 @@ class RDBI::Cursor
   # underlying handle.
   
   attr_reader :handle
+  attr_accessor :rewindable_result
 
   # Default constructor. Feel free to override this.
   #

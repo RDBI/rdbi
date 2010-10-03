@@ -63,23 +63,6 @@ class TestRDBI < Test::Unit::TestCase
     dbh = RDBI.connect_cached(:Mock, :username => :foo, :pool_name => :test_05)
     assert_equal(RDBI.pool(:test_05).handles[0], dbh)
   end
-
-  def test_06_re_disconnect_all
-    RDBI.disconnect_all
-    connected_size = RDBI.all_connections.select(&:connected).size
-    assert_equal(0, connected_size)
-
-    total_size = RDBI.all_connections.size
-    RDBI.reconnect_all
-    connected_size = RDBI.all_connections.select(&:connected).size
-    assert_equal(connected_size, total_size)
-  end
-
-  def test_07_all_connections
-    total_size = RDBI.all_connections.size
-    mock_connect
-    assert_equal(RDBI.all_connections.size, total_size + 1)
-  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

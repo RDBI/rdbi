@@ -23,7 +23,6 @@ class TestStatement < Test::Unit::TestCase
   def test_02_accessors
     sth = dbh.new_statement("some query")
     assert(sth)
-    assert_kind_of(Mutex, sth.mutex)
     assert(!sth.finished?)
     assert(!sth.finished)
     sth.finish

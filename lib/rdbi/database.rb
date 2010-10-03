@@ -8,8 +8,6 @@
 #
 # To deal with transactions, refer to +transaction+, +commit+, and +rollback+.
 class RDBI::Database
-  extend MethLab
-
   # the driver class that is responsible for creating this database handle.
   attr_accessor :driver
 
@@ -22,67 +20,51 @@ class RDBI::Database
   # the arguments used to create the connection.
   attr_reader :connect_args
 
-  ##
-  # :attr_reader: last_statement
-  #
   # the last statement handle allocated. affected by +prepare+ and +execute+.
-  attr_threaded_accessor :last_statement
-
-  ##
-  # :attr: last_query
+  attr_accessor :last_statement
+ 
   # the last query sent, as a string.
-  attr_threaded_accessor :last_query
+  attr_accessor :last_query
 
-  ##
-  # :attr: open_statements
   # all the open statement handles.
-  attr_threaded_accessor :open_statements
+  attr_accessor :open_statements
 
-  ##
-  # :attr: in_transaction
   # are we currently in a transaction?
+  def in_transaction
+    @in_transaction > 0
+  end
 
-  ##
-  # :attr: in_transaction?
-  # are we currently in a transaction?
-  inline(:in_transaction, :in_transaction?) { @in_transaction > 0 }
+  alias in_transaction? in_transaction
 
-  # the mutex for this database handle.
-  attr_reader :mutex
-
-  ##
-  # :attr: connected
   # are we connected to the database?
 
-  ##
-  # :attr_accessor: connected?
-  # are we connected to the database?
-  inline(:connected, :connected?) { @connected }
+  attr_reader :connected
+  alias connected? connected
 
-  ##
-  # :method: ping
   # ping the database. yield an integer result on success.
-  inline(:ping) { raise NoMethodError, "this method is not implemented in this driver" }
+  def ping
+    raise NoMethodError, "this method is not implemented in this driver"
+  end
 
-  ##
-  # :method: table_schema
   # query the schema for a specific table. Returns an RDBI::Schema object.
-  inline(:table_schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
+  def table_schema(table_name)
+    raise NoMethodError, "this method is not implemented in this driver"
+  end
 
-  ##
-  # :method: schema
   # query the schema for the entire database. Returns an array of RDBI::Schema objects.
-  inline(:schema) { |*args| raise NoMethodError, "this method is not implemented in this driver" }
+  def schema
+    raise NoMethodError, "this method is not implemented in this driver"
+  end
 
-  ##
-  # :method: rollback
   # ends the outstanding transaction and rolls the affected rows back.
-  inline(:rollback) { @in_transaction -= 1 unless @in_transaction == 0 }
+  def rollback
+    @in_transaction -= 1 unless @in_transaction == 0
+  end
 
-  ##
-  # :method: commit
   # ends the outstanding transaction and commits the result.
-  inline(:commit)   { @in_transaction -= 1 unless @in_transaction == 0 }
+  def commit
+    @in_transaction -= 1 unless @in_transaction == 0 
+  end
 
   #
   # Create a new database handle. This is typically done by a driver and
@@ -93,7 +75,6 @@ class RDBI::Database
   def initialize(*args)
     @connect_args         = RDBI::Util.key_hash_as_symbols(args[0])
     @connected            = true
-    @mutex                = Mutex.new
     @in_transaction       = 0
     @rewindable_result    = false
     self.open_statements  = { }
@@ -173,12 +154,11 @@ class RDBI::Database
   #
   def prepare(query)
     sth = nil
-    mutex.synchronize do
-      self.last_query = query
-      sth = new_statement(query)
-      yield sth if block_given?
-      sth.finish if block_given?
-    end
+
+    self.last_query = query
+    sth = new_statement(query)
+    yield sth if block_given?
+    sth.finish if block_given?
 
     return self.last_statement = sth
   end
@@ -204,26 +184,22 @@ class RDBI::Database
   def execute(query, *binds)
     res = nil
 
-    mutex.synchronize do
-      self.last_query = query
-      self.last_statement = sth = new_statement(query)
-      res = sth.execute(*binds)
+    self.last_query = query
+    self.last_statement = sth = new_statement(query)
+    res = sth.execute(*binds)
 
-      if block_given?
-        yield res
-      end
+    if block_given?
+      yield res
     end
 
     return res
   end
 
   def execute_modification(query, *binds)
-    mutex.synchronize do
-      self.last_statement = sth = new_statement(query)
-      rows = sth.execute_modification(*binds)
-      sth.finish
-      return rows
-    end
+    self.last_statement = sth = new_statement(query)
+    rows = sth.execute_modification(*binds)
+    sth.finish
+    return rows
   end
 
   #
@@ -247,9 +223,7 @@ class RDBI::Database
   # quoter during bind processing.
   #
   def preprocess_query(query, *binds)
-    mutex.synchronize do
-      self.last_query = query
-    end
+    self.last_query = query
 
     ep = Epoxy.new(query)
 

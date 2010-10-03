@@ -35,7 +35,6 @@
 # RDBI::Result#fetch or more explicitly with the RDBI::Result#as call.
 #
 class RDBI::Result
-  extend MethLab
   include Enumerable
 
   # The RDBI::Schema structure associated with this result.
@@ -62,19 +61,20 @@ class RDBI::Result
   # See RDBI::Statement#rewindable_result.
   attr_reader :rewindable_result
 
-  # FIXME async
-  inline(:complete, :complete?) { true }
 
-  ##
-  # :attr_reader: has_data
-  #
-  # Does this result have data?
+  # :nodoc: FIXME async
+  def complete
+    true
+  end
 
-  ##
-  # :attr_reader: has_data?
-  #
+  alias complete? complete
+  
   # Does this result have data?
-  inline(:has_data, :has_data?) { @data.size > 0 }
+  def has_data
+    @data.size > 0
+  end
+
+  alias has_data? has_data
 
   #
   # Creates a new RDBI::Result. Please refer to RDBI::Statement#new_execution
@@ -89,7 +89,6 @@ class RDBI::Result
     @sth            = sth
     @binds          = binds
     @type_hash      = type_hash
-    @mutex          = Mutex.new
     @driver         = RDBI::Result::Driver::Array
     @fetch_handle   = nil
 
@@ -328,23 +327,30 @@ class RDBI::Result::Driver
   # type converted array.
   #
   def fetch(row_count)
-    
-    RDBI::Util.format_results(row_count, (@result.raw_fetch(row_count) || []).collect { |item| convert_row(item) })
-  end
+    rows = RDBI::Util.format_results(row_count, (@result.raw_fetch(row_count) || []))
 
-  # convert an entire row of data with the specified result map (see
-  # RDBI::Type)
-  def convert_row(row)
-    i = -1 
-    (row || []).collect do |x|
-      i += 1
-      convert_item(x, @result.schema.columns[i])
+    if rows.nil?
+      return rows 
+    elsif [:first, :last].include?(row_count)
+      result = []
+      i = -1
+      rows.each_with_index do |x, i| 
+        result << RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
+      end
+
+      return result
+    else
+      result = []
+      rows.each do |row| 
+        newrow = []
+        row.each_with_index do |x, i|
+          newrow << RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
+        end
+
+        result << newrow
+      end
     end
-  end
-
-  # convert a single item (row element) with the specified result map.
-  def convert_item(item, column)
-    RDBI::Type::Out.convert(item, column, @result.type_hash)
+    return result
   end
 end
 

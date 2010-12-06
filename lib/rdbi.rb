@@ -1,5 +1,4 @@
 require 'epoxy'
-require 'thread'
 
 module RDBI
   class << self

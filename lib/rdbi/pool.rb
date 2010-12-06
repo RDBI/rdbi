@@ -216,9 +216,6 @@ class RDBI::Pool
   # Add any ol' database handle. This is not for global consumption.
   #
   def add(dbh)
-    dbh = *MethLab.validate_array_params([RDBI::Database], [dbh])
-    raise dbh if dbh.kind_of?(Exception)
-
     dbh = dbh[0] if dbh.kind_of?(Array)
 
     mutex.synchronize do

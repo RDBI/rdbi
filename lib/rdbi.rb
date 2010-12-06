@@ -1,20 +1,12 @@
 require 'epoxy'
-require 'methlab'
 require 'thread'
 
 module RDBI
   class << self
-    extend MethLab
-
-    # Every database handle allocated throughout the lifetime of the
-    # program. This functionality is subject to change and may be pruned
-    # during disconnection.
-    attr_reader :all_connections
-
     #
     # The last database handle allocated. This may come from pooled connections or regular ones.
     #
-    attr_threaded_accessor :last_dbh
+    attr_accessor :last_dbh
   end
 
   #
@@ -37,9 +29,6 @@ module RDBI
 
     driver = klass.new(*args)
     dbh = self.last_dbh = driver.new_handle
-
-    @all_connections ||= []
-    @all_connections.push(dbh)
 
     yield dbh if block_given?
     return dbh
@@ -83,18 +72,6 @@ module RDBI
   # Connects to and pings the database. Arguments are the same as for RDBI.connect.
   def self.ping(klass, *args)
     connect(klass, *args).ping
-  end
-
-  #
-  # Reconnects all known connections. See RDBI.all_connections.
-  def self.reconnect_all
-    @all_connections.each(&:reconnect)
-  end
-
-  #
-  # Disconnects all known connections. See RDBI.all_connections.
-  def self.disconnect_all
-    @all_connections.each(&:disconnect)
   end
 
   #

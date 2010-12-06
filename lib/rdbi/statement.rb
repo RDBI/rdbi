@@ -83,14 +83,10 @@
 # may be possible.
 #
 class RDBI::Statement
-  extend MethLab
-
   # the RDBI::Database handle that created this statement.
   attr_reader :dbh
   # The query this statement was created for.
   attr_reader :query
-  # A mutex for locked operations. Basically a cached copy of Mutex.new.
-  attr_reader :mutex
   # The input type map provided during statement creation -- used for binding.
   attr_reader :input_type_map
 
@@ -98,7 +94,7 @@ class RDBI::Statement
   # :attr_reader: last_result
   #
   # The last RDBI::Result this statement yielded.
-  attr_threaded_accessor :last_result
+  attr_accessor :last_result
 
   ##
   # :attr_reader: rewindable_result
@@ -112,24 +108,22 @@ class RDBI::Statement
   # Cascades from RDBI::Database#rewindable_result and through
   # RDBI::Result#rewindable_result.
   #
-  attr_threaded_accessor :rewindable_result
+  attr_accessor :rewindable_result
 
   ##
   # :attr_reader: finished
   #
   # Has this statement been finished?
 
-  ##
-  # :attr_reader: finished?
-  #
   # Has this statement been finished?
-  inline(:finished, :finished?)   { @finished  }
 
-  ##
-  # :attr_reader: driver
-  #
+  attr_reader :finished
+  alias finished? finished
+
   # The RDBI::Driver object that this statement belongs to.
-  inline(:driver)                 { dbh.driver }
+  def driver
+    dbh.driver
+  end
 
   class << self
     def input_type_map
@@ -144,7 +138,6 @@ class RDBI::Statement
   def initialize(query, dbh)
     @query                 = query
     @dbh                   = dbh
-    @mutex                 = Mutex.new
     @finished              = false
     @input_type_map        = self.class.input_type_map
 
@@ -167,19 +160,15 @@ class RDBI::Statement
   def execute(*binds)
     binds = pre_execute(*binds)
 
-    mutex.synchronize do
-      cursor, schema, type_map = new_execution(*binds)
-      cursor.rewindable_result = self.rewindable_result
-      self.last_result = RDBI::Result.new(self, binds, cursor, schema, type_map)
-    end
+    cursor, schema, type_map = new_execution(*binds)
+    cursor.rewindable_result = self.rewindable_result
+    self.last_result = RDBI::Result.new(self, binds, cursor, schema, type_map)
   end
 
   def execute_modification(*binds)
     binds = pre_execute(*binds)
 
-    mutex.synchronize do
-      return new_modification(*binds)
-    end
+    return new_modification(*binds)
   end
 
   #
@@ -215,7 +204,7 @@ class RDBI::Statement
   # to this call) to RDBI::Result.new.
   #
 
-  inline(:new_execution) do |*args|
+  def new_execution
     raise NoMethodError, "this method is not implemented in this driver"
   end
 

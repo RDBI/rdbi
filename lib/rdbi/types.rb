@@ -115,7 +115,7 @@ module RDBI::Type
 
   # Shorthand for creating a new +TypeLib::FilterList+.
   def self.filterlist(*ary)
-    TypeLib::FilterList.new([Filters::NULL, *ary])
+    [Filters::NULL, *ary]
   end
 
   # Shorthand to duplicate the +DEFAULTS+ hash from a module. Most frequently
@@ -141,12 +141,12 @@ module RDBI::Type
   #
   module Out
     DEFAULTS = {
-      :integer     => RDBI::Type.filterlist(Filters::STR_TO_INT),
-      :decimal     => RDBI::Type.filterlist(Filters::STR_TO_DEC),
-      :datetime    => RDBI::Type.filterlist(TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)),
-      :timestamp   => RDBI::Type.filterlist(TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)),
-      :boolean     => RDBI::Type.filterlist(Filters::TO_BOOLEAN),
-      :default     => RDBI::Type.filterlist()
+      :integer     => [Filters::STR_TO_INT],
+      :decimal     => [Filters::STR_TO_DEC],
+      :datetime    => [TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)],
+      :timestamp   => [TypeLib::Canned.build_strptime_filter(DEFAULT_STRFTIME_FILTER)],
+      :boolean     => [Filters::TO_BOOLEAN],
+      :default     => []
     }
 
     #
@@ -160,7 +160,7 @@ module RDBI::Type
         fl = type_hash[:default]
       end
 
-      fl.execute(obj)
+      TypeLib.execute_filterlist(fl, obj)
     end
   end
 
@@ -172,14 +172,14 @@ module RDBI::Type
   #
   module In
     DEFAULTS = {
-      Integer    => RDBI::Type.filterlist(Filters::FROM_INTEGER),
-      Fixnum     => RDBI::Type.filterlist(Filters::FROM_INTEGER),
-      Float      => RDBI::Type.filterlist(Filters::FROM_NUMERIC),
-      BigDecimal => RDBI::Type.filterlist(Filters::FROM_DECIMAL),
-      DateTime   => RDBI::Type.filterlist(Filters::FROM_DATETIME),
-      TrueClass  => RDBI::Type.filterlist(Filters::FROM_BOOLEAN),
-      FalseClass => RDBI::Type.filterlist(Filters::FROM_BOOLEAN),
-      :default   => RDBI::Type.filterlist()
+      Integer    => [Filters::FROM_INTEGER],
+      Fixnum     => [Filters::FROM_INTEGER],
+      Float      => [Filters::FROM_NUMERIC],
+      BigDecimal => [Filters::FROM_DECIMAL],
+      DateTime   => [Filters::FROM_DATETIME],
+      TrueClass  => [Filters::FROM_BOOLEAN],
+      FalseClass => [Filters::FROM_BOOLEAN],
+      :default   => []
     }
 
     #
@@ -193,7 +193,7 @@ module RDBI::Type
         fl = type_hash[:default]
       end
 
-      fl.execute(obj)
+      TypeLib.execute_filterlist(fl, obj)
     end
   end
 end

@@ -232,6 +232,20 @@ class RDBI::Result
     @fetch_handle.fetch(row_count)
   end
 
+  #
+  # returns the first result in the set.
+  #
+  def first
+    @data.first
+  end
+
+  #
+  # returns the last result in the set.
+  #
+  def last
+    @data.last
+  end
+
   alias read fetch
 
   #
@@ -332,25 +346,43 @@ class RDBI::Result::Driver
     if rows.nil?
       return rows 
     elsif [:first, :last].include?(row_count)
-      result = []
-      i = -1
-      rows.each_with_index do |x, i| 
-        result << RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
-      end
-
-      return result
+      return convert_row(rows)
     else
       result = []
       rows.each do |row| 
-        newrow = []
-        row.each_with_index do |x, i|
-          newrow << RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
-        end
-
-        result << newrow
+        result << convert_row(row)
       end
     end
     return result
+  end
+
+  #
+  # Returns the first result in the set.
+  #
+  def first
+    return convert_row(@data.first)
+  end
+
+  #
+  # Returns the last result in the set.
+  #
+  # +Warning+: Depending on your database and drivers, calling this could have
+  # serious memory and performance implications!
+  #
+  def last
+    return convert_row(@data.last)
+  end
+
+  protected
+
+  def convert_row(row)
+    return [] if row.nil?
+    
+    row.each_with_index do |x, i|
+      row[i] = RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
+    end
+
+    return row
   end
 end
 

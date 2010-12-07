@@ -108,6 +108,8 @@ class TestResult < Test::Unit::TestCase
 
     assert_equal(generate_data[0], res.fetch(:first))
     assert_equal(generate_data[-1], res.fetch(:last))
+    assert_equal(generate_data[0], res.first)
+    assert_equal(generate_data[-1], res.last)
 
     res.sth.finish
   end

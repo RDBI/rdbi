@@ -110,7 +110,8 @@ class RDBI::Pool
   end
 
   #
-  # Asserts that all the pooled handles are connected.
+  # Asserts that all the pooled handles are connected. Returns true or false
+  # depending on the result of that assertion.
   #
   def up
     alive = false

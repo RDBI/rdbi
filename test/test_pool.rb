@@ -81,10 +81,16 @@ class TestPool < Test::Unit::TestCase
     end
   end
 
-  def test_06_ping
+  def test_06_ping_and_up
     pool = create_pool(:test_06)
     4.times { pool.add_connection }
     assert_equal(10, pool.ping)
+
+    assert(pool.up)
+
+    pool.handles[0].disconnect
+
+    assert(!pool.up)
   end
 
   def test_07_resize

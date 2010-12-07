@@ -110,6 +110,19 @@ class RDBI::Pool
   end
 
   #
+  # Asserts that all the pooled handles are connected.
+  #
+  def up
+    alive = false
+
+    mutex.synchronize do
+      alive = @handles.select { |x| x.ping.nil? }.empty?
+    end
+
+    return alive
+  end
+
+  #
   # Unconditionally reconnect all database handles.
   def reconnect
     mutex.synchronize do 

@@ -20,6 +20,24 @@ path down the rabbit hole:
 * If you're interested in how schemas and types are dealt with, see
   RDBI::Schema, RDBI::Column, and RDBI::Type.
 
+== Need a Driver?
+
+=== Databases:
+
+==== Maintained by the RDBI project:
+
+* rdbi-driver-mysql: http://github.com/RDBI/rdbi-driver-mysql
+* rdbi-driver-postgresql: http://github.com/RDBI/rdbi-driver-postgresql
+* rdbi-driver-sqlite3: http://github.com/RDBI/rdbi-driver-sqlite3
+
+==== Maintained by third parties:
+
+* rdbi-driver-odbc: https://github.com/semmons99/rdbi-driver-odbc by Shane Emmons
+
+=== Results:
+
+* rdbi-result-driver-json: http://github.com/RDBI/rdbi-result-driver-json
+
 == Give me a code sample already!
 
   # connect to an in-memory sqlite3 database:
@@ -51,7 +69,6 @@ compelling (or off-putting. We're pragmatists.):
 * RDBI is, at the time of this writing, fewer than 1000 lines of code.
 * RDBI is light and fast. Eventually we will show you benchmarks.
 * RDBI can be tested without a database, or even a database driver.
-* RDBI is almost 100% thread-safe.
 * RDBI can transform your results through a driver system. Want a CSV? Use the
   CSV driver, don't bother transforming it yourself. Transform to JSON or YAML
   with another gem. Drivers can be independently installed, used and swapped.

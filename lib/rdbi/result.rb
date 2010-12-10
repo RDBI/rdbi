@@ -465,4 +465,43 @@ class RDBI::Result::Driver::Struct < RDBI::Result::Driver
   end
 end
 
+# 
+# Yields YAML representations of rows, each as an array keyed by the column
+# name (as symbol, not string).
+#
+# For example, a table:
+#
+#   create table foo (i integer, x varchar);
+#   insert into foo (i, x) values (1, "bar");
+#   insert into foo (i, x) values (2, "foo");
+#   insert into foo (i, x) values (3, "quux");
+#
+# With a query as such:
+#
+#   dbh.execute("select * from foo").as(:YAML).fetch(:all)
+#
+# Will yield:
+#
+#   --- 
+#   - :i: 1
+#     :x: bar 
+#   - :i: 2
+#     :x: foo
+#   - :i: 3 
+#     :x: quux
+#
+class RDBI::Result::Driver::YAML < RDBI::Result::Driver
+  def initialize(result, *args)
+    super
+    RDBI::Util.optional_require('yaml')
+  end
+
+  def fetch(row_count)
+    column_names = @result.schema.columns.map(&:name)
+    @result.raw_fetch(row_count).collect do |row|
+      Hash[column_names.zip(row)]
+    end.to_yaml
+  end
+end
+
 # vim: syntax=ruby ts=2 et sw=2 sts=2

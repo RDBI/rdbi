@@ -178,7 +178,7 @@ class RDBI::Result
     @data.rewind
     @data.rewindable_result = rr
     @driver       = driver_klass
-    configure_driver(@driver)
+    configure_driver(@driver, *args)
   end
 
   #

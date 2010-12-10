@@ -360,7 +360,7 @@ class RDBI::Result::Driver
   # Returns the first result in the set.
   #
   def first
-    return convert_row(@data.first)
+    return fetch(:first)
   end
 
   #
@@ -370,7 +370,7 @@ class RDBI::Result::Driver
   # serious memory and performance implications!
   #
   def last
-    return convert_row(@data.last)
+    return fetch(:last)
   end
 
   protected
@@ -498,9 +498,14 @@ class RDBI::Result::Driver::YAML < RDBI::Result::Driver
 
   def fetch(row_count)
     column_names = @result.schema.columns.map(&:name)
-    @result.raw_fetch(row_count).collect do |row|
-      Hash[column_names.zip(row)]
-    end.to_yaml
+
+    if [:first, :last].include?(row_count)
+      Hash[column_names.zip(@result.raw_fetch(row_count)[0])].to_yaml
+    else
+      @result.raw_fetch(row_count).collect do |row|
+        Hash[column_names.zip(row)]
+      end.to_yaml
+    end
   end
 end
 

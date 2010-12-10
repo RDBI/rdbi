@@ -275,6 +275,30 @@ class TestResult < Test::Unit::TestCase
     res.reload
     res.rewind
   end
+
+  def test_12_as_yaml
+    res = mock_result
+    require 'yaml'
+
+    assert_equal(
+      [ 
+        {:zero=>-1, :one=>0, :two=>1},
+        {:zero=>0, :one=>1, :two=>2},
+        {:zero=>1, :one=>2, :two=>3},
+        {:zero=>2, :one=>3, :two=>4},
+        {:zero=>3, :one=>4, :two=>5},
+        {:zero=>4, :one=>5, :two=>6},
+        {:zero=>5, :one=>6, :two=>7},
+        {:zero=>6, :one=>7, :two=>8},
+        {:zero=>7, :one=>8, :two=>9},
+        {:zero=>8, :one=>9, :two=>10}
+      ],
+      YAML.load(res.as(:YAML).fetch(:all))
+    )
+
+    assert_equal({:zero=>-1, :one=>0, :two=>1}, YAML.load(res.as(:YAML).first))
+    assert_equal({:zero=>8, :one=>9, :two=>10}, YAML.load(res.as(:YAML).last))
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

@@ -20,7 +20,6 @@ begin
     #gem.add_development_dependency 'hanna'
     gem.add_development_dependency 'fastercsv'
 
-    gem.add_dependency 'methlab', '>= 0.0.9'
     gem.add_dependency 'epoxy', '>= 0.3.1'
     gem.add_dependency 'typelib'
 

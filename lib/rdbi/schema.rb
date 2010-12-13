@@ -13,7 +13,8 @@ RDBI::Column = Struct.new(
   :nullable,
   :metadata,
   :default,
-  :table
+  :table,
+  :primary_key
 )
 
 #
@@ -115,6 +116,12 @@ class RDBI::Column
   # :attr_reader: table
   #
   # The table this column belongs to, if known, as symbol.
+  #
+  
+  ##
+  # :attr_reader: primary_key
+  #
+  # Is this column a primary key?
   #
 end
 

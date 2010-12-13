@@ -237,6 +237,13 @@ class RDBI::Database
       ep.quote(total_hash) { |x| %Q{'#{(total_hash[x] || binds[x]).to_s.gsub(/'/, "''")}'} }
     end
   end
+
+  #
+  # Quote a single item using a consistent quoting method.
+  #
+  def quote(item)
+    "\'#{item.to_s}\'"
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

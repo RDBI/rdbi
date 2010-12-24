@@ -231,7 +231,7 @@ class RDBI::Pool
   # reformat the connect arguments coming from certain external sources.
   def munge_connect_args!
     if @connect_args.kind_of?(Hash) and @connect_args.has_key?(:driver)
-      new_connect_args = [@connect_args.delete(:driver), *@connect_args]
+      new_connect_args = [@connect_args.delete(:driver), @connect_args]
       @connect_args = new_connect_args
     end
   end

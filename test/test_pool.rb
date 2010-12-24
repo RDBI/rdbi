@@ -189,7 +189,7 @@ class TestPool < Test::Unit::TestCase
     assert(dbh)
     assert_kind_of(RDBI::Database, dbh)
 
-    assert_equal([:Mock, [:database, ":memory:"], [:username, "foo"]], pool.instance_variable_get(:@connect_args))
+    assert_equal([:Mock, { :database => ":memory:", :username =>  "foo" }], pool.instance_variable_get(:@connect_args))
   end
 end
 

@@ -184,12 +184,12 @@ class TestPool < Test::Unit::TestCase
   end
 
   def test_09_alternative_connect_syntax
-    pool = RDBI::Pool.new(name, { :database => :Mock, :username => "foo" })
+    pool = RDBI::Pool.new(name, { :driver => :Mock, :database => ":memory:", :username => "foo" })
     dbh = pool.get_dbh
     assert(dbh)
     assert_kind_of(RDBI::Database, dbh)
 
-    assert_equal([:Mock, [:username, "foo"]], pool.instance_variable_get(:@connect_args))
+    assert_equal([:Mock, [:database, ":memory:"], [:username, "foo"]], pool.instance_variable_get(:@connect_args))
   end
 end
 

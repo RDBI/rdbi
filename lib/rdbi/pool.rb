@@ -83,9 +83,11 @@ class RDBI::Pool
   # Usage:
   #
   # Pool.new(:fart, [:SQLite3, :database => "/tmp/foo.db"])
+  # Pool.new(:quux, { :database => :SQLite3, :database => ":memory:" })
   def initialize(name, connect_args, max=5)
     @handles      = []
     @connect_args = connect_args
+    munge_connect_args!
     @max          = max
     @last_index   = 0
     @mutex        = Mutex.new
@@ -225,6 +227,14 @@ class RDBI::Pool
   end
 
   protected 
+  
+  # reformat the connect arguments coming from certain external sources.
+  def munge_connect_args!
+    if @connect_args.kind_of?(Hash) and @connect_args.has_key?(:database)
+      new_connect_args = [@connect_args.delete(:database), *@connect_args]
+      @connect_args = new_connect_args
+    end
+  end
 
   #
   # Add any ol' database handle. This is not for global consumption.

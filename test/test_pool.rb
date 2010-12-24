@@ -182,6 +182,15 @@ class TestPool < Test::Unit::TestCase
 
     assert_respond_to(pool, :map)
   end
+
+  def test_09_alternative_connect_syntax
+    pool = RDBI::Pool.new(name, { :database => :Mock, :username => "foo" })
+    dbh = pool.get_dbh
+    assert(dbh)
+    assert_kind_of(RDBI::Database, dbh)
+
+    assert_equal([:Mock, [:username, "foo"]], pool.instance_variable_get(:@connect_args))
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

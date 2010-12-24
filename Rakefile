@@ -22,6 +22,8 @@ begin
 
     gem.add_dependency 'epoxy', '>= 0.3.1'
     gem.add_dependency 'typelib'
+    
+    gem.files = Dir[".gemtest"] + Dir["Rakefile"] + Dir["lib/**/*.rb"] + Dir["test/**/*.rb"]
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

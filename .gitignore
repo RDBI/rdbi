@@ -32,3 +32,4 @@ pkg
 *.tp
 *.vr
 test.db
+*.rbc

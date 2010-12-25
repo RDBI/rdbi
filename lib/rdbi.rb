@@ -49,8 +49,8 @@ module RDBI
 
     dbh = nil
 
-    if RDBI::Pool[pool_name]
-      dbh = RDBI::Pool[pool_name].get_dbh
+    if pool = RDBI::Pool[pool_name]
+      dbh = pool.get_dbh
     else
       dbh = RDBI::Pool.new(pool_name, [klass, args]).get_dbh
     end
@@ -154,11 +154,14 @@ module RDBI::Util
 
   def self.index_binds(args, index_map)
     # FIXME exception if mixed hash/indexed binds
-    if args[0].kind_of?(Hash)
+    
+    args = args[0] 
+
+    if args.kind_of?(Hash)
       binds = []
-      args[0].keys.each do |key| 
+      args.keys.each do |key| 
         if index == index_map.index(key)
-          binds.insert(index, args[0][key])
+          binds.insert(index, args[key])
         end
       end
       return binds

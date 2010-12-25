@@ -16,8 +16,7 @@ begin
     gem.add_development_dependency 'rdbi-driver-mock'
     gem.add_development_dependency 'test-unit'
     gem.add_development_dependency 'rdoc'
-    ## for now, install hanna from here: http://github.com/erikh/hanna
-    #gem.add_development_dependency 'hanna'
+    gem.add_development_dependency 'hanna-nouveau'
     gem.add_development_dependency 'fastercsv'
 
     gem.add_dependency 'epoxy', '>= 0.3.1'
@@ -77,17 +76,16 @@ end
 task :default => :test
 
 begin
-  require 'hanna'
+  gem 'rdoc'
   require 'rdoc/task'
   RDoc::Task.new do |rdoc|
     version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
-    rdoc.options.push '-f', 'hanna'
+    rdoc.generator = 'hanna'
     rdoc.main = 'README.rdoc'
     rdoc.rdoc_dir = 'rdoc'
     rdoc.title = "RDBI #{version} Documentation"
-    rdoc.rdoc_files.include('README*')
-    rdoc.rdoc_files.include('lib/**/*.rb')
+    rdoc.rdoc_files.include('README*', 'lib/**/*.rb')
   end
 rescue LoadError => e
   rdoc_missing = lambda do
@@ -95,10 +93,6 @@ rescue LoadError => e
   end
   task :rdoc, &rdoc_missing
   task :clobber_rdoc, &rdoc_missing
-end
-
-task :to_blog => [:clobber_rdoc, :rdoc] do
-  sh "rm -fr $git/blog/content/docs/rdbi && mv doc $git/blog/content/docs/rdbi"
 end
 
 task :install => [:test, :build]

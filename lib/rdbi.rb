@@ -155,19 +155,25 @@ module RDBI::Util
   def self.index_binds(args, index_map)
     # FIXME exception if mixed hash/indexed binds
     
-    args = args[0] 
+    if args.empty? or !args.find { |x| x.kind_of?(Hash) }
+      return args
+    end
 
     if args.kind_of?(Hash)
       binds = []
-      args.keys.each do |key| 
-        if index == index_map.index(key)
-          binds.insert(index, args[key])
-        end
-      end
-      return binds
+      hash = args
     else
-      return args
+      hashes, binds = args.partition { |x| x.kind_of?(Hash) }
+      hash = hashes.inject({ }, :merge)
     end
+
+    hash.each do |key, value| 
+      # XXX yes, we want to *assign* here.
+      if index = index_map.index(key)
+        binds.insert(index, value)
+      end
+    end
+    return binds
   end
 end
 

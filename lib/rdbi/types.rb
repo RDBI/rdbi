@@ -94,6 +94,8 @@ module RDBI::Type
           true
         when /^(f(alse)?|0)$/i
           false
+        else
+          nil
       end
     }
   end

@@ -157,7 +157,7 @@ module RDBI::Util
     if args[0].kind_of?(Hash)
       binds = []
       args[0].keys.each do |key| 
-        if index = index_map.index(key)
+        if index == index_map.index(key)
           binds.insert(index, args[0][key])
         end
       end

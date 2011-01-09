@@ -206,12 +206,30 @@ class TestDatabase < Test::Unit::TestCase
     my_sth = nil
     my_res = nil
 
+    # ordinary execution
     @dbh.prepare("some statement") do |sth|
       assert(sth)
       assert_respond_to(sth, :execute)
       res = sth.execute
       assert(res)
       my_sth = sth
+      assert(! my_sth.finished?)
+    end
+
+    assert(my_sth.finished?)
+
+    # and exceptional
+    begin
+      @dbh.prepare("some statement") do |sth|
+        assert(sth)
+        assert_respond_to(sth, :execute)
+        res = sth.execute
+        assert(res)
+        my_sth = sth
+        assert(! my_sth.finished?)
+        raise "Blam!"
+      end
+    rescue
     end
 
     assert(my_sth.finished?)
@@ -220,6 +238,7 @@ class TestDatabase < Test::Unit::TestCase
       assert(res)
       assert_kind_of(RDBI::Result, res)
     end
+
   end
 
   def test_09_statement_allocation

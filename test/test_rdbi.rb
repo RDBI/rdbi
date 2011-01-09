@@ -63,6 +63,59 @@ class TestRDBI < Test::Unit::TestCase
     dbh = RDBI.connect_cached(:Mock, :username => :foo, :pool_name => :test_05)
     assert_equal(RDBI.pool(:test_05).handles[0], dbh)
   end
+
+  def test_06_connect_block
+    my_dbh = nil
+
+    # Ordinary operation
+    RDBI.connect(:Mock, :username => :foo, :password => :bar) do |dbh|
+      assert(dbh)
+      assert_kind_of(RDBI::Database, dbh)
+      my_dbh = dbh
+      assert(my_dbh.connected?)
+    end
+    assert(! my_dbh.connected?)
+
+    # and exceptional operation
+    begin
+      RDBI.connect(:Mock, :username => :foo, :password => :bar) do |dbh|
+        assert(dbh)
+        assert_kind_of(RDBI::Database, dbh)
+        my_dbh = dbh
+        assert(my_dbh.connected?)
+        raise "Blam!"
+      end
+    rescue
+    end
+    assert(! my_dbh.connected?)
+  end
+
+  def test_07_connect_cached_block
+    conn_args = [:Mock, {:username => :foo, :password => :bar}]
+    my_dbh = nil
+
+    # Ordinary operation
+    RDBI.connect_cached(*conn_args) do |dbh|
+      assert(dbh)
+      assert_kind_of(RDBI::Database, dbh)
+      my_dbh = dbh
+      assert(my_dbh.connected?)
+    end
+    assert(my_dbh.connected?)
+
+    # and exceptional operation
+    begin
+      RDBI.connect_cached(*conn_args) do |dbh|
+        assert(dbh)
+        assert_kind_of(RDBI::Database, dbh)
+        my_dbh = dbh
+        assert(my_dbh.connected?)
+        raise "Blam!"
+      end
+    rescue
+    end
+    assert(my_dbh.connected?)
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

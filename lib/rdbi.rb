@@ -1,6 +1,8 @@
 require 'epoxy'
 
 module RDBI
+  autoload :Schema, 'rdbi/schema' # deprecated, use Relation instead
+
   class << self
     #
     # The last database handle allocated. This may come from pooled connections or regular ones.
@@ -99,6 +101,35 @@ end
 # public consumption.
 #
 module RDBI::Util
+
+  #
+  # Extendable class to assist in one-time deprecation warnings for renamed
+  # methods.
+  #
+  module WarnDeprecated
+    def deprecated_attr_reader(old, new)
+      deprecated_instance_method(old, new)
+    end
+
+    def deprecated_attr_accessor(old, new)
+      deprecated_attr_reader(old, new)
+      old_w, new_w = [old, new].map { |sym| (sym.to_s + '=').to_sym }
+      deprecated_instance_method(old_w, new_w)
+    end
+
+    def deprecated_instance_method(old, new)
+      klass = self.class.name
+      define_method old do |*args|
+        warn "WARNING: deprecated method #{klass}##{old} called, use ##{new} instead"
+        self.class.class_eval do
+          define_method old do |*args|
+            self.__send__(new, *args)
+          end
+        end
+        self.__send__(new, *args)
+      end
+    end
+  end
   #
   # Requires with a LoadError check and emits a friendly "please install me"
   # message.
@@ -182,7 +213,6 @@ require 'rdbi/pool'
 require 'rdbi/driver'
 require 'rdbi/database'
 require 'rdbi/statement'
-require 'rdbi/schema'
 require 'rdbi/result'
 require 'rdbi/cursor'
 

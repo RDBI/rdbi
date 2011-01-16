@@ -4,10 +4,12 @@
 #
 # To execute statements, look at +prepare+ and +execute+.
 #
-# To retrieve schema information, look at +schema+ and +table_schema+.
+# To retrieve table information, look at +relations+ and +relation_info+.
 #
 # To deal with transactions, refer to +transaction+, +commit+, and +rollback+.
 class RDBI::Database
+  extend RDBI::Util::WarnDeprecated
+
   # the driver class that is responsible for creating this database handle.
   attr_accessor :driver
 
@@ -46,15 +48,17 @@ class RDBI::Database
     raise NoMethodError, "this method is not implemented in this driver"
   end
 
-  # query the schema for a specific table. Returns an RDBI::Schema object.
-  def table_schema(table_name)
+  # query the structure of a specific table table or view. Returns an RDBI::Relation object.
+  def relation_info(table_name)
     raise NoMethodError, "this method is not implemented in this driver"
   end
+  deprecated_instance_method :table_schema, :relation_info
 
-  # query the schema for the entire database. Returns an array of RDBI::Schema objects.
-  def schema
+  # query the schema for all relational object (tables and views). Returns an array of RDBI::Relation objects.
+  def relations
     raise NoMethodError, "this method is not implemented in this driver"
   end
+  deprecated_instance_method :relations, :schema
 
   # ends the outstanding transaction and rolls the affected rows back.
   def rollback

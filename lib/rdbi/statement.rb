@@ -195,9 +195,9 @@ class RDBI::Statement
   # Implementations of this method must return, in order:
   #
   # * A RDBI::Cursor object which encapsulates the result
-  # * a RDBI::Schema struct which represents the kinds of data being queried
+  # * a RDBI::Relation struct which represents the kinds of data being queried
   # * a +type_hash+ for on-fetch conversion which corresponds to the
-  #   RDBI::Column information (see RDBI::Schema) and follows a structure similar
+  #   RDBI::Column information (see RDBI::Relation) and follows a structure similar
   #   to RDBI::Type::Out
   #
   # These return values are passed (along with this object and the binds passed

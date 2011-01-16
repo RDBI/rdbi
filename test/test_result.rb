@@ -15,12 +15,12 @@ class TestResult < Test::Unit::TestCase
   
   def mock_result
     names = [:zero, :one, :two]
-    res = RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Relation.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
   end
 
   def mock_empty_result
     names = [:zero, :one, :two]
-    res = RDBI::Result.new(@dbh.prepare("foo"), [1], RDBI::Driver::Mock::Cursor.new([]), RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+    res = RDBI::Result.new(@dbh.prepare("foo"), [1], RDBI::Driver::Mock::Cursor.new([]), RDBI::Relation.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
   end
 
   def get_index(res)
@@ -29,7 +29,7 @@ class TestResult < Test::Unit::TestCase
 
   def get_guts(res)
     h = { }
-    %W[index schema binds sth data].collect(&:to_sym).each do |sym|
+    %W[index relation binds sth data].collect(&:to_sym).each do |sym|
       h[sym] = res.instance_variable_get("@#{sym}") || res.instance_variable_get("@#{sym}".to_sym)
     end
 
@@ -48,9 +48,9 @@ class TestResult < Test::Unit::TestCase
     assert_equal(res.sth, guts[:sth])
     res.sth.finish
 
-    assert_kind_of(RDBI::Schema, guts[:schema])
-    assert_kind_of(RDBI::Schema, res.schema)
-    assert_equal(res.schema, guts[:schema])
+    assert_kind_of(RDBI::Relation, guts[:relation])
+    assert_kind_of(RDBI::Relation, res.relation)
+    assert_equal(res.relation, guts[:relation])
 
     assert_kind_of(Array, guts[:binds])
     assert_equal(res.binds, guts[:binds])
@@ -61,7 +61,7 @@ class TestResult < Test::Unit::TestCase
     res = mock_result
 
     %W[
-      schema
+      relation
       sth
       driver
       result_count
@@ -230,7 +230,7 @@ class TestResult < Test::Unit::TestCase
 
     assert_equal([-1, 0, 1], res.fetch(1)[0])
     assert_equal(10, res.result_count)
-    assert_equal([:zero, :one, :two], res.schema.columns.map(&:name))
+    assert_equal([:zero, :one, :two], res.relation.columns.map(&:name))
 
     res.reload
 
@@ -238,7 +238,7 @@ class TestResult < Test::Unit::TestCase
     # completely different.  not the best test, but it gets the job done.
     assert_equal(%W[10], res.fetch(1)[0])
     assert_equal(5, res.result_count)
-    assert_equal((0..9).to_a, res.schema.columns.map(&:name))
+    assert_equal((0..9).to_a, res.relation.columns.map(&:name))
     res.finish
   end
 

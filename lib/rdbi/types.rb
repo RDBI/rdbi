@@ -41,7 +41,7 @@ require 'typelib/canned'
 #
 # * Input types are the native class of the type.
 # * Output types are a symbol that represents the database type. These type
-#   names are provided by RDBI::Column via RDBI::Schema in the response from an
+#   names are provided by RDBI::Column via RDBI::Relation in the response from an
 #   execution. See RDBI::Statement#new_execution and RDBI::Column#ruby_type.
 #
 # Note that in the latter case these database types are effectively normalized,

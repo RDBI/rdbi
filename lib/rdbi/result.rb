@@ -35,10 +35,12 @@
 # RDBI::Result#fetch or more explicitly with the RDBI::Result#as call.
 #
 class RDBI::Result
+  extend RDBI::Util::WarnDeprecated
   include Enumerable
 
-  # The RDBI::Schema structure associated with this result.
-  attr_reader :schema
+  # The RDBI::Relation structure associated with this result.
+  attr_reader :relation
+  deprecated_attr_reader :schema, :relation
 
   # The RDBI::Statement that yielded this result.
   attr_reader :sth
@@ -81,8 +83,8 @@ class RDBI::Result
   # for instructions on how this is typically used and how the contents are
   # passed to the constructor.
   #
-  def initialize(sth, binds, data, schema, type_hash)
-    @schema         = schema
+  def initialize(sth, binds, data, relation, type_hash)
+    @relation       = relation
     @data           = data
     @result_count   = data.size
     @affected_count = data.affected_count
@@ -107,7 +109,7 @@ class RDBI::Result
     res = @sth.execute(*@binds)
     @data           = res.instance_variable_get(:@data)
     @type_hash      = res.instance_variable_get(:@type_hash)
-    @schema         = res.instance_variable_get(:@schema)
+    @relation       = res.instance_variable_get(:@relation)
     @result_count   = res.instance_variable_get(:@result_count)
     @affected_count = res.instance_variable_get(:@affected_count)
 
@@ -271,17 +273,37 @@ class RDBI::Result
   end
 
   #
+  # Return a list of tables, views and relational aliases associated with
+  # this Result.  For example:
+  #
+  #   query                      res.relations
+  #   -------------------------  -------------
+  #   SELECT 1 FROM tbl          [:tbl]
+  #   SELECT 1 FROM tbl Aliased  [:Aliased]     -- maybe
+  #   SELECT 1;                  []
+  #   SELECT 1 FROM tbl
+  #     CROSS JOIN (SELECT 1) d  [:tbl, :d]     -- maybe
+  #
+  # This method is advisory only -- not all databases and drivers will behave
+  # identically when faced with the choice of returning aliases or table
+  # names, and order of names is not guaranteed.
+  #
+  def relation_names
+    relation.columns.collect { |col| col.table }.any?.uniq rescue []
+  end
+
+  #
   # This call finishes the result and the RDBI::Statement handle, scheduling
   # any unpreserved data for garbage collection.
   #
   def finish
     @sth.finish
     @data.finish
-    @data   = nil
-    @sth    = nil
-    @driver = nil
-    @binds  = nil
-    @schema = nil
+    @data     = nil
+    @sth      = nil
+    @driver   = nil
+    @binds    = nil
+    @relation = nil
   end
 
   protected
@@ -379,7 +401,7 @@ class RDBI::Result::Driver
     return [] if row.nil?
     
     row.each_with_index do |x, i|
-      row[i] = RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
+      row[i] = RDBI::Type::Out.convert(x, @result.relation.columns[i], @result.type_hash)
     end
 
     return row
@@ -415,7 +437,7 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
     else
       require 'csv'
     end
-    # FIXME columns from schema deal maybe?
+    # FIXME columns from relation deal maybe?
   end
 
   def fetch(row_count)
@@ -445,7 +467,7 @@ class RDBI::Result::Driver::Struct < RDBI::Result::Driver
   end
 
   def fetch(row_count)
-    column_names = @result.schema.columns.map(&:name)
+    column_names = @result.relation.columns.map(&:name)
 
     klass = ::Struct.new(*column_names)
 
@@ -497,7 +519,7 @@ class RDBI::Result::Driver::YAML < RDBI::Result::Driver
   end
 
   def fetch(row_count)
-    column_names = @result.schema.columns.map(&:name)
+    column_names = @result.relation.columns.map(&:name)
 
     if [:first, :last].include?(row_count)
       Hash[column_names.zip(@result.raw_fetch(row_count)[0])].to_yaml

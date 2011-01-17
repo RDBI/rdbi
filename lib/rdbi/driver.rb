@@ -17,6 +17,9 @@ class RDBI::Driver
   # the constructor.
   def initialize(dbh_class, *args)
     @dbh_class = dbh_class
+    if args.empty? 
+      raise ArgumentError, "unable to connect without arguments"
+    end 
     @connect_args = [RDBI::Util.key_hash_as_symbols(args[0])]
   end
 
@@ -25,7 +28,7 @@ class RDBI::Driver
   # the RDBI::Database object, and sets the driver on the object to this
   # current object for duplication / multiple creation.
   #
-  def new_handle 
+  def new_handle
     dbh = @dbh_class.new(*@connect_args)
     dbh.driver = self
     return dbh

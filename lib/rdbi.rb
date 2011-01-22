@@ -21,7 +21,8 @@ module RDBI
   #
   # connect() returns an instance of RDBI::Database. In the instance a block
   # is provided, it will be called upon connection success, with the
-  # RDBI::Database object provided in as the first argument.
+  # RDBI::Database object provided in as the first argument, and the
+  # connection will be automatically disconnected at the end of the block.
   def self.connect(klass, *args)
 
     klass = RDBI::Util.class_from_class_or_symbol(klass, self::Driver)
@@ -29,8 +30,13 @@ module RDBI
     driver = klass.new(*args)
     dbh = self.last_dbh = driver.new_handle
 
-    yield dbh if block_given?
-    return dbh
+    return dbh unless block_given?
+
+    begin
+        yield dbh
+    ensure
+        dbh.disconnect rescue nil
+    end
   end
 
   #
@@ -43,6 +49,9 @@ module RDBI
   #
   # If a pool *already* exists, your connection arguments will be ignored and
   # it will instantiate from the Pool's connection arguments.
+  #
+  # If a block is provided, the connection is *not* disconnected at the end
+  # of the block.
   def self.connect_cached(klass, *args)
     args = args[0]
     pool_name = args[:pool_name] || :default

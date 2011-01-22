@@ -156,11 +156,15 @@ class RDBI::Database
     sth = nil
 
     self.last_query = query
-    sth = new_statement(query)
-    yield sth if block_given?
-    sth.finish if block_given?
+    self.last_statement = sth = new_statement(query)
 
-    return self.last_statement = sth
+    return sth unless block_given?
+
+    begin
+      yield sth
+    ensure
+      sth.finish rescue nil
+    end
   end
 
   #

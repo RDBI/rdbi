@@ -115,10 +115,11 @@ class RDBI::Result
   end
 
   #
-  # Iterator for Enumerable methods. Yields a row at a time.
+  # Iterator for Enumerable methods.  Yields a row at a time as translated
+  # by the current +driver+.
   #
   def each
-    @data.each do |row|
+    while row = fetch()[0]
       yield(row)
     end
   end
@@ -179,6 +180,7 @@ class RDBI::Result
     @data.rewindable_result = rr
     @driver       = driver_klass
     configure_driver(@driver, *args)
+    self
   end
 
   #
@@ -233,17 +235,20 @@ class RDBI::Result
   end
 
   #
-  # returns the first result in the set.
+  # Returns the first result in the set.  Note that this may force an
+  # advance of the underlying cursor for non-rewindable ResultSets.
   #
   def first
-    @data.first
+    fetch(:first)
   end
 
   #
-  # returns the last result in the set.
+  # Returns the last result in the set.  Note that this may exhaust the
+  # underlying cursor for non-rewindable ResultSets, as the driver advances
+  # to the end of the results to fetch the last row.
   #
   def last
-    @data.last
+    fetch(:last)
   end
 
   alias read fetch
@@ -354,23 +359,6 @@ class RDBI::Result::Driver
       end
     end
     return result
-  end
-
-  #
-  # Returns the first result in the set.
-  #
-  def first
-    return fetch(:first)
-  end
-
-  #
-  # Returns the last result in the set.
-  #
-  # +Warning+: Depending on your database and drivers, calling this could have
-  # serious memory and performance implications!
-  #
-  def last
-    return fetch(:last)
   end
 
   protected

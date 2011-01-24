@@ -155,6 +155,7 @@ class RDBI::Result
   #
   # Replace the Result Driver. See RDBI::Result's main docs and
   # RDBI::Result::Driver for more information on Result Drivers.
+  # Returns its receiver, permitting method chaining.
   #
   # You may pass:
   #

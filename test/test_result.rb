@@ -299,6 +299,55 @@ class TestResult < Test::Unit::TestCase
     assert_equal({:zero=>-1, :one=>0, :two=>1}, YAML.load(res.as(:YAML).first))
     assert_equal({:zero=>8, :one=>9, :two=>10}, YAML.load(res.as(:YAML).last))
   end
+
+  def test_13_enumerable_as
+    # 'master' dab6270 branch (0.9.1+) returned a Result::Driver for as()
+
+    res = mock_result
+
+    i = -1
+    # Mock result set is:
+    #
+    #   ZERO  ONE  TWO
+    #   ====  ===  ===
+    #    -1    0    1
+    #     0    1    2
+    #     1    2    3
+    #         ...
+    #     8    9   10
+    #
+    res.as(:Struct).each do |row|
+      assert_kind_of(::Struct, row)
+      assert_equal([i, i+1, i+2], [row.zero, row.one, row.two])
+      i += 1
+    end
+
+    res.sth.finish
+  end
+
+  def test_14_results_driven
+    # 'master' dab6270 branch (0.9.1+) returned 'raw' rows for #each,
+    # #first and #last
+
+    res = mock_result
+
+    res.as(:Struct)
+    row = res.first
+    assert_kind_of(::Struct, row)
+    assert_equal([-1, 0, 1], [row.zero, row.one, row.two])
+
+    res.each do |row|
+      assert_kind_of(::Struct, row)
+      assert_equal([-1, 0, 1], [row.zero, row.one, row.two])
+      break # Just one row, thank you
+    end
+
+    row = res.last
+    assert_kind_of(::Struct, row)
+    assert_equal([8, 9, 10], [row.zero, row.one, row.two])
+
+    res.sth.finish
+  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

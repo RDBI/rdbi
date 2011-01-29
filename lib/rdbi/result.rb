@@ -119,7 +119,7 @@ class RDBI::Result
   # by the current +driver+.
   #
   def each
-    while row = fetch()[0]
+    while row = @fetch_handle.fetch(1)[0] and !row.empty?
       yield(row)
     end
   end

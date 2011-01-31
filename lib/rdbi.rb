@@ -1,6 +1,9 @@
 require 'epoxy'
 
 module RDBI
+
+  VERSION = '1.0.0'
+
   class << self
     #
     # The last database handle allocated. This may come from pooled connections or regular ones.

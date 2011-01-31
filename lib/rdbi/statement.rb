@@ -140,6 +140,7 @@ class RDBI::Statement
     @dbh                   = dbh
     @finished              = false
     @input_type_map        = self.class.input_type_map
+    @finish_block          = nil
 
     self.rewindable_result = dbh.rewindable_result
     @dbh.open_statements[self.object_id] = self

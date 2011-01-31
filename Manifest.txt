@@ -1,4 +1,3 @@
-.document
 .gemtest
 History.txt
 LICENSE

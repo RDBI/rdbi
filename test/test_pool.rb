@@ -20,7 +20,7 @@ class TestPool < Test::Unit::TestCase
 
   def test_03_pooling!
     pool = create_pool(:test_03)
-    assert_raise(ArgumentError.new("too many handles in this pool (max: 5)")) do
+    assert_raise(ArgumentError) do
       6.times do
         RDBI::Pool[:test_03].add_connection
       end
@@ -160,7 +160,7 @@ class TestPool < Test::Unit::TestCase
       assert_kind_of(RDBI::Pool, pool)
     end
 
-    assert(10, count)
+    assert_equal(10, count)
     assert_respond_to(RDBI::Pool, :map)
 
     pool = create_pool(:test_08)
@@ -184,7 +184,7 @@ class TestPool < Test::Unit::TestCase
   end
 
   def test_09_alternative_connect_syntax
-    pool = RDBI::Pool.new(name, { :driver => :Mock, :database => ":memory:", :username => "foo" })
+    pool = RDBI::Pool.new("connections!", { :driver => :Mock, :database => ":memory:", :username => "foo" })
     dbh = pool.get_dbh
     assert(dbh)
     assert_kind_of(RDBI::Database, dbh)

@@ -15,21 +15,34 @@ class TestResult < Test::Unit::TestCase
   
   def mock_result
     names = [:zero, :one, :two]
-    res = RDBI::Result.new(@dbh.prepare("foo"), [1], generate_data, RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+    res = RDBI::Result.new(
+      @dbh.prepare("foo"), 
+      [1], 
+      generate_data, 
+      RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), 
+      { :default => RDBI::Type.filterlist() }
+    )
   end
 
   def mock_empty_result
     names = [:zero, :one, :two]
-    res = RDBI::Result.new(@dbh.prepare("foo"), [1], RDBI::Driver::Mock::Cursor.new([]), RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), { :default => RDBI::Type.filterlist() })
+    res = RDBI::Result.new(
+      @dbh.prepare("foo"), 
+      [1], 
+      RDBI::Driver::Mock::Cursor.new([]), 
+      RDBI::Schema.new((0..2).to_a.map { |x| RDBI::Column.new(names[x], :integer, :default) }), 
+      { :default => RDBI::Type.filterlist() }
+    )
   end
 
   def get_index(res)
-    get_guts(get_guts(res)[:data])[:index]
+    cursor = get_guts(res)[:data]
+    cursor.instance_variable_get("@index") || res.instance_variable_get(:@index)
   end
 
   def get_guts(res)
     h = { }
-    %W[index schema binds sth data].collect(&:to_sym).each do |sym|
+    %W[schema binds sth data].collect(&:to_sym).each do |sym|
       h[sym] = res.instance_variable_get("@#{sym}") || res.instance_variable_get("@#{sym}".to_sym)
     end
 

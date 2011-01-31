@@ -57,7 +57,7 @@ class TestStatement < Test::Unit::TestCase
     assert(!sth.finished?)
     sth.finish
     assert(sth.finished?)
-    assert_raises(StandardError.new("you may not execute a finished handle")) { sth.execute }
+    assert_raises(StandardError) { sth.execute }
     sth.finish
   end
 end

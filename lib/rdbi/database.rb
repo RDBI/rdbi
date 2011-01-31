@@ -77,6 +77,7 @@ class RDBI::Database
     @connected            = true
     @in_transaction       = 0
     @rewindable_result    = false
+    @preprocess_quoter    = nil
     self.open_statements  = { }
   end
 

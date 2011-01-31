@@ -6,15 +6,13 @@ class TestUtil < Test::Unit::TestCase
   end
 
   def test_02_optional_require
-    assert_raises(
-      LoadError.new("The 'fart' gem is required to use this driver. Please install it.")
-    ) { RDBI::Util.optional_require('fart') }
+    assert_raises(LoadError) { RDBI::Util.optional_require('fart') }
 
     RDBI::Util.optional_require('ostruct')
   end
 
   def test_03_class_from_class_or_symbol
-    assert_raises(ArgumentError.new("Invalid argument for driver name; must be Class, or a Symbol or String identifying the Class, and the driver Class must have been loaded")) do
+    assert_raises(ArgumentError) do
       RDBI::Util.class_from_class_or_symbol(1, RDBI)
     end
 

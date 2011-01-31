@@ -32,6 +32,7 @@ Hoe.spec 'rdbi' do
   extra_dev_deps << ['fastercsv']
   extra_dev_deps << ['roodi']
   extra_dev_deps << ['reek']
+  extra_dev_deps << ['minitest']
 
   extra_deps << ['epoxy', '>= 0.3.1']
   extra_deps << ['typelib']

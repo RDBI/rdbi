@@ -6,6 +6,8 @@ require 'hoe'
 Hoe.plugins.delete :rubyforge
 Hoe.plugin :git
 Hoe.plugin :rcov
+Hoe.plugin :roodi
+Hoe.plugin :reek
 
 Hoe.spec 'rdbi' do
   developer 'Erik Hollensbe', 'erik@hollensbe.org'
@@ -30,28 +32,21 @@ Hoe.spec 'rdbi' do
   extra_dev_deps << ['rdoc']
   extra_dev_deps << ['hanna-nouveau']
   extra_dev_deps << ['fastercsv']
-  extra_dev_deps << ['roodi']
-  extra_dev_deps << ['reek']
+  extra_dev_deps << ['hoe-roodi']
+  extra_dev_deps << ['hoe-reek']
   extra_dev_deps << ['minitest']
 
   extra_deps << ['epoxy', '>= 0.3.1']
   extra_deps << ['typelib']
 
+  # waiting on a patch from hoe for this
+  #self.extra_rdoc_args = lambda do |rd|
+    #rd.generator = "hanna"
+  #end
+
   desc "install a gem without sudo"
   task :install => [:gem] do
     sh "gem install pkg/#{self.name}-#{self.version}.gem"
-  end
-end
-
-begin
-  require 'roodi'
-  require 'roodi_task'
-  RoodiTask.new do |t|
-    t.verbose = false
-  end
-rescue LoadError
-  task :roodi do
-    abort "Roodi is not available. In order to run roodi, you must: sudo gem install roodi"
   end
 end
 

@@ -9,7 +9,7 @@ Hoe.plugin :rcov
 Hoe.plugin :roodi
 Hoe.plugin :reek
 
-Hoe.spec 'rdbi' do
+spec = Hoe.spec 'rdbi' do
   developer 'Erik Hollensbe', 'erik@hollensbe.org'
 
   self.rubyforge_name = nil
@@ -45,20 +45,9 @@ Hoe.spec 'rdbi' do
   #end
 
   desc "install a gem without sudo"
-  task :install => [:gem] do
-    sh "gem install pkg/#{self.name}-#{self.version}.gem"
-  end
 end
 
-begin
-  require 'reek/rake/task'
-  Reek::Rake::Task.new do |t|
-    t.reek_opts << '-q'
-  end
-rescue LoadError
-  task :reek do
-    abort "Reek is not available. 'gem install reek'."
-  end
+task :install => [:gem] do
+  sh "gem install pkg/#{spec.name}-#{spec.version}.gem"
 end
-
 # vim: syntax=ruby

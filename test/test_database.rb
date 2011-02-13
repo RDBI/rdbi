@@ -258,6 +258,33 @@ class TestDatabase < Test::Unit::TestCase
     @dbh.disconnect
   end
 
+  def test_10_execute_finish
+    @dbh.execute("SELECT 1") do |res|
+      # noop
+    end
+    assert(@dbh.last_statement.finished?,
+           "#execute() block did not finish implicit sth")
+
+    @dbh.execute("SELECT 2")
+    assert(!@dbh.last_statement.finished?,
+           "#execute() unexpectedly finished implicit sth")
+  end
+
+  def test_11_execute_mod_finish
+    @dbh.execute_modification("DROP SCHEMA INFORMATION_SCHEMA")
+    assert(@dbh.last_statement.finished?,
+           "#execute_modification() did not finish implicit sth")
+
+    a = nil
+    @dbh.execute_modification("IGNORED!") do |*blah|
+      a = "Not nil - but this block is not executed"
+    end
+
+    assert(a.nil?, "#execute_modification() invoked a block unexpectedly")
+    assert(@dbh.last_statement.finished?,
+           "#execute_modification() &ignored_block did not finish implicit sth")
+  end
+
   def teardown
     @dbh.disconnect
   end

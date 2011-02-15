@@ -197,7 +197,12 @@ class RDBI::Database
 
     self.last_query = query
     self.last_statement = sth = new_statement(query)
-    res = sth.execute(*binds)
+    begin
+      res = sth.execute(*binds)
+    rescue Exception => e
+      sth.finish rescue nil
+      raise e
+    end
 
     return res unless block_given?
 

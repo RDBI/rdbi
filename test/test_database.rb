@@ -5,6 +5,10 @@ class TestDatabase < Test::Unit::TestCase
     @dbh = mock_connect
   end
 
+  def teardown
+    @dbh.disconnect
+  end
+
   def assert_transaction(count)
     in_transaction = @dbh.instance_variable_get("@in_transaction") ||
       @dbh.instance_variable_get(:@in_transaction)
@@ -265,9 +269,29 @@ class TestDatabase < Test::Unit::TestCase
     assert(@dbh.last_statement.finished?,
            "#execute() block did not finish implicit sth")
 
-    @dbh.execute("SELECT 2")
+    res = @dbh.execute("SELECT 2")
     assert(!@dbh.last_statement.finished?,
            "#execute() unexpectedly finished implicit sth")
+    assert_nothing_raised do
+      res.finish
+      @dbh.disconnect
+    end
+
+    @dbh = RDBI.connect(:MockFaulty, :user => 'u', :pass => 'p')
+    assert_raises(FaultyDB::Error) do
+      @dbh.execute("ignored") do |not_reached|
+        assert(false, "A block not supposed to be reached was executed")
+      end
+    end
+    assert(@dbh.last_statement.finished?,
+           "Failed execute() &block did not finish statement")
+
+    assert_raises(FaultyDB::Error) do
+      res = @dbh.execute("ignored")
+      res.finish # Not reached
+    end
+    assert(@dbh.last_statement.finished?,
+           "Failed execute() did not finish statement")
   end
 
   def test_11_execute_mod_finish
@@ -283,11 +307,17 @@ class TestDatabase < Test::Unit::TestCase
     assert(a.nil?, "#execute_modification() invoked a block unexpectedly")
     assert(@dbh.last_statement.finished?,
            "#execute_modification() &ignored_block did not finish implicit sth")
+
+    @dbh.disconnect
+
+    @dbh = RDBI.connect(:MockFaulty, :user => 'u', :pass => 'p')
+    assert_raises(FaultyDB::Error) do
+      count = @dbh.execute_modification("ignored")
+    end
+    assert(@dbh.last_statement.finished?,
+           "Failed execute_modification() did not finish statement")
   end
 
-  def teardown
-    @dbh.disconnect
-  end
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

@@ -114,7 +114,6 @@ class RDBI::Result
     @data           = res.instance_variable_get(:@data)
     @type_hash      = res.instance_variable_get(:@type_hash)
     @schema         = res.instance_variable_get(:@schema)
-    @result_count   = nil # recomputed on demand
     @affected_count = nil # recomputed on demand
 
     configure_rewindable

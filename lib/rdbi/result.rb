@@ -78,7 +78,6 @@ class RDBI::Result
   def initialize(sth, binds, data, schema, type_hash)
     @schema         = schema
     @data           = data
-    @result_count   = nil  # computed on demand
     @affected_count = nil  # computed on demand
     @sth            = sth
     @binds          = binds
@@ -92,7 +91,9 @@ class RDBI::Result
 
   # The count of results (see RDBI::Result main documentation)
   def result_count
-    @result_count ||= @data.size
+    # Non-rewindable cursors typically will give the number of rows
+    # fetched so far...
+    @data.size
   end
 
   # The count of affected rows by a DML statement (see RDBI::Result main documentation)

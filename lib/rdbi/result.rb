@@ -46,12 +46,6 @@ class RDBI::Result
   # The RDBI::Result::Driver currently associated with this Result.
   attr_reader :driver
 
-  # The count of results (see RDBI::Result main documentation)
-  attr_reader :result_count
-
-  # The count of affected rows by a DML statement (see RDBI::Result main documentation)
-  attr_reader :affected_count
-
   # The mapping of types for each positional argument in the Result.
   attr_reader :type_hash
 
@@ -84,8 +78,8 @@ class RDBI::Result
   def initialize(sth, binds, data, schema, type_hash)
     @schema         = schema
     @data           = data
-    @result_count   = data.size
-    @affected_count = data.affected_count
+    @result_count   = nil  # computed on demand
+    @affected_count = nil  # computed on demand
     @sth            = sth
     @binds          = binds
     @type_hash      = type_hash
@@ -95,6 +89,17 @@ class RDBI::Result
     configure_rewindable
     configure_driver(@driver)
   end
+
+  # The count of results (see RDBI::Result main documentation)
+  def result_count
+    @result_count ||= @data.size
+  end
+
+  # The count of affected rows by a DML statement (see RDBI::Result main documentation)
+  def affected_count
+    @affected_count ||= @data.affected_count
+  end
+
 
   #
   # Reload the result. This will:
@@ -108,8 +113,8 @@ class RDBI::Result
     @data           = res.instance_variable_get(:@data)
     @type_hash      = res.instance_variable_get(:@type_hash)
     @schema         = res.instance_variable_get(:@schema)
-    @result_count   = res.instance_variable_get(:@result_count)
-    @affected_count = res.instance_variable_get(:@affected_count)
+    @result_count   = nil # recomputed on demand
+    @affected_count = nil # recomputed on demand
 
     configure_rewindable
   end

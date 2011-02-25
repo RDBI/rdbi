@@ -89,10 +89,9 @@ class TestResult < Test::Unit::TestCase
       as
       fetch
       read
-      raw_fetch
-      finish 
+      finish
     ].collect(&:to_sym).each do |sym|
-      assert_respond_to(res, sym)
+      assert_respond_to(res, sym, "#{res.class} did not respond to :#{sym}")
     end
 
     res.sth.finish
@@ -404,6 +403,22 @@ class TestResult < Test::Unit::TestCase
     assert_equal({:zero=>8, :one=>9, :two=>10}, YAML.load(row))
 
     res.sth.finish
+  end
+
+  def test_17_results_as_empty
+    [:Array, :Struct, :YAML, :CSV].each do |rd|
+      res = mock_empty_result
+      res.as(rd).each do |not_reached|
+        assert(false, "each block unexpectedly reached during :#{rd} test")
+      end
+      res.sth.finish
+
+      res = mock_empty_result
+      res.as(rd)
+      assert_nil(res.first, "#first was not nil on empty result set")
+      assert_nil(res.last, "#last was not nil on empty result set")
+      res.sth.finish
+    end
   end
 
 end

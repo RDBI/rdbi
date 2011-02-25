@@ -334,24 +334,23 @@ class TestResult < Test::Unit::TestCase
       assert_equal([i, i+1, i+2], [row.zero, row.one, row.two])
       i += 1
     end
-
     res.sth.finish
   end
 
-  def test_14_results_driven
+  def test_14_results_driven_struct
     # 'master' dab6270 branch (0.9.1+) returned 'raw' rows for #each,
     # #first and #last
 
     res = mock_result
 
     res.as(:Struct)
-    row = res.first
+    row = res.first # does not advance underlying index
     assert_kind_of(::Struct, row)
     assert_equal([-1, 0, 1], [row.zero, row.one, row.two])
 
-    res.each do |row|
-      assert_kind_of(::Struct, row)
-      assert_equal([-1, 0, 1], [row.zero, row.one, row.two])
+    res.each do |r|
+      assert_kind_of(::Struct, r)
+      assert_equal([-1, 0, 1], [r.zero, r.one, r.two])
       break # Just one row, thank you
     end
 
@@ -361,6 +360,52 @@ class TestResult < Test::Unit::TestCase
 
     res.sth.finish
   end
+
+  def test_15_results_driven_csv
+    # 'master' 20917a3 branch (pilcrow/result-as) didn't handle
+    # eof properly for result drivers that didn't return sets of
+    # rows as an array of rows
+
+    res = mock_result
+
+    res.as(:CSV)
+    row = res.first # does not advance underlying index
+    assert_equal("-1,0,1\n", row)
+
+    res.each do |r|
+      assert_equal("-1,0,1\n", r)
+      break # Just one row, thank you
+    end
+
+    row = res.last
+    assert_equal("8,9,10\n", row)
+
+    res.sth.finish
+  end
+
+  def test_16_results_driven_yaml
+    # As for test_15, but with YAML
+    # 'master' 20917a3 branch (pilcrow/result-as) didn't handle
+    # eof properly for result drivers that didn't return sets of
+    # rows as an array of rows
+
+    res = mock_result
+
+    res.as(:YAML)
+    row = res.first # does not advance underlying index
+    assert_equal({:zero=>-1, :one=>0, :two=>1}, YAML.load(row))
+
+    res.each do |r|
+      assert_equal({:zero=>-1, :one=>0, :two=>1}, YAML.load(r))
+      break # Just one row, thank you
+    end
+
+    row = res.last
+    assert_equal({:zero=>8, :one=>9, :two=>10}, YAML.load(row))
+
+    res.sth.finish
+  end
+
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

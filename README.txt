@@ -50,9 +50,8 @@ path down the rabbit hole:
   dbh.prepare("insert into foo (bar, baz) values (?, ?)") do |sth|
 
     # and execute it with bound variables:
-    sth.execute(1, "foo")
-    sth.execute(2, "bar")
-    sth.execute(3, "quux")
+    sth.execute("foo")
+    sth.execute("bar")
   end
 
   # get a result handle from a select statement:

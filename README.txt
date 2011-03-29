@@ -44,22 +44,22 @@ path down the rabbit hole:
   dbh = RDBI.connect(:SQLite3, :database => ":memory:")
 
   # execute this CREATE TABLE statement:
-  dbh.execute("create table foo (bar integer, baz varchar)")
+  dbh.execute("create table tbl (string varchar(32), number integer)")
 
   # prepare an insert statement for execution with two placeholders:
-  dbh.prepare("insert into foo (bar, baz) values (?, ?)") do |sth|
+  dbh.prepare("insert into tbl (string, number) values (?, ?)") do |sth|
 
-    # and execute it with bound variables:
-    sth.execute(1, "foo")
-    sth.execute(2, "bar")
-    sth.execute(3, "quux")
+    # and execute it three times with bound variables:
+    sth.execute("foo", -37)
+    sth.execute("bar", 127)
+    sth.execute("quux", 1024)
   end
 
   # get a result handle from a select statement:
-  result = dbh.execute("select * from foo")
+  result = dbh.execute("select * from tbl")
 
   # and fetch the first row
-  result.fetch(:first) # [1, "foo"]
+  result.fetch(:first) # ["foo", -37]
 
 == What +is+ RDBI all about, anyway?
 
@@ -154,7 +154,7 @@ Aaaaaand here are some things RDBI won't do:
 == Show me even more awesome!
 
   # retrieve cached handles 5 times -- handles will be yielded twice if there
-  # is a smaller Pool size: 
+  # is a smaller Pool size:
   5.times do
     RDBI.connect_cached(:SQLite3, :database => ":memory:")
   end

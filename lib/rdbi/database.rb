@@ -193,11 +193,13 @@ class RDBI::Database
     self.last_statement = sth = new_statement(query)
     res = sth.execute(*binds)
 
-    if block_given?
-      yield res
-    end
+    return res unless block_given?
 
-    return res
+    begin
+      yield res
+    ensure
+      res.finish rescue nil
+    end
   end
 
   def execute_modification(query, *binds)

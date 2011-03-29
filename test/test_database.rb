@@ -234,15 +234,24 @@ class TestDatabase < Test::Unit::TestCase
 
     assert(my_sth.finished?)
 
+    # Database#execute &block
+
+    my_res = nil
     block_ret = @dbh.execute("some statement") do |res|
+                  my_res = res
                   assert(res)
                   assert_kind_of(RDBI::Result, res)
                   "BLOCK RETURN"
                 end
+
+    assert_kind_of(RDBI::Result, my_res)
+    # Result#finish implies Statement#finish, nil'ing
+    assert(my_res.sth.nil?,
+           'Database#execute &p did not finish its Result')
     assert(!block_ret.kind_of?(RDBI::Result),
-           'dbh.execute() {BLOCK} wrongly returned its RDBI::Result')
+           'Database#execute &block wrongly returned its Result')
     assert_equal("BLOCK RETURN", block_ret,
-                 "dbh.execute() {BLOCK} didn't return the value of BLOCK")
+                 "Database#execute &block didn't return the return value of &block")
   end
 
   def test_09_statement_allocation

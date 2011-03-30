@@ -90,7 +90,7 @@ class RDBI::Result
     @binds          = binds
     @type_hash      = type_hash
     @driver         = RDBI::Result::Driver::Array
-    @fetch_handle   = nil
+    @result_driver  = nil
 
     configure_rewindable
     configure_driver(@driver)
@@ -119,7 +119,7 @@ class RDBI::Result
   # by the current +driver+.
   #
   def each
-    while row = @fetch_handle.fetch(1)[0] and !row.empty?
+    while row = fetch(:next_row)
       yield(row)
     end
   end
@@ -232,7 +232,25 @@ class RDBI::Result
       as(driver_klass, *args)
     end
 
-    @fetch_handle.fetch(row_count)
+    # fetch() has two significantly different return signatures:
+    #
+    # Returning a single row is nil upon EOF (:first, :last, inside #each)
+    # Returning a set of rows is [] upon EOF (all others)
+
+    raw, multiple_rows = case row_count
+                         when :first, :last, :next_row
+                           [@data.__send__(row_count), false]
+                         when :all, :rest
+                           [@data.__send__(row_count), true]
+                         else
+                           [@data.fetch(row_count), true]
+                         end
+
+    return @result_driver.format_multiple_rows(raw) if multiple_rows
+
+    @result_driver.format_single_row(raw) if raw
+
+    # else nil -- :first, :last or #each at EOF
   end
 
   #
@@ -255,28 +273,6 @@ class RDBI::Result
   alias read fetch
 
   #
-  # raw_fetch is a straight array fetch without driver interaction. If you
-  # think you need this, please still read the fetch documentation as there is
-  # a considerable amount of overlap.
-  #
-  # This is generally used by Result Drivers to transform results.
-  #
-  def raw_fetch(row_count)
-    final_res = case row_count
-                when :all
-                  @data.all
-                when :rest
-                  @data.rest
-                when :first
-                  [@data.first]
-                when :last
-                  [@data.last]
-                else
-                  @data.fetch(row_count)
-                end
-  end
-
-  #
   # This call finishes the result and the RDBI::Statement handle, scheduling
   # any unpreserved data for garbage collection.
   #
@@ -293,7 +289,7 @@ class RDBI::Result
   protected
 
   def configure_driver(driver_klass, *args)
-    @fetch_handle = driver_klass.new(self, *args)
+    @result_driver = driver_klass.new(self, *args)
   end
 
   def configure_rewindable
@@ -315,21 +311,21 @@ end
 # == Creating a Result Driver
 #
 # A result driver typically inherits from RDBI::Result::Driver and implements
-# at least one method: +fetch+.
+# at least two methods: +format_single_row+ and +format_multiple_rows+.
 #
-# This fetch is not RDBI::Result#fetch, and doesn't have the same call
-# semantics. Instead, it takes a single argument, the +row_count+, and
-# typically passes that to RDBI::Result#raw_fetch to get results to process. It
-# then returns the data transformed.
+# +format_single_row+ is called with a single row fetched "raw" from the
+# underlying driver, that is, with an array of variously typed elements.  It
+# is never called with a nil argument.  +format_multiple_rows+ is called with
+# a possibly empty array of raw rows.
 #
-# RDBI::Result::Driver additionally provides two methods, convert_row and
-# convert_item, which leverage RDBI's type conversion facility (see RDBI::Type)
-# to assist in type conversion. For performance reasons, RDBI chooses to
-# convert on request instead of preemptively, so <b>it is the driver implementor's
-# job to do any conversion</b>.
+# Note that +format_multiple_rows+ could be implemented in terms of
+# +format_single_row+.  However, for performance reasons it is not.
 #
-# If you wish to implement a constructor in your class, please see
-# RDBI::Result::Driver.new.
+# Base class RDBI::Result::Driver additionally provides the method
+# +convert_row+ to employ RDBI's type conversion facility (see RDBI::Type) for
+# converting "raw" data elements to convenient ruby types.  For performance
+# reasons, RDBI converts on request instead of preemptively, so <b>it is the
+# driver implementor's job to do any conversion</b>.
 #
 class RDBI::Result::Driver
 
@@ -342,31 +338,17 @@ class RDBI::Result::Driver
     @result = result
   end
 
-  #
-  # Fetch the result with any transformations. The default is to present the
-  # type converted array.
-  #
-  def fetch(row_count)
-    rows = RDBI::Util.format_results(row_count, (@result.raw_fetch(row_count) || []))
+  def format_single_row(raw)
+    convert_row(raw)
+  end
 
-    if rows.nil?
-      return rows 
-    elsif [:first, :last].include?(row_count)
-      return convert_row(rows)
-    else
-      result = []
-      rows.each do |row| 
-        result << convert_row(row)
-      end
-    end
-    return result
+  def format_multiple_rows(raw_rows)
+    raw_rows.collect { |rr| convert_row(rr) }
   end
 
   protected
 
   def convert_row(row)
-    return [] if row.nil?
-    
     row.each_with_index do |x, i|
       row[i] = RDBI::Type::Out.convert(x, @result.schema.columns[i], @result.type_hash)
     end
@@ -407,12 +389,12 @@ class RDBI::Result::Driver::CSV < RDBI::Result::Driver
     # FIXME columns from schema deal maybe?
   end
 
-  def fetch(row_count)
-    csv_string = ""
-    @result.raw_fetch(row_count).each do |row|
-      csv_string << row.to_csv
-    end
-    return csv_string
+  def format_single_row(raw)
+    raw.to_csv
+  end
+
+  def format_multiple_rows(raw_rows)
+    raw_rows.inject("") do |accum, row| accum << row.to_csv end
   end
 end
 
@@ -433,28 +415,21 @@ class RDBI::Result::Driver::Struct < RDBI::Result::Driver
     super
   end
 
-  def fetch(row_count)
-    column_names = @result.schema.columns.map(&:name)
+  def format_single_row(raw)
+    struct_klass.new(*super)
+  end
 
-    klass = ::Struct.new(*column_names)
+  def format_multiple_rows(raw_rows)
+    super.collect { |row| struct_klass.new(*row) }
+  end
 
-    structs = super
-
-    if [:first, :last].include?(row_count) 
-      if structs
-        return klass.new(*structs)
-      else
-        return structs
-      end
-    end
-
-    structs.collect! { |row| klass.new(*row) }
-
-    return RDBI::Util.format_results(row_count, structs)
+  private
+  def struct_klass
+    @struct_klass ||= ::Struct.new(*@result.schema.columns.map(&:name))
   end
 end
 
-# 
+#
 # Yields YAML representations of rows, each as an array keyed by the column
 # name (as symbol, not string).
 #
@@ -485,16 +460,17 @@ class RDBI::Result::Driver::YAML < RDBI::Result::Driver
     RDBI::Util.optional_require('yaml')
   end
 
-  def fetch(row_count)
-    column_names = @result.schema.columns.map(&:name)
+  def format_single_row(raw)
+    ::Hash[column_names.zip(raw)].to_yaml
+  end
 
-    if [:first, :last].include?(row_count)
-      Hash[column_names.zip(@result.raw_fetch(row_count)[0])].to_yaml
-    else
-      @result.raw_fetch(row_count).collect do |row|
-        Hash[column_names.zip(row)]
-      end.to_yaml
-    end
+  def format_multiple_rows(raw_rows)
+    raw_rows.collect { |row| ::Hash[column_names.zip(row)] }.to_yaml
+  end
+
+  private
+  def column_names
+    @column_names ||= @result.schema.columns.map(&:name)
   end
 end
 

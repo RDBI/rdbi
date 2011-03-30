@@ -146,24 +146,6 @@ module RDBI::Util
     Marshal.load(Marshal.dump(obj))
   end
 
-  #
-  # Takes an array and appropriate boxes/deboxes it based on what was
-  # requested.
-  #
-  #--
-  # FIXME this is a really poorly performing way of doing this.
-  #++
-  def self.format_results(row_count, ary)
-    case row_count
-    when :first, :last
-      ary = ary[0]
-      return nil if ary and ary.empty?
-      return ary
-    else
-      return ary
-    end
-  end
-
   def self.index_binds(args, index_map)
     # FIXME exception if mixed hash/indexed binds
     

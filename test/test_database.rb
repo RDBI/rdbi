@@ -5,6 +5,10 @@ class TestDatabase < Test::Unit::TestCase
     @dbh = mock_connect
   end
 
+  def teardown
+    @dbh.disconnect
+  end
+
   def assert_transaction(count)
     in_transaction = @dbh.instance_variable_get("@in_transaction") ||
       @dbh.instance_variable_get(:@in_transaction)
@@ -271,9 +275,62 @@ class TestDatabase < Test::Unit::TestCase
     @dbh.disconnect
   end
 
-  def teardown
-    @dbh.disconnect
+  def test_10_execute_finish
+    @dbh.execute("SELECT 1") do |res|
+      # noop
+    end
+    assert(@dbh.last_statement.finished?,
+           "#execute() block did not finish implicit sth")
+
+    res = @dbh.execute("SELECT 2")
+    assert(!@dbh.last_statement.finished?,
+           "#execute() unexpectedly finished implicit sth")
+    assert_nothing_raised do
+      res.finish
+      @dbh.disconnect
+    end
+
+    @dbh = RDBI.connect(:MockFaulty, :user => 'u', :pass => 'p')
+    assert_raises(FaultyDB::Error) do
+      @dbh.execute("ignored") do |not_reached|
+        assert(false, "A block not supposed to be reached was executed")
+      end
+    end
+    assert(@dbh.last_statement.finished?,
+           "Failed execute() &block did not finish statement")
+
+    assert_raises(FaultyDB::Error) do
+      res = @dbh.execute("ignored")
+      res.finish # Not reached
+    end
+    assert(@dbh.last_statement.finished?,
+           "Failed execute() did not finish statement")
   end
+
+  def test_11_execute_mod_finish
+    @dbh.execute_modification("DROP SCHEMA INFORMATION_SCHEMA")
+    assert(@dbh.last_statement.finished?,
+           "#execute_modification() did not finish implicit sth")
+
+    a = nil
+    @dbh.execute_modification("IGNORED!") do |*blah|
+      a = "Not nil - but this block is not executed"
+    end
+
+    assert(a.nil?, "#execute_modification() invoked a block unexpectedly")
+    assert(@dbh.last_statement.finished?,
+           "#execute_modification() &ignored_block did not finish implicit sth")
+
+    @dbh.disconnect
+
+    @dbh = RDBI.connect(:MockFaulty, :user => 'u', :pass => 'p')
+    assert_raises(FaultyDB::Error) do
+      count = @dbh.execute_modification("ignored")
+    end
+    assert(@dbh.last_statement.finished?,
+           "Failed execute_modification() did not finish statement")
+  end
+
 end
 
 # vim: syntax=ruby ts=2 et sw=2 sts=2

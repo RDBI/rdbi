@@ -169,44 +169,67 @@ class RDBI::Database
   end
 
   #
-  # Prepares and executes a statement. Takes a string query and an optional
+  # Prepares and executes a statement.  Takes a string query and an optional
   # number of variable type binds.
   #
   # ex:
   #   res = dbh.execute("select * from foo where item = ?", "an item")
   #   ary = res.to_a
   #
-  # You can also use a block form which will finish the statement and yield the
-  # result handle:
+  # If invoked with a block, the result handle will be yielded and the handle
+  # and statement will be finished at the end of the block.  Use this form
+  # when the result handle is not needed outside the block:
+  #
   #   dbh.execute("select * from foo where item = ?", "an item") do |res|
   #     res.as(:Struct).fetch(:all).each do |struct|
   #       p struct.item
   #     end
   #   end
   #
-  # Which will be considerably more performant under some database drivers.
+  # Block invocation may be considerably more efficient under some database
+  # drivers.
+  #
+  # For DDL and other statements which return no rows, see
+  # #execute_modification.
   #
   def execute(query, *binds)
     res = nil
 
     self.last_query = query
     self.last_statement = sth = new_statement(query)
-    res = sth.execute(*binds)
+    begin
+      res = sth.execute(*binds)
+    rescue Exception => e
+      sth.finish rescue nil
+      raise e
+    end
 
     return res unless block_given?
 
     begin
       yield res
     ensure
-      res.finish rescue nil
+      res.finish rescue nil # Will also finish() sth
     end
   end
 
+  #
+  # Prepare, execute and finish a statement, returning the number of rows
+  # affected (number of rows INSERTed, DELETEd, etc.).
+  #
+  # Effectively equivalent to
+  #
+  #   dbh.execute(sql_stmt) do |res|
+  #     res.affected_count
+  #   end
+  #
+  # but likely more efficient.  See also RDBI::Statement#execute_modification
+  #
   def execute_modification(query, *binds)
     self.last_statement = sth = new_statement(query)
-    rows = sth.execute_modification(*binds)
-    sth.finish
-    return rows
+    sth.execute_modification(*binds)
+  ensure
+    sth.finish rescue nil
   end
 
   #

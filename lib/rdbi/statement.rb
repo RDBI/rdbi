@@ -166,6 +166,10 @@ class RDBI::Statement
     self.last_result = RDBI::Result.new(self, binds, cursor, schema, type_map)
   end
 
+  #
+  # Execute the statement with the supplied binds.  Intended for DDL and
+  # other statements which return no rows (e.g., INSERT, DELETE).
+  #
   def execute_modification(*binds)
     binds = pre_execute(*binds)
 
@@ -209,8 +213,18 @@ class RDBI::Statement
     raise NoMethodError, "this method is not implemented in this driver"
   end
 
+  ##
+  #
+  # Executes the statement, returning the number of rows affected.
+  #
+  # Database drivers may override this method in their +Statement+
+  # subclasses for efficiency.  This method is called when
+  # #execute_modification() is called for an RDBI::Statement or
+  # RDBI::Database object.
+  #
   def new_modification(*binds)
-    raise NoMethodError, "this method is not implemented in this driver"
+    cursor = new_execution(*binds)[0]
+    cursor.affected_count
   end
 
   protected

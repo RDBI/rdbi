@@ -1,5 +1,4 @@
 require 'rubygems'
-gem 'rdbi-driver-mock'
 require 'test/unit'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))

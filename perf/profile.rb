@@ -3,9 +3,7 @@ require 'rubygems'
 require 'rdbi'
 require 'fileutils'
 ENV["driver"] ||= "SQLite3"
-gem "rdbi-driver-#{ENV["driver"].downcase}"
 require "rdbi/driver/#{ENV["driver"].downcase}"
-gem 'perftools.rb'
 require 'perftools'
 
 FileUtils.rm 'test.db' rescue nil

@@ -24,7 +24,7 @@ spec = Hoe.spec 'rdbi' do
 
   self.summary = 'RDBI is a database interface built out of small parts.'
   self.url = %w[http://github.com/rdbi/rdbi]
-  
+
   require_ruby_version ">= 1.8.7"
 
   extra_dev_deps << ['rdbi-driver-mock']
@@ -50,4 +50,17 @@ end
 task :install => [:gem] do
   sh "gem install pkg/#{spec.name}-#{spec.version}.gem"
 end
+
+namespace 'test' do
+  desc 'Run tests using local development versions of [certain] libraries if available'
+  task 'dev' do
+    if ENV['RUBYLIB'].nil?
+      ENV['RUBYLIB'] = ':../epoxy/lib:../typelib/lib:../rdbi-driver-mock/lib'
+    else
+      ENV['RUBYLIB'] += ':../epoxy/lib:../typelib/lib:../rdbi-driver-mock/lib'
+    end
+    Rake::Task['test'].execute
+  end
+end
+
 # vim: syntax=ruby

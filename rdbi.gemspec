@@ -17,11 +17,9 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
-    ".document",
     "LICENSE",
-    "README.rdoc",
+    "README.txt",
     "Rakefile",
-    "VERSION",
     "docs/external-api.pdf",
     "docs/external-api.texi",
     "lib/rdbi.rb",

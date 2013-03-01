@@ -82,6 +82,9 @@
 # which itself is provided by the epoxy gem) is unkempt, SQL injection attacks
 # may be possible.
 #
+
+require 'weakref'
+
 class RDBI::Statement
   # the RDBI::Database handle that created this statement.
   attr_reader :dbh
@@ -143,7 +146,6 @@ class RDBI::Statement
     @finish_block          = nil
 
     self.rewindable_result = dbh.rewindable_result
-    @dbh.open_statements[self.object_id] = self
   end
 
   def prep_finalizer(&block)
@@ -163,7 +165,9 @@ class RDBI::Statement
 
     cursor, schema, type_map = new_execution(*binds)
     cursor.rewindable_result = self.rewindable_result
-    self.last_result = RDBI::Result.new(self, binds, cursor, schema, type_map)
+    r = RDBI::Result.new(self, binds, cursor, schema, type_map)
+    self.last_result = ::WeakRef.new(r)
+    r
   end
 
   #

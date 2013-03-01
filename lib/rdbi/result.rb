@@ -87,6 +87,8 @@ class RDBI::Result
 
     configure_rewindable
     configure_driver(@driver)
+
+    RDBI::Util.upon_finalize!(self, "result/data", @data, :finish)
   end
 
   # The count of results (see RDBI::Result main documentation)
@@ -278,11 +280,10 @@ class RDBI::Result
   alias read fetch
 
   #
-  # This call finishes the result and the RDBI::Statement handle, scheduling
-  # any unpreserved data for garbage collection.
+  # This call finishes the result, scheduling any unpreserved data for
+  # garbage collection.
   #
   def finish
-    @sth.finish
     @data.finish
     @data   = nil
     @sth    = nil

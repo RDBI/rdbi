@@ -22,7 +22,7 @@ class RDBI::Database
 
   # the last statement handle allocated. affected by +prepare+ and +execute+.
   attr_accessor :last_statement
- 
+
   # the last query sent, as a string.
   attr_accessor :last_query
 
@@ -93,6 +93,7 @@ class RDBI::Database
   #
   def disconnect
     @connected = false
+    # FIXME - this is not serving a useful purpose nor public API
     self.open_statements.values.each { |x| x.finish if x }
     self.open_statements = { }
   end
@@ -154,10 +155,10 @@ class RDBI::Database
   #   end
   #
   def prepare(query)
-    sth = nil
+    sth = new_statement(query)
 
     self.last_query = query
-    self.last_statement = sth = new_statement(query)
+    self.open_statements[sth.object_id] = self.last_statement = ::WeakRef.new(sth)
 
     return sth unless block_given?
 
@@ -195,8 +196,7 @@ class RDBI::Database
   def execute(query, *binds)
     res = nil
 
-    self.last_query = query
-    self.last_statement = sth = new_statement(query)
+    sth = prepare(query)
     begin
       res = sth.execute(*binds)
     rescue Exception => e
@@ -204,12 +204,16 @@ class RDBI::Database
       raise e
     end
 
-    return res unless block_given?
+    unless block_given?
+      RDBI::Util.upon_finalize!(res, sth, :finish)
+      return res
+    end
 
     begin
       yield res
     ensure
-      res.finish rescue nil # Will also finish() sth
+      res.finish rescue nil
+      sth.finish rescue nil
     end
   end
 
@@ -226,7 +230,7 @@ class RDBI::Database
   # but likely more efficient.  See also RDBI::Statement#execute_modification
   #
   def execute_modification(query, *binds)
-    self.last_statement = sth = new_statement(query)
+    sth = prepare(query)
     sth.execute_modification(*binds)
   ensure
     sth.finish rescue nil

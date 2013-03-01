@@ -169,7 +169,19 @@ module RDBI::Util
     end
     return binds
   end
-end
+
+  def self.upon_finalize!(what, o, meth, *args)
+    ObjectSpace.define_finalizer(what, make_fini_proc(o, meth, *args))
+  end
+
+  def self.make_fini_proc(obj, meth, *args)
+    proc { |object_id|
+           #puts "(finalize #{tag} #{object_id})"
+           #puts "#{obj}.#{meth}(...)"
+           obj.__send__(meth.to_sym, *args) rescue nil }
+  end
+
+end # -- module RDBI::Util
 
 require 'rdbi/types'
 require 'rdbi/pool'

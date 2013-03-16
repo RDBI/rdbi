@@ -14,14 +14,12 @@ Gem::Specification.new do |s|
   s.email = %q{erik@hollensbe.org}
   s.extra_rdoc_files = [
     "LICENSE",
-    "README.rdoc"
+    "README.txt"
   ]
   s.files = [
-    ".document",
     "LICENSE",
-    "README.rdoc",
+    "README.txt",
     "Rakefile",
-    "VERSION",
     "docs/external-api.pdf",
     "docs/external-api.texi",
     "lib/rdbi.rb",

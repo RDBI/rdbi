@@ -88,7 +88,7 @@ class RDBI::Result
     configure_rewindable
     configure_driver(@driver)
 
-    RDBI::Util.upon_finalize!(self, "result/data", @data, :finish)
+    RDBI::Util.upon_finalize!(self, @data, :finish)
   end
 
   # The count of results (see RDBI::Result main documentation)

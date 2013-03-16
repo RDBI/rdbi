@@ -1,3 +1,13 @@
-=== Now / 2011-01-30
+=== 2013-03-16 / 1.1.0
+* Bump version
+* [deprecation] Statement#prep_finalizer considered harmful
+  Internal API:  driver authors, do not use.  RDBI::Util offers upon_finalize!
+  but this may not be needed as RDBI's own finalizations now will finish()
+  driver sth and result set data objects.
+* [bugfix] issue#33 (memory leak) addressed with new finalization and weakened
+  sth objects held by Result objects.
+* [bugfix] Result no longer finish()es Statement (issue#34)
+
+=== Prehistory / 2011-01-30
 
 * First use of Hoe.

@@ -2,7 +2,7 @@ require 'epoxy'
 
 module RDBI
 
-  VERSION = '1.0.0'
+  VERSION = '1.1.0'
 
   class << self
     #
@@ -175,10 +175,7 @@ module RDBI::Util
   end
 
   def self.make_fini_proc(obj, meth, *args)
-    proc { |object_id|
-           #puts "(finalize #{tag} #{object_id})"
-           #puts "#{obj}.#{meth}(...)"
-           obj.__send__(meth.to_sym, *args) rescue nil }
+    proc { |object_id| obj.__send__(meth.to_sym, *args) rescue nil }
   end
 
 end # -- module RDBI::Util

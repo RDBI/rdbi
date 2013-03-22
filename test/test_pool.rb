@@ -134,23 +134,21 @@ class TestPool < Test::Unit::TestCase
   end
 
   def test_08_enumerable
-    assert_equal(
-      [
-        :test_01,
-        :test_02,
-        :test_03,
-        :test_03_2,
-        :test_04,
-        :test_05,
-        :test_06,
-        :test_07,
-        :test_07_2,
-        :test_07_3
-      ], 
-      RDBI::Pool.keys.map(&:to_s).sort.map(&:to_sym)
-    )
+    pool_names = [
+                   :test_01,
+                   :test_02,
+                   :test_03,
+                   :test_03_2,
+                   :test_04,
+                   :test_05,
+                   :test_06,
+                   :test_07,
+                   :test_07_2,
+                   :test_07_3
+                 ]
+    assert( (pool_names - RDBI::Pool.keys).empty?,
+           "RDBI::Pool did not contain at least the expected pool names")
 
-    assert_equal(10, RDBI::Pool.values.count)
     assert_kind_of(RDBI::Pool, RDBI::Pool.values[0])
 
     count = 0
@@ -160,7 +158,6 @@ class TestPool < Test::Unit::TestCase
       assert_kind_of(RDBI::Pool, pool)
     end
 
-    assert_equal(10, count)
     assert_respond_to(RDBI::Pool, :map)
 
     pool = create_pool(:test_08)

@@ -28,7 +28,14 @@ module RDBI
   # connection will be automatically disconnected at the end of the block.
   def self.connect(klass, *args)
 
-    klass = RDBI::Util.class_from_class_or_symbol(klass, self::Driver)
+    klass = case klass
+            when ::Class
+              klass
+            when ::String, ::Symbol
+              Util.resolve_driver(klass)
+            else
+              raise ArgumentError.new("Invalid driver specification")
+            end
 
     driver = klass.new(*args)
     dbh = self.last_dbh = driver.new_handle
@@ -119,6 +126,28 @@ module RDBI::Util
     require lib
   rescue LoadError => e
     raise LoadError, "The '#{lib}' gem is required to use this driver. Please install it."
+  end
+
+  # Require and swallow errors.  Returns true if module loaded (for the first
+  # time), false if already loaded or unable to load
+  def self.naive_require(lib)
+    require lib
+  rescue LoadError
+    nil
+  end
+
+  # Given a short driver name (e.g., :FauxSQL), return the corresponding
+  # class, attempting to load the driver library if needed.
+  def self.resolve_driver(driver)
+    loop do
+      return ::RDBI::Driver.const_get(driver.to_sym) if ::RDBI::Driver.const_defined?(driver.to_sym)
+      # const_defined? will throw a NameError if driver is not a valid
+      # constant name
+      redo if naive_require("rdbi-driver-#{driver.to_s.downcase}")
+      redo if naive_require("rdbi/driver/#{driver.to_s.downcase}")
+      break
+    end
+    raise ArgumentError.new("Unable to qualify driver #{driver}")
   end
 
   #

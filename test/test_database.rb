@@ -153,12 +153,12 @@ class TestDatabase < Test::Unit::TestCase
     assert(sth)
     assert_kind_of(RDBI::Statement, sth)
 
-    assert_equal(@dbh.last_statement.object_id, sth.object_id)
+    assert_equal(@dbh.last_statement.query, sth.query)
 
     res = @dbh.execute("some other statement")
     assert(res)
     assert_kind_of(RDBI::Result, res)
-    assert_not_equal(@dbh.last_statement.object_id, sth.object_id)
+    assert_not_equal(@dbh.last_statement.query, sth.query)
     sth.finish
   end
 

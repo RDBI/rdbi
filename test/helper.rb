@@ -1,11 +1,12 @@
-require 'rubygems'
-gem 'rdbi-driver-mock'
 require 'test/unit'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
 require 'rdbi'
-require 'rdbi/driver/mock'
+require 'rdbi/driver/mock'  # Aaargh 1.0.0 vs .9.x
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'testlib'))
 
 # -- Fake an exceptional statement handle
 module FaultyDB

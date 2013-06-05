@@ -23,8 +23,8 @@ spec = Hoe.spec 'rdbi' do
   EOF
 
   self.summary = 'RDBI is a database interface built out of small parts.'
-  self.url = %w[http://github.com/rdbi/rdbi]
-  
+  self.urls = %w[http://github.com/rdbi/rdbi]
+
   require_ruby_version ">= 1.8.7"
 
   extra_dev_deps << ['rdbi-driver-mock']

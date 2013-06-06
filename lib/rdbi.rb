@@ -1,8 +1,6 @@
-require 'epoxy'
+require 'rdbi/version'
 
 module RDBI
-
-  VERSION = '1.1.0'
 
   class << self
     #

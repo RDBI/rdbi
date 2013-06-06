@@ -257,6 +257,8 @@ class RDBI::Database
   # quoter during bind processing.
   #
   def preprocess_query(query, *binds)
+    require 'epoxy'
+
     self.last_query = query
 
     ep = Epoxy.new(query)

@@ -1,6 +1,6 @@
 require 'helper'
 
-puts RDBI.constants
+#puts RDBI.constants
 
 class TestImplicitLoad < Test::Unit::TestCase
 

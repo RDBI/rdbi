@@ -127,12 +127,15 @@ class RDBI::Database
   # for you.
   #
   def transaction(&block)
-    @in_transaction += 1
+    transaction_depth = (@in_transaction += 1)
+
     begin
       yield self
-      self.commit if @in_transaction > 0
+      # Only commit if user didn't already explicitly end the transaction
+      self.commit if @in_transaction == transaction_depth
     rescue => e
-      self.rollback
+      # Only rollback if user didn't already explicitly end the transaction
+      self.rollback if @in_transaction == transaction_depth
       raise e
     ensure
       @in_transaction -= 1 unless @in_transaction == 0

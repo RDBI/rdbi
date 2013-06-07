@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency(%q<rdbi-driver-mock>, [">= 0"])
   s.add_development_dependency(%q<test-unit>, [">= 0"])
   s.add_development_dependency(%q<rdoc>, [">= 0"])
-  s.add_runtime_dependency(%q<methlab>, [">= 0.0.9"])
   s.add_runtime_dependency(%q<epoxy>, [">= 0.3.1"])
   s.add_runtime_dependency(%q<typelib>, [">= 0"])
 end
